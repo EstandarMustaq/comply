@@ -18,4 +18,6 @@ public interface CurrencyTransactionReportRepository extends JpaRepository<Curre
             LocalDate aggregationPeriodEnd,
             UUID thresholdRuleId
     );
+
+    List<CurrencyTransactionReport> findByAggregationPeriodStartBetween(LocalDate start, LocalDate end);
 }

@@ -6,10 +6,13 @@ import com.fincomp.reporting.entity.CurrencyTransactionReport;
 import com.fincomp.reporting.entity.SuspiciousActivityReport;
 import com.fincomp.reporting.repository.CurrencyTransactionReportRepository;
 import com.fincomp.reporting.repository.SuspiciousActivityReportRepository;
+import com.fincomp.reporting.service.RegulatoryExportService;
 import com.fincomp.users.entity.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.time.Year;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -26,15 +30,18 @@ public class ReportController {
     private final SuspiciousActivityReportRepository strRepository;
     private final CurrencyTransactionReportRepository ctrRepository;
     private final AuditService auditService;
+    private final RegulatoryExportService regulatoryExportService;
 
     public ReportController(
             SuspiciousActivityReportRepository strRepository,
             CurrencyTransactionReportRepository ctrRepository,
-            AuditService auditService
+            AuditService auditService,
+            RegulatoryExportService regulatoryExportService
     ) {
         this.strRepository = strRepository;
         this.ctrRepository = ctrRepository;
         this.auditService = auditService;
+        this.regulatoryExportService = regulatoryExportService;
     }
 
     @GetMapping("/str")
@@ -151,5 +158,38 @@ public class ReportController {
                 || str.getOcosName() == null || str.getOcosName().isBlank()) {
             throw new IllegalArgumentException("STR incompleto: preencha instituição, titular, descrição da suspeita, relação de negócio e OCOS");
         }
+    }
+
+    @GetMapping("/exports/str/{id}.pdf")
+        @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
+    public ResponseEntity<byte[]> exportStrPdf(@PathVariable UUID id, Authentication authentication) {
+            SuspiciousActivityReport report = strRepository.findById(id).orElse(null);
+            if (report == null) return ResponseEntity.notFound().build();
+            if (!report.isSubmitted()) {
+                return ResponseEntity.badRequest().build();
+            }
+            byte[] content = regulatoryExportService.exportStrPdf(report);
+            auditService.record((User) authentication.getPrincipal(), AuditAction.REGULATORY_EXPORT,
+                    "suspicious_activity_reports", id, "{\"format\":\"PDF\"}");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"str-" + id + ".pdf\"")
+                    .body(content);
+    }
+
+    @GetMapping("/exports/annual/{year}.xlsx")
+        @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
+    public ResponseEntity<byte[]> exportAnnual(@PathVariable int year, Authentication authentication) throws java.io.IOException {
+            if (year < 2000 || year > Year.now().getValue() + 1) {
+                return ResponseEntity.badRequest().build();
+            }
+            byte[] content = regulatoryExportService.exportAnnualExcel(year);
+            auditService.record((User) authentication.getPrincipal(), AuditAction.REGULATORY_EXPORT,
+                    "annual_regulatory_reports", null, "{\"format\":\"XLSX\",\"year\":" + year + "}");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"relatorio-bm-" + year + ".xlsx\"")
+                    .body(content);
     }
 }
