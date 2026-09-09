@@ -66,9 +66,19 @@ public class SuspiciousActivityReport {
     }
 
     public void markAsSubmitted(String gifimRegNumber) {
+        if (submittedAt != null) {
+            throw new IllegalStateException("Relatório STR já foi submetido e não pode ser alterado");
+        }
+        if (gifimRegNumber == null || gifimRegNumber.isBlank()) {
+            throw new IllegalArgumentException("O número de registo GIFiM é obrigatório");
+        }
         this.submittedAt = Instant.now();
-        this.gifimRegistrationNumber = gifimRegNumber;
+        this.gifimRegistrationNumber = gifimRegNumber.trim();
         this.retentionUntil = LocalDate.ofInstant(this.submittedAt, ZoneId.systemDefault()).plusYears(10);
+    }
+
+    public boolean isSubmitted() {
+        return submittedAt != null;
     }
 
     public UUID getId() {
