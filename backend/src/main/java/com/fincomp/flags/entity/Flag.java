@@ -39,7 +39,7 @@ public class Flag {
     private FlagStatus status = FlagStatus.PENDING;
 
     @Column(name = "sla_deadline")
-    private Instant slaDeadline; // 24 horas para sanções (Lei 15/2023, Art. 38-40)
+    private Instant slaDeadline;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();

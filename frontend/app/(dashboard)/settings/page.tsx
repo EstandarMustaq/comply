@@ -224,7 +224,7 @@ export default function SettingsPage() {
                 <div>
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
                     <History className="h-4 w-4 text-primary" />
-                    Trilha de Auditoria Forense e Imutável (Art. 89)
+                    Trilha de auditoria imutável
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Registo inviolável protegido por trigger a nível de base de dados PostgreSQL (rejeição estrita de UPDATE e DELETE)

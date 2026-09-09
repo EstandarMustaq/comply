@@ -27,7 +27,7 @@ public class BeneficialOwner {
     private BeneficialOwnerRole role;
 
     @Column(name = "ownership_percentage", precision = 5, scale = 2)
-    private BigDecimal ownershipPercentage; // ≥10% (Art. 51.1.e)
+    private BigDecimal ownershipPercentage;
 
     @Column(name = "verified_at")
     private LocalDate verifiedAt;

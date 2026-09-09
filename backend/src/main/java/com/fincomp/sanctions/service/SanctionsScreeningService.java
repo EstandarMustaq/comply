@@ -64,7 +64,7 @@ public class SanctionsScreeningService {
                 Instant deadline = Instant.now().plus(slaHours, ChronoUnit.HOURS);
                 String reason = String.format(
                         "Correspondência com Lista Restritiva (%s - Ref: %s): '%s'. " +
-                        "Obrigação legal de congelamento imediato de activos e comunicação ao GIFiM no prazo fatal de %d horas (Artigos 38 a 40 da Lei n.º 15/2023).",
+                        "Ação prioritária: congelar a relação e concluir a revisão em até %d horas.",
                         entry.getSourceList(), entry.getRawReference(), entry.getFullName(), slaHours
                 );
 

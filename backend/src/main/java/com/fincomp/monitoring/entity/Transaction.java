@@ -48,7 +48,7 @@ public class Transaction {
     private String counterpartyDetails;
 
     @Column(name = "retention_until", nullable = false)
-    private LocalDate retentionUntil; // 10 anos (Art. 88 Aviso 10/GBM/2024)
+    private LocalDate retentionUntil;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();

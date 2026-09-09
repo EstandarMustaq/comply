@@ -60,7 +60,7 @@ public class SuspiciousActivityReport {
     private Instant submittedAt;
 
     @Column(name = "retention_until")
-    private LocalDate retentionUntil; // 10 anos a contar da elaboração/submissão (Art. 89)
+    private LocalDate retentionUntil;
 
     public SuspiciousActivityReport() {
     }

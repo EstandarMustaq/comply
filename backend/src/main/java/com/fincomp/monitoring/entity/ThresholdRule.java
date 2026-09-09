@@ -1,5 +1,6 @@
 package com.fincomp.monitoring.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -83,6 +84,7 @@ public class ThresholdRule {
         this.aggregationWindowDays = aggregationWindowDays;
     }
 
+    @JsonIgnore
     public String getLegalBasis() {
         return legalBasis;
     }

@@ -1,0 +1,16 @@
+{
+  "name": "financial-compliance-intelligent-workspace",
+  "private": true,
+  "scripts": {
+    "install": "./scripts/workspace.sh install",
+    "dev": "./scripts/workspace.sh dev",
+    "build": "./scripts/workspace.sh build",
+    "test": "./scripts/workspace.sh test",
+    "typecheck": "./scripts/workspace.sh typecheck",
+    "lint": "./scripts/workspace.sh lint",
+    "quality": "./scripts/workspace.sh quality",
+    "compose:config": "./scripts/workspace.sh compose-config",
+    "migrate": "./scripts/workspace.sh migrate",
+    "deploy": "./scripts/workspace.sh deploy"
+  }
+}

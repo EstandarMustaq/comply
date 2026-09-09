@@ -78,7 +78,7 @@ public class DueDiligenceRegimeValidator {
             String reason = String.format(
                     "Cliente em Regime Simplificado excedeu o %s. " +
                     "Reclassificado automaticamente para Regime Normal; é obrigatória a recolha de diligência completa " +
-                    "(Artigos 137 e 141 do Aviso 10/GBM/2024).",
+                    "Complete o perfil de risco e a diligência do cliente.",
                     exceededLimit
             );
 

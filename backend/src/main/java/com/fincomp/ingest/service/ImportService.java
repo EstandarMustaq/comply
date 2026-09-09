@@ -257,7 +257,7 @@ public class ImportService {
                     );
                 }
 
-                // 2. Criação da transação com retenção legal de 10 anos (Artigo 88)
+                // 2. Criação da transação com retenção configurada
                 Transaction tx = new Transaction(client, amount, "MZN", txDate, txType);
                 tx.setImportBatch(batch);
                 if (accountStr != null) {
@@ -265,7 +265,7 @@ public class ImportService {
                 }
                 Transaction savedTx = transactionRepository.save(tx);
 
-                // 3. Execução síncrona dos motores regulatórios
+                // 3. Execução síncrona dos motores de análise
                 sanctionsScreeningService.screenClientAgainstSanctions(client, savedTx);
                 thresholdScreeningService.evaluateTransaction(savedTx);
                 structuringDetectionService.detectStructuring(savedTx);

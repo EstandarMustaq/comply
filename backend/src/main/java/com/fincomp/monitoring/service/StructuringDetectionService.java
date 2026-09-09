@@ -67,7 +67,7 @@ public class StructuringDetectionService {
             if (rule.getValueThreshold() != null && sum.compareTo(rule.getValueThreshold()) >= 0) {
                 String reason = String.format(
                         "Suspeita de fraccionamento de operações (structuring): identificadas %d operações no período de %d dias " +
-                        "com montante cumulativo de %.2f MT (limiar de detecção: %.2f MT). Base Legal: %s.",
+                        "com montante cumulativo de %.2f MT (limiar de detecção: %.2f MT). Regra: %s.",
                         windowTransactions.size(), windowDays, sum, rule.getValueThreshold(), rule.getLegalBasis()
                 );
 

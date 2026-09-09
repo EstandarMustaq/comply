@@ -55,7 +55,7 @@ public class ThresholdScreeningService {
             if (rule.getType() == ThresholdRuleType.SINGLE_TRANSACTION_VALUE) {
                 if (rule.getValueThreshold() != null && tx.getAmount().compareTo(rule.getValueThreshold()) >= 0) {
                     String reason = String.format(
-                            "Operação relevante em numerário que atinge ou ultrapassa o limiar legal de %.2f MT (valor: %.2f MT). Base Legal: %s.",
+                            "Operação em numerário que atinge ou ultrapassa o limiar configurado de %.2f MT (valor: %.2f MT). Regra: %s.",
                             rule.getValueThreshold(), tx.getAmount(), rule.getLegalBasis()
                     );
                     if (!flagRepository.existsByTransactionIdAndType(tx.getId(), FlagType.THRESHOLD_VALUE)) {
@@ -82,7 +82,7 @@ public class ThresholdScreeningService {
                         tx.getClient().getId(), startDate, endDate, CASH_TRANSACTION_TYPES);
                 if (rule.getValueThreshold() != null && aggregate.compareTo(rule.getValueThreshold()) >= 0) {
                     String reason = String.format(
-                            "Valor agregado de transacções do mesmo cliente na janela de %d dias ultrapassa o limiar legal de %.2f MT (total acumulado: %.2f MT). Base Legal: %s.",
+                            "Valor agregado de transações do mesmo cliente na janela de %d dias ultrapassa o limiar configurado de %.2f MT (total acumulado: %.2f MT). Regra: %s.",
                             windowDays, rule.getValueThreshold(), aggregate, rule.getLegalBasis()
                     );
                     if (!flagRepository.existsByTransactionIdAndType(tx.getId(), FlagType.THRESHOLD_VALUE)) {

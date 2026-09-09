@@ -81,7 +81,7 @@ public class ReportController {
         if (str == null) return ResponseEntity.notFound().build();
 
         if (str.getSubmittedAt() != null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Relatório já submetido ao GIFiM não pode ser editado"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Relatório já submetido não pode ser editado"));
         }
 
         if (request.accountNumber() != null) str.setAccountNumber(request.accountNumber());

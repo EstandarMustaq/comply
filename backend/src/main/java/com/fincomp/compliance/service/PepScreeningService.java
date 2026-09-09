@@ -48,7 +48,7 @@ public class PepScreeningService {
             if (!hasPendingFlag) {
                 String reason = String.format(
                         "Revisão periódica de PEP vencida há mais de 12 meses (última revisão: %s). " +
-                        "Obrigatória reavaliação contínua da relação de negócio nos termos dos Artigos 65 e 66 do Aviso 10/GBM/2024.",
+                        "Atualize a revisão e a avaliação da relação.",
                         client.getPepLastReviewedAt() != null ? client.getPepLastReviewedAt().toString() : "Nunca realizada"
                 );
 

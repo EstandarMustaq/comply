@@ -38,12 +38,15 @@ fix/p0-backup-secrets
 fix/p0-api-contract
 fix/p1-compliance-regime-pep
 fix/p1-monitoring-idempotency
-fix/p1-reporting-state
+fix/p1-import-validation
 feat/p1-kyc-beneficial-owners
+fix/p1-reporting-state
+feat/p1-regulatory-exports
 refactor/p2-import-pipeline
 ci/p2-quality-gates
 ops/p2-observability-finops
 feat/p2-multitenancy-controls
+ops/p2-sanctions-data-lifecycle
 ```
 
 ### Convenção de commits
@@ -168,8 +171,18 @@ Uma release somente pode ser promovida quando:
 - [x] Criar histórico inicial do projeto.
 - [x] Excluir arquivos locais de ambiente do versionamento.
 - [x] Registrar o roadmap baseado em `review.md`.
-- [ ] Implementar e mesclar o bloco P0.
-- [ ] Implementar e mesclar o bloco P1.
-- [ ] Implementar e mesclar o bloco P2.
+- [x] Implementar e mesclar o bloco P0.
+- [x] Implementar e mesclar o bloco P1.
+- [x] Implementar e mesclar o bloco P2.
 - [ ] Executar homologação regulatória final.
 - [ ] Autorizar produção.
+
+Próxima fase — Documentação de produto e modularização:
+
+- [ ] Documentar todos os endpoints, contratos, comportamento e arquitetura em `docs/`.
+- [ ] Consolidar `README.md`, `ROADMAP.md` e a linguagem Financial Compliance Intelligent.
+- [ ] Aplicar o bloqueio de referências legais em UI, backend e respostas de produto.
+- [ ] Unificar comandos de workspace na raiz.
+- [ ] Migrar `backend/` e `frontend/` para submódulos Git após obter URLs reais e preservar o histórico.
+
+Observação: os blocos de implementação P0, P1 e P2 foram executados em branches específicas, validados e mesclados em `main`, preservando os branches de trabalho. O estado atual da entrega é "funcional para evolução operacional/cumprimento, mas ainda pendente de homologação regulatória final e autorização de produção".

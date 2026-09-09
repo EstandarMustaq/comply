@@ -32,7 +32,7 @@ public class Client {
     private ClientType clientType = ClientType.INDIVIDUAL;
 
     @Column(name = "nuib")
-    private String nuib; // Número Único de Identificação Bancária (Art. 138)
+    private String nuib;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "risk_rating", nullable = false)

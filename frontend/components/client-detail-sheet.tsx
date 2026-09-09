@@ -106,7 +106,7 @@ export function ClientDetailSheet({
             <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg space-y-1 text-amber-900">
               <div className="flex items-center gap-1.5 font-bold">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
-                Pessoa Exposta Politicamente (PEP) - Art. 65 e 66
+                Pessoa Exposta Politicamente (PEP)
               </div>
               <p className="text-[11px] text-amber-800">
                 Categoria: <strong>{client.pepCategory || "Nacional / Funções Públicas Relevantes"}</strong>
