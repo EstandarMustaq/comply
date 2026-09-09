@@ -40,6 +40,16 @@ spring:
       timeout: 2000ms
 
 fincomp:
+  bootstrap:
+    enabled: ${FINCOMP_BOOTSTRAP_ENABLED:false}
+    admin:
+      full-name: ${FINCOMP_BOOTSTRAP_ADMIN_FULL_NAME:}
+      email: ${FINCOMP_BOOTSTRAP_ADMIN_EMAIL:}
+      password: ${FINCOMP_BOOTSTRAP_ADMIN_PASSWORD:}
+    ocos:
+      full-name: ${FINCOMP_BOOTSTRAP_OCOS_FULL_NAME:}
+      email: ${FINCOMP_BOOTSTRAP_OCOS_EMAIL:}
+      password: ${FINCOMP_BOOTSTRAP_OCOS_PASSWORD:}
   security:
     jwt:
       secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
