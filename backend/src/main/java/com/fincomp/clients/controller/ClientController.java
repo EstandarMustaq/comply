@@ -8,6 +8,8 @@ import com.fincomp.clients.entity.DueDiligenceRegime;
 import com.fincomp.clients.entity.RiskRating;
 import com.fincomp.clients.repository.ClientRepository;
 import com.fincomp.users.entity.User;
+import com.fincomp.tenancy.entity.Organization;
+import com.fincomp.tenancy.service.TenantAccessService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,10 +31,12 @@ public class ClientController {
 
     private final ClientRepository clientRepository;
     private final AuditService auditService;
+    private final TenantAccessService tenantAccessService;
 
-    public ClientController(ClientRepository clientRepository, AuditService auditService) {
+    public ClientController(ClientRepository clientRepository, AuditService auditService, TenantAccessService tenantAccessService) {
         this.clientRepository = clientRepository;
         this.auditService = auditService;
+        this.tenantAccessService = tenantAccessService;
     }
 
     @GetMapping
@@ -41,9 +45,12 @@ public class ClientController {
             @RequestParam(required = false) RiskRating risk,
             @RequestParam(required = false) Boolean pep,
             @RequestParam(required = false) String search,
-            Pageable pageable
+            Pageable pageable,
+            Authentication authentication
     ) {
+        Organization organization = tenantAccessService.requireOrganization((User) authentication.getPrincipal());
         Specification<Client> spec = Specification.where(null);
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("organization"), organization));
 
         if (regime != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("dueDiligenceRegime"), regime));
@@ -68,8 +75,9 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClient(@PathVariable UUID id) {
-        return clientRepository.findById(id)
+    public ResponseEntity<Client> getClient(@PathVariable UUID id, Authentication authentication) {
+        Organization organization = tenantAccessService.requireOrganization((User) authentication.getPrincipal());
+        return clientRepository.findByIdAndOrganization(id, organization)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -83,7 +91,8 @@ public class ClientController {
             @Valid @RequestBody UpdateRiskRatingRequest request,
             Authentication authentication
     ) {
-        Client client = clientRepository.findById(id).orElse(null);
+        User actor = (User) authentication.getPrincipal();
+        Client client = clientRepository.findByIdAndOrganization(id, tenantAccessService.requireOrganization(actor)).orElse(null);
         if (client == null) {
             return ResponseEntity.notFound().build();
         }
@@ -92,7 +101,6 @@ public class ClientController {
         client.setRiskRatingUpdatedAt(LocalDate.now());
         clientRepository.save(client);
 
-        User actor = (User) authentication.getPrincipal();
         auditService.record(actor, AuditAction.CLIENT_UPDATED, "clients", client.getId(),
                 "{\"field\": \"riskRating\", \"newValue\": \"" + request.riskRating() + "\"}");
 
@@ -102,7 +110,8 @@ public class ClientController {
     @PatchMapping("/{id}/pep-review")
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> registerPepReview(@PathVariable UUID id, Authentication authentication) {
-        Client client = clientRepository.findById(id).orElse(null);
+        User actor = (User) authentication.getPrincipal();
+        Client client = clientRepository.findByIdAndOrganization(id, tenantAccessService.requireOrganization(actor)).orElse(null);
         if (client == null) {
             return ResponseEntity.notFound().build();
         }
@@ -110,7 +119,6 @@ public class ClientController {
         client.setPepLastReviewedAt(LocalDate.now());
         clientRepository.save(client);
 
-        User actor = (User) authentication.getPrincipal();
         auditService.record(actor, AuditAction.PEP_REVIEWED, "clients", client.getId(),
                 "{\"pepLastReviewedAt\": \"" + LocalDate.now() + "\"}");
 
@@ -136,6 +144,7 @@ public class ClientController {
             Authentication authentication
     ) {
         Client client = new Client(request.fullName(), request.idDocumentType(), request.idDocumentNumber());
+        client.setOrganization(tenantAccessService.requireOrganization((User) authentication.getPrincipal()));
         if (request.clientType() != null) {
             client.setClientType(request.clientType());
         }

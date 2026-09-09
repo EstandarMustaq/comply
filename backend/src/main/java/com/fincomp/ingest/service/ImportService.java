@@ -17,6 +17,7 @@ import com.fincomp.monitoring.service.StructuringDetectionService;
 import com.fincomp.monitoring.service.ThresholdScreeningService;
 import com.fincomp.sanctions.service.SanctionsScreeningService;
 import com.fincomp.users.entity.User;
+import com.fincomp.tenancy.service.TenantAccessService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -55,6 +56,7 @@ public class ImportService {
     private final InsightsService insightsService;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
+    private final TenantAccessService tenantAccessService;
 
     private final Map<UUID, Object> batchLocks = new ConcurrentHashMap<>();
 
@@ -77,7 +79,8 @@ public class ImportService {
             DueDiligenceRegimeValidator dueDiligenceRegimeValidator,
             InsightsService insightsService,
             AuditService auditService,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            TenantAccessService tenantAccessService
     ) {
         this.importBatchRepository = importBatchRepository;
         this.clientRepository = clientRepository;
@@ -92,6 +95,28 @@ public class ImportService {
         this.insightsService = insightsService;
         this.auditService = auditService;
         this.objectMapper = objectMapper;
+        this.tenantAccessService = tenantAccessService;
+    }
+
+    public ImportService(
+            ImportBatchRepository importBatchRepository,
+            ClientRepository clientRepository,
+            TransactionRepository transactionRepository,
+            CsvParser csvParser,
+            XlsxParser xlsxParser,
+            ColumnMappingService columnMappingService,
+            SanctionsScreeningService sanctionsScreeningService,
+            ThresholdScreeningService thresholdScreeningService,
+            StructuringDetectionService structuringDetectionService,
+            DueDiligenceRegimeValidator dueDiligenceRegimeValidator,
+            InsightsService insightsService,
+            AuditService auditService,
+            ObjectMapper objectMapper
+    ) {
+        this(importBatchRepository, clientRepository, transactionRepository, csvParser, xlsxParser,
+                columnMappingService, sanctionsScreeningService, thresholdScreeningService,
+                structuringDetectionService, dueDiligenceRegimeValidator, insightsService,
+                auditService, objectMapper, new TenantAccessService());
     }
 
     public record UploadPreviewResponse(
@@ -122,6 +147,7 @@ public class ImportService {
         }
 
         ImportBatch batch = new ImportBatch(originalFilename, format, user);
+        batch.setOrganization(tenantAccessService.requireOrganization(user));
         batch.setTotalRows(rows.size());
         ImportBatch savedBatch = importBatchRepository.save(batch);
 
@@ -154,6 +180,10 @@ public class ImportService {
 
         if (batch.getImportedBy() != null && user != null && !batch.getImportedBy().getId().equals(user.getId())) {
             throw new SecurityException("O lote de importação pertence a outro utilizador");
+        }
+        if (user != null && (batch.getOrganization() == null
+                || !batch.getOrganization().getId().equals(tenantAccessService.organizationId(user)))) {
+            throw new SecurityException("O lote de importação pertence a outra organização");
         }
         if (batch.getSourceFilePath() == null || batch.getSourceFilePath().isBlank()) {
             throw new IllegalStateException("Arquivo do lote não encontrado ou já processado");
@@ -210,9 +240,11 @@ public class ImportService {
                 TransactionType txType = parseTransactionType(typeStr);
 
                 // 1. Obtém ou cadastra cliente
-                Client client = clientRepository.findByIdDocumentNumber(docNumber).orElseGet(() -> {
+                Client client = clientRepository.findByOrganizationAndIdDocumentNumber(
+                        tenantAccessService.requireOrganization(user), docNumber).orElseGet(() -> {
                     String docType = docNumber.length() == 9 ? "NUIT" : "BI";
                     Client newClient = new Client(clientName, docType, docNumber);
+                    newClient.setOrganization(tenantAccessService.requireOrganization(user));
                     if (accountStr != null && !accountStr.isBlank()) {
                         newClient.setNuib(accountStr);
                     }

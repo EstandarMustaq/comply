@@ -5,6 +5,7 @@ import com.fincomp.audit.service.AuditService;
 import com.fincomp.users.entity.Role;
 import com.fincomp.users.entity.User;
 import com.fincomp.users.repository.UserRepository;
+import com.fincomp.tenancy.service.TenantAccessService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,16 +29,23 @@ public class UserManagementController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
+    private final TenantAccessService tenantAccessService;
 
-    public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuditService auditService) {
+    public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuditService auditService,
+                                    TenantAccessService tenantAccessService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditService = auditService;
+        this.tenantAccessService = tenantAccessService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> listUsers() {
-        List<Map<String, Object>> users = userRepository.findAll().stream().map(u -> Map.<String, Object>of(
+    public ResponseEntity<List<Map<String, Object>>> listUsers(Authentication authentication) {
+        User actor = (User) authentication.getPrincipal();
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        List<Map<String, Object>> users = userRepository.findAll().stream()
+                .filter(u -> u.getOrganization() != null && organizationId.equals(u.getOrganization().getId()))
+                .map(u -> Map.<String, Object>of(
                 "id", u.getId(),
                 "fullName", u.getFullName(),
                 "email", u.getEmail(),
@@ -69,6 +77,7 @@ public class UserManagementController {
                 passwordEncoder.encode(request.password()),
                 request.role()
         );
+        newUser.setOrganization(tenantAccessService.requireOrganization((User) authentication.getPrincipal()));
 
         User saved = userRepository.save(newUser);
 
@@ -87,7 +96,9 @@ public class UserManagementController {
 
     @PatchMapping("/{id}/reset-mfa")
     public ResponseEntity<?> resetMfa(@PathVariable UUID id, Authentication authentication) {
-        User user = userRepository.findById(id).orElse(null);
+        User actor = (User) authentication.getPrincipal();
+        User user = userRepository.findById(id).filter(u -> u.getOrganization() != null
+                && u.getOrganization().getId().equals(tenantAccessService.organizationId(actor))).orElse(null);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -97,7 +108,6 @@ public class UserManagementController {
         user.setMfaBackupCodesHash(null);
         userRepository.save(user);
 
-        User actor = (User) authentication.getPrincipal();
         auditService.record(actor, AuditAction.USER_UPDATED, "users", user.getId(), "{\"action\": \"RESET_MFA\"}");
 
         return ResponseEntity.ok(Map.of("message", "MFA redefinido com sucesso para " + user.getEmail()));

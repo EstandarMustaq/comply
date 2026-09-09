@@ -3,6 +3,8 @@ package com.fincomp.config;
 import com.fincomp.users.entity.Role;
 import com.fincomp.users.entity.User;
 import com.fincomp.users.repository.UserRepository;
+import com.fincomp.tenancy.entity.Organization;
+import com.fincomp.tenancy.repository.OrganizationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -19,15 +21,26 @@ public class BootstrapUserInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final BootstrapProperties properties;
+    private final OrganizationRepository organizationRepository;
+
+    public BootstrapUserInitializer(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            BootstrapProperties properties,
+            OrganizationRepository organizationRepository
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.properties = properties;
+        this.organizationRepository = organizationRepository;
+    }
 
     public BootstrapUserInitializer(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             BootstrapProperties properties
     ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.properties = properties;
+        this(userRepository, passwordEncoder, properties, null);
     }
 
     @Override
@@ -61,6 +74,10 @@ public class BootstrapUserInitializer implements CommandLineRunner {
                 passwordEncoder.encode(configuredUser.getPassword()),
                 role
         );
+        if (organizationRepository != null) {
+            user.setOrganization(organizationRepository.findBySlug("default")
+                    .orElseThrow(() -> new IllegalStateException("Organização default não encontrada")));
+        }
         userRepository.save(user);
         log.info("Utilizador inicial para o perfil {} criado com o email configurado.", role);
     }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 import java.util.UUID;
+import com.fincomp.tenancy.entity.Organization;
 
 @Entity
 @Table(name = "import_batches")
@@ -38,6 +39,10 @@ public class ImportBatch {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imported_by")
     private User importedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @Column(name = "imported_at", nullable = false, updatable = false)
     private Instant importedAt = Instant.now();
@@ -123,4 +128,7 @@ public class ImportBatch {
     public void setImportedAt(Instant importedAt) {
         this.importedAt = importedAt;
     }
+
+    public Organization getOrganization() { return organization; }
+    public void setOrganization(Organization organization) { this.organization = organization; }
 }
