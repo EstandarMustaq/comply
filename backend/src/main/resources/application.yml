@@ -69,6 +69,9 @@ fincomp:
       max-review-interval-days: 365
     retention:
       standard-years: 10
+  imports:
+    storage-path: ${FINCOMP_IMPORT_STORAGE_PATH:${java.io.tmpdir}/fincomp-imports}
+    pending-ttl-hours: ${FINCOMP_IMPORT_PENDING_TTL_HOURS:24}
 
 logging:
   level:

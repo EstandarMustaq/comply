@@ -18,8 +18,12 @@ import com.fincomp.monitoring.service.ThresholdScreeningService;
 import com.fincomp.sanctions.service.SanctionsScreeningService;
 import com.fincomp.users.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -27,10 +31,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ImportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ImportService.class);
 
     private final ImportBatchRepository importBatchRepository;
     private final ClientRepository clientRepository;
@@ -46,8 +56,13 @@ public class ImportService {
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
 
-    // Cache temporário em memória para arquivos em fase de mapeamento antes da confirmação
-    private final Map<UUID, byte[]> pendingFiles = new ConcurrentHashMap<>();
+    private final Map<UUID, Object> batchLocks = new ConcurrentHashMap<>();
+
+    @Value("${fincomp.imports.storage-path:${java.io.tmpdir}/fincomp-imports}")
+    private String storagePath;
+
+    @Value("${fincomp.imports.pending-ttl-hours:24}")
+    private long pendingTtlHours;
 
     public ImportService(
             ImportBatchRepository importBatchRepository,
@@ -110,7 +125,10 @@ public class ImportService {
         batch.setTotalRows(rows.size());
         ImportBatch savedBatch = importBatchRepository.save(batch);
 
-        pendingFiles.put(savedBatch.getId(), bytes);
+        Path storedFile = storageDirectory().resolve(savedBatch.getId() + fileExtension(format));
+        Files.write(storedFile, bytes);
+        savedBatch.setSourceFilePath(storedFile.toString());
+        importBatchRepository.save(savedBatch);
 
         Map<String, String> suggestedMapping = columnMappingService.suggestMapping(headers);
         List<List<String>> preview = rows.subList(0, Math.min(rows.size(), 5));
@@ -120,13 +138,31 @@ public class ImportService {
 
     @Transactional
     public Map<String, Object> confirmAndProcess(UUID batchId, Map<String, String> columnMapping, User user) throws Exception {
+        Object lock = batchLocks.computeIfAbsent(batchId, ignored -> new Object());
+        synchronized (lock) {
+            try {
+                return confirmAndProcessLocked(batchId, columnMapping, user);
+            } finally {
+                batchLocks.remove(batchId, lock);
+            }
+        }
+    }
+
+    private Map<String, Object> confirmAndProcessLocked(UUID batchId, Map<String, String> columnMapping, User user) throws Exception {
         ImportBatch batch = importBatchRepository.findById(batchId)
                 .orElseThrow(() -> new IllegalArgumentException("Lote de importação não encontrado: " + batchId));
 
-        byte[] bytes = pendingFiles.get(batchId);
-        if (bytes == null) {
+        if (batch.getImportedBy() != null && user != null && !batch.getImportedBy().getId().equals(user.getId())) {
+            throw new SecurityException("O lote de importação pertence a outro utilizador");
+        }
+        if (batch.getSourceFilePath() == null || batch.getSourceFilePath().isBlank()) {
             throw new IllegalStateException("Arquivo do lote não encontrado ou já processado");
         }
+        Path storedFile = Path.of(batch.getSourceFilePath()).normalize();
+        if (!storedFile.startsWith(storageDirectory())) {
+            throw new IllegalStateException("Localização do arquivo de importação inválida");
+        }
+        byte[] bytes = Files.readAllBytes(storedFile);
 
         List<String> headers;
         List<List<String>> rows;
@@ -214,7 +250,9 @@ public class ImportService {
         batch.setErrorRows(errorCount);
         importBatchRepository.save(batch);
 
-        pendingFiles.remove(batchId);
+        Files.deleteIfExists(storedFile);
+        batch.setSourceFilePath(null);
+        importBatchRepository.save(batch);
         insightsService.evictInsightsCache();
 
         auditService.record(user, AuditAction.UPLOAD, "import_batches", batch.getId(),
@@ -227,6 +265,41 @@ public class ImportService {
                 "errorsCount", errorCount,
                 "errors", errorDetails
         );
+    }
+
+    @Scheduled(fixedDelayString = "${fincomp.imports.cleanup-delay-ms:3600000}")
+    @Transactional
+    public void cleanupExpiredImportFiles() {
+        Instant cutoff = Instant.now().minus(Duration.ofHours(Math.max(1, pendingTtlHours)));
+        for (ImportBatch batch : importBatchRepository.findByImportedAtBefore(cutoff)) {
+            if (batch.getSourceFilePath() == null || batch.getSourceFilePath().isBlank()) {
+                continue;
+            }
+            try {
+                Path path = Path.of(batch.getSourceFilePath()).normalize();
+                if (path.startsWith(storageDirectory())) {
+                    Files.deleteIfExists(path);
+                    batch.setSourceFilePath(null);
+                    importBatchRepository.save(batch);
+                }
+            } catch (IOException exception) {
+                log.warn("Não foi possível limpar arquivo de importação expirado {}", batch.getSourceFilePath(), exception);
+            }
+        }
+    }
+
+    private Path storageDirectory() {
+        try {
+            Path directory = Path.of(storagePath).toAbsolutePath().normalize();
+            Files.createDirectories(directory);
+            return directory;
+        } catch (IOException exception) {
+            throw new IllegalStateException("Não foi possível preparar o armazenamento de importações", exception);
+        }
+    }
+
+    private String fileExtension(ImportFormat format) {
+        return format == ImportFormat.XLSX ? ".xlsx" : ".csv";
     }
 
     private int getIndex(List<String> headers, String targetHeader) {

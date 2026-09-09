@@ -32,6 +32,9 @@ public class ImportBatch {
     @Column(name = "error_rows", nullable = false)
     private int errorRows = 0;
 
+    @Column(name = "source_file_path")
+    private String sourceFilePath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imported_by")
     private User importedBy;
@@ -95,6 +98,14 @@ public class ImportBatch {
 
     public void setErrorRows(int errorRows) {
         this.errorRows = errorRows;
+    }
+
+    public String getSourceFilePath() {
+        return sourceFilePath;
+    }
+
+    public void setSourceFilePath(String sourceFilePath) {
+        this.sourceFilePath = sourceFilePath;
     }
 
     public User getImportedBy() {
