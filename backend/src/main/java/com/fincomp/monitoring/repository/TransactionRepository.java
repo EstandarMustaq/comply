@@ -50,4 +50,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     );
 
     long countByRetentionUntilBefore(LocalDate date);
+
+    long countByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.transactionDate BETWEEN :startDate AND :endDate")
+    BigDecimal sumAmountByTransactionDateBetween(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

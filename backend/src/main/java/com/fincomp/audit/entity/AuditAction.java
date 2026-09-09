@@ -13,5 +13,6 @@ public enum AuditAction {
     PEP_REVIEWED,
     SETTINGS_UPDATED,
     USER_CREATED,
-    USER_UPDATED
+    USER_UPDATED,
+    REGULATORY_EXPORT
 }
