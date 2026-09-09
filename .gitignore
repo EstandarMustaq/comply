@@ -2,24 +2,24 @@
 .env
 .env.local
 .env.*.local
-frontend/.env.local
+app/application/.env.local
 *.pem
 *.key
 
 # Backend
-backend/target/
-backend/.mvn/timing.properties
-backend/.flattened-pom.xml
+package/compliance-engine/target/
+package/compliance-engine/.mvn/timing.properties
+package/compliance-engine/.flattened-pom.xml
 
 # Frontend
-frontend/node_modules/
-frontend/.pnp
-frontend/.pnp.js
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/*.tsbuildinfo
-frontend/next-env.d.ts
+app/application/node_modules/
+app/application/.pnp
+app/application/.pnp.js
+app/application/.next/
+app/application/out/
+app/application/build/
+app/application/*.tsbuildinfo
+app/application/next-env.d.ts
 
 # Logs & temp files
 *.log

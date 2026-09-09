@@ -13,9 +13,9 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      app:
+      compliance-engine:
         condition: service_healthy
-      frontend:
+      application:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
@@ -36,14 +36,14 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  frontend:
+  application:
     build:
-      context: ./frontend
+      context: ./app/application
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-FinComp}
-    container_name: fincomp-frontend
+    container_name: fincomp-application
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -51,7 +51,7 @@ services:
     expose:
       - "3000"
     depends_on:
-      app:
+      compliance-engine:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
@@ -62,7 +62,7 @@ services:
     mem_limit: "${FRONTEND_MEMORY_LIMIT:-512m}"
     labels:
       com.fincomp.environment: production
-      com.fincomp.service: frontend
+      com.fincomp.service: application
       com.fincomp.cost-center: product
     networks:
       - fincomp-net
@@ -72,11 +72,11 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  app:
+  compliance-engine:
     build:
-      context: ./backend
+      context: ./package/compliance-engine
       dockerfile: Dockerfile
-    container_name: fincomp-app
+    container_name: fincomp-compliance-engine
     restart: unless-stopped
     expose:
       - "8080"
@@ -113,7 +113,7 @@ services:
     mem_limit: "${BACKEND_MEMORY_LIMIT:-1024m}"
     labels:
       com.fincomp.environment: production
-      com.fincomp.service: backend
+      com.fincomp.service: compliance-engine
       com.fincomp.cost-center: product
     volumes:
       - fincomp_imports:/var/lib/fincomp/imports

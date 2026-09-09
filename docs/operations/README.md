@@ -2,7 +2,7 @@
 
 ## Workspace commands
 
-Use `./scripts/workspace.sh help` to list the unified commands. The root command delegates to the current `backend/` and `frontend/` directories and is ready to switch to `package/compliance-engine` and `app/application` after submodule migration.
+Use `./scripts/workspace.sh help` to list the unified commands. The root command delegates to the current `package/compliance-engine/` and `app/application/` directories and is ready to switch to `package/compliance-engine` and `app/application` after submodule migration.
 
 ## Validation
 

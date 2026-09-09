@@ -42,8 +42,8 @@ echo -e "${BOLD}Starting FinComp Full Stack Build Pipeline${NC}"
 echo -e "${BOLD}${CYAN}==================================================================${NC}"
 
 # 1. Build Backend
-echo -e "\n${BOLD}${YELLOW}[1/2] Building Backend (Spring Boot 3 + Maven)...${NC}"
-cd "${ROOT_DIR}/backend"
+echo -e "\n${BOLD}${YELLOW}[1/2] Building Compliance Engine (Spring Boot 3 + Maven)...${NC}"
+cd "${ROOT_DIR}/package/compliance-engine"
 
 if [ "$SKIP_TESTS" = true ]; then
     echo -e "${CYAN}Running: mvn clean package -DskipTests${NC}"
@@ -56,7 +56,7 @@ fi
 BACKEND_JAR=$(find target -name "fincomp-backend-*.jar" ! -name "*sources*" ! -name "*javadoc*" 2>/dev/null | head -n 1)
 
 if [[ -z "${BACKEND_JAR}" || ! -f "${BACKEND_JAR}" ]]; then
-    echo -e "${RED}Error: Backend JAR not found in backend/target! Build failed.${NC}" >&2
+    echo -e "${RED}Error: Compliance Engine JAR not found in package/compliance-engine/target! Build failed.${NC}" >&2
     exit 1
 fi
 
@@ -64,12 +64,12 @@ JAR_SIZE=$(ls -lh "${BACKEND_JAR}" | awk '{print $5}')
 echo -e "${GREEN}[✓] Backend build succeeded: ${BACKEND_JAR} (${JAR_SIZE})${NC}"
 
 # 2. Build Frontend
-echo -e "\n${BOLD}${YELLOW}[2/2] Building Frontend (Next.js 16 + Turbopack)...${NC}"
-cd "${ROOT_DIR}/frontend"
+echo -e "\n${BOLD}${YELLOW}[2/2] Building Application (Next.js 16 + Turbopack)...${NC}"
+cd "${ROOT_DIR}/app/application"
 
 # Ensure .env.local exists for build-time validation
 if [[ ! -f ".env.local" ]]; then
-    echo -e "${YELLOW}Notice: .env.local not found in frontend. Copying from .env.example...${NC}"
+    echo -e "${YELLOW}Notice: .env.local not found in app/application. Copying from .env.example...${NC}"
     cp ".env.example" ".env.local"
 fi
 
@@ -91,5 +91,5 @@ echo -e "${BOLD}${GREEN}========================================================
 echo -e "${BOLD}FinComp Full Stack Build Completed Successfully in ${DURATION}s!${NC}"
 echo -e "${BOLD}${GREEN}==================================================================${NC}"
 echo -e "  ${BOLD}Backend Artifact:${NC}  ${BACKEND_JAR} (${JAR_SIZE})"
-echo -e "  ${BOLD}Frontend Artifact:${NC} frontend/.next (Production Turbopack bundle)"
+echo -e "  ${BOLD}Application Artifact:${NC} app/application/.next (Production Turbopack bundle)"
 echo ""

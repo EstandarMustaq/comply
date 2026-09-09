@@ -5,9 +5,9 @@
 {$DOMAIN:localhost} {
     encode gzip zstd
 
-    # API endpoints routed to Spring Boot backend
+    # API endpoints routed to compliance engine
     handle /api/* {
-        reverse_proxy app:8080 {
+        reverse_proxy compliance-engine:8080 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up X-Forwarded-For {remote_host}
@@ -15,9 +15,9 @@
         }
     }
 
-    # All frontend and static assets routed to Next.js
+    # All application and static assets routed to Next.js
     handle {
-        reverse_proxy frontend:3000 {
+        reverse_proxy application:3000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up X-Forwarded-For {remote_host}
@@ -25,7 +25,7 @@
         }
     }
 
-    # Statutory and Hardening Security Headers
+    # Security headers
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         X-Content-Type-Options "nosniff"

@@ -1,0 +1,6 @@
+[submodule "package/compliance-engine"]
+	path = package/compliance-engine
+	url = git@github.com:FinCompHub/compliance-engine.git
+[submodule "app/application"]
+	path = app/application
+	url = git@github.com:FinCompHub/application.git

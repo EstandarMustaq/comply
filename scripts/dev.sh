@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # FinComp Development Environment Controller
-# Orchestrates local PostgreSQL, Redis, Backend (Spring Boot), and Frontend (Next.js)
+# Orchestrates local PostgreSQL, Redis, Compliance Engine (Spring Boot), and Frontend (Next.js)
 # ==============================================================================
 
 set -euo pipefail
@@ -24,10 +24,10 @@ check_env() {
         echo -e "${GREEN}[✓] Created ${ROOT_DIR}/.env${NC}"
     fi
 
-    if [[ ! -f "${ROOT_DIR}/frontend/.env.local" ]]; then
-        echo -e "${YELLOW}[!] frontend/.env.local not found. Initializing from frontend/.env.example...${NC}"
-        cp "${ROOT_DIR}/frontend/.env.example" "${ROOT_DIR}/frontend/.env.local"
-        echo -e "${GREEN}[✓] Created ${ROOT_DIR}/frontend/.env.local${NC}"
+    if [[ ! -f "${ROOT_DIR}/app/application/.env.local" ]]; then
+        echo -e "${YELLOW}[!] app/application/.env.local not found. Initializing from app/application/.env.example...${NC}"
+        cp "${ROOT_DIR}/app/application/.env.example" "${ROOT_DIR}/app/application/.env.local"
+        echo -e "${GREEN}[✓] Created ${ROOT_DIR}/app/application/.env.local${NC}"
     fi
 }
 
@@ -72,23 +72,23 @@ start_infra() {
     echo -e "  ${BOLD}Redis:${NC}       localhost:6379"
     echo ""
     echo -e "${BOLD}Next steps:${NC}"
-    echo -e "  1. Start Backend:  ${CYAN}./scripts/dev.sh backend${NC}  (or cd backend && mvn spring-boot:run)"
-    echo -e "  2. Start Frontend: ${CYAN}./scripts/dev.sh frontend${NC} (or cd frontend && pnpm dev)"
+    echo -e "  1. Start Compliance Engine:  ${CYAN}./scripts/dev.sh compliance-engine${NC}  (or cd package/compliance-engine && mvn spring-boot:run)"
+    echo -e "  2. Start Application: ${CYAN}./scripts/dev.sh application${NC} (or cd app/application && pnpm dev)"
     echo -e "  Or run full stack: ${CYAN}./scripts/dev.sh all${NC}"
     echo ""
 }
 
-start_backend() {
+start_compliance_engine() {
     check_env
-    echo -e "${BOLD}${CYAN}=== Launching FinComp Backend (Spring Boot) ===${NC}"
-    cd "${ROOT_DIR}/backend"
+    echo -e "${BOLD}${CYAN}=== Launching FinComp Compliance Engine (Spring Boot) ===${NC}"
+    cd "${ROOT_DIR}/package/compliance-engine"
     mvn spring-boot:run
 }
 
-start_frontend() {
+start_application() {
     check_env
-    echo -e "${BOLD}${CYAN}=== Launching FinComp Frontend (Next.js 16) ===${NC}"
-    cd "${ROOT_DIR}/frontend"
+    echo -e "${BOLD}${CYAN}=== Launching FinComp Application (Next.js 16) ===${NC}"
+    cd "${ROOT_DIR}/app/application"
     pnpm dev
 }
 
@@ -126,11 +126,11 @@ ${BOLD}Usage:${NC} $(basename "$0") [COMMAND]
 ${BOLD}Commands:${NC}
   start, up            Start PostgreSQL and Redis containers (default)
   stop, down           Stop and remove Docker containers
-  backend              Run Spring Boot backend locally via Maven
-  frontend             Run Next.js 16 frontend locally via pnpm
+  compliance-engine    Run the compliance engine locally via Maven
+  application          Run the application locally via pnpm
   all                  Build and start full stack in Docker (Postgres, Redis, Backend, Frontend)
   status               Check Docker container status and health
-  logs [service]       Follow logs (e.g. ./scripts/dev.sh logs backend)
+  logs [service]       Follow logs (e.g. ./scripts/dev.sh logs compliance-engine|backend)
   help                 Display this help message
 EOF
     exit 0
@@ -146,11 +146,11 @@ case "${COMMAND}" in
     stop|down)
         stop_services
         ;;
-    backend)
-        start_backend
+    compliance-engine|backend)
+        start_compliance_engine
         ;;
-    frontend)
-        start_frontend
+    application|frontend)
+        start_application
         ;;
     all)
         start_all_docker
