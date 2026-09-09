@@ -18,6 +18,9 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
+    public static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    public static final String REFRESH_TOKEN_TYPE = "REFRESH";
+
     private final SecretKey signingKey;
     private final long expirationMinutes;
     private final long refreshExpirationDays;
@@ -49,6 +52,7 @@ public class JwtService {
                 .claim("userId", user.getId().toString())
                 .claim("fullName", user.getFullName())
                 .claim("role", user.getRole().name())
+                .claim("tokenType", ACCESS_TOKEN_TYPE)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(signingKey)
@@ -64,7 +68,7 @@ public class JwtService {
                 .id(jti)
                 .subject(user.getEmail())
                 .claim("userId", user.getId().toString())
-                .claim("tokenType", "REFRESH")
+                .claim("tokenType", REFRESH_TOKEN_TYPE)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(signingKey)
@@ -104,13 +108,32 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
+        return isTokenValid(token, null);
+    }
+
+    public boolean isAccessTokenValid(String token) {
+        return isTokenValid(token, ACCESS_TOKEN_TYPE);
+    }
+
+    public boolean isRefreshTokenValid(String token) {
+        return isTokenValid(token, REFRESH_TOKEN_TYPE);
+    }
+
+    private boolean isTokenValid(String token, String expectedTokenType) {
         try {
             Claims claims = extractClaims(token);
             String jti = claims.getId();
             if (tokenBlacklistService.isTokenBlacklisted(jti)) {
                 return false;
             }
-            return !claims.getExpiration().before(new Date());
+            if (claims.getExpiration().before(new Date())) {
+                return false;
+            }
+            if (expectedTokenType != null
+                    && !expectedTokenType.equals(claims.get("tokenType", String.class))) {
+                return false;
+            }
+            return true;
         } catch (Exception e) {
             return false;
         }

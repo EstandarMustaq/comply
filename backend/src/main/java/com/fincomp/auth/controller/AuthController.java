@@ -139,6 +139,37 @@ public class AuthController {
         ));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+        if (!jwtService.isRefreshTokenValid(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Refresh token inválido, expirado ou já utilizado"));
+        }
+
+        UUID userId;
+        String jti;
+        try {
+            userId = jwtService.extractUserId(refreshToken);
+            jti = jwtService.extractJti(refreshToken);
+        } catch (RuntimeException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Refresh token inválido"));
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Utilizador não encontrado"));
+        }
+
+        tokenBlacklistService.blacklistToken(jti, jwtService.getRemainingMillis(refreshToken));
+        return ResponseEntity.ok(new RefreshTokenResponse(
+                jwtService.generateAccessToken(user),
+                jwtService.generateRefreshToken(user)
+        ));
+    }
+
     @PostMapping("/mfa/enroll")
     public ResponseEntity<?> enrollMfa(@RequestBody(required = false) Map<String, String> body, Authentication authentication) {
         User user = null;

@@ -52,7 +52,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/mfa/verify", "/api/auth/mfa/enroll", "/api/auth/mfa/confirm").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/mfa/verify", "/api/auth/mfa/enroll", "/api/auth/mfa/confirm", "/api/auth/refresh").permitAll()
                         .requestMatchers("/actuator/**", "/error").permitAll()
                         .requestMatchers("/api/settings/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/audit-log/**").hasRole("ADMIN")
