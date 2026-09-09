@@ -217,6 +217,7 @@ class ApiClient {
         fullName: clientData.fullName,
         idDocumentType: clientData.idDocumentType ?? "BI",
         idDocumentNumber: clientData.idDocumentNumber ?? clientData.documentNumber,
+        clientType: clientData.clientType ?? "INDIVIDUAL",
         nuib: clientData.nuib,
         dueDiligenceRegime: clientData.dueDiligenceRegime ??
           (clientData.regime === "SIMPLIFICADO" ? "SIMPLIFIED" : "NORMAL"),
