@@ -13,8 +13,21 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - app
-      - frontend
+      app:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    cpus: "${CADDY_CPU_LIMIT:-0.25}"
+    mem_limit: "${CADDY_MEMORY_LIMIT:-128m}"
+    labels:
+      com.fincomp.environment: production
+      com.fincomp.service: edge
+      com.fincomp.cost-center: platform
     networks:
       - fincomp-net
     logging:
@@ -38,7 +51,19 @@ services:
     expose:
       - "3000"
     depends_on:
-      - app
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    cpus: "${FRONTEND_CPU_LIMIT:-0.50}"
+    mem_limit: "${FRONTEND_MEMORY_LIMIT:-512m}"
+    labels:
+      com.fincomp.environment: production
+      com.fincomp.service: frontend
+      com.fincomp.cost-center: product
     networks:
       - fincomp-net
     logging:
@@ -76,6 +101,22 @@ services:
       - FINCOMP_BOOTSTRAP_OCOS_FULL_NAME=${FINCOMP_BOOTSTRAP_OCOS_FULL_NAME:-}
       - FINCOMP_BOOTSTRAP_OCOS_EMAIL=${FINCOMP_BOOTSTRAP_OCOS_EMAIL:-}
       - FINCOMP_BOOTSTRAP_OCOS_PASSWORD=${FINCOMP_BOOTSTRAP_OCOS_PASSWORD:-}
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:-health,info,metrics,prometheus}
+      - FINCOMP_IMPORT_STORAGE_PATH=${FINCOMP_IMPORT_STORAGE_PATH:-/var/lib/fincomp/imports}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 45s
+      retries: 5
+    cpus: "${BACKEND_CPU_LIMIT:-1.00}"
+    mem_limit: "${BACKEND_MEMORY_LIMIT:-1024m}"
+    labels:
+      com.fincomp.environment: production
+      com.fincomp.service: backend
+      com.fincomp.cost-center: product
+    volumes:
+      - fincomp_imports:/var/lib/fincomp/imports
     depends_on:
       db:
         condition: service_healthy
@@ -104,6 +145,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    cpus: "${POSTGRES_CPU_LIMIT:-1.00}"
+    mem_limit: "${POSTGRES_MEMORY_LIMIT:-1024m}"
+    labels:
+      com.fincomp.environment: production
+      com.fincomp.service: postgres
+      com.fincomp.cost-center: data
     networks:
       - fincomp-net
     logging:
@@ -125,6 +172,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    cpus: "${REDIS_CPU_LIMIT:-0.50}"
+    mem_limit: "${REDIS_MEMORY_LIMIT:-512m}"
+    labels:
+      com.fincomp.environment: production
+      com.fincomp.service: redis
+      com.fincomp.cost-center: data
     networks:
       - fincomp-net
     logging:
@@ -138,6 +191,7 @@ volumes:
   caddy_config:
   postgres_prod_data:
   redis_prod_data:
+  fincomp_imports:
 
 networks:
   fincomp-net:
