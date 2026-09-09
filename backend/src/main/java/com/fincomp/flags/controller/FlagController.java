@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class FlagController {
     public record ReviewFlagRequest(@NotBlank String note, FlagStatus status) {}
 
     @PatchMapping("/{id}/review")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> reviewFlag(
             @PathVariable UUID id,
             @Valid @RequestBody ReviewFlagRequest request,
@@ -53,6 +55,7 @@ public class FlagController {
     }
 
     @PostMapping("/{id}/escalate-to-str")
+    @PreAuthorize("hasRole('OCOS')")
     public ResponseEntity<?> escalateToStr(
             @PathVariable UUID id,
             Authentication authentication
