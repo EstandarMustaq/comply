@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -160,12 +161,17 @@ public class ImportService {
                 String clientName = nameIdx >= 0 && nameIdx < row.size() ? row.get(nameIdx).trim() : "Cliente Desconhecido";
                 String dateStr = dateIdx >= 0 && dateIdx < row.size() ? row.get(dateIdx).trim() : null;
                 String amountStr = amountIdx >= 0 && amountIdx < row.size() ? row.get(amountIdx).trim() : null;
-                String typeStr = typeIdx >= 0 && typeIdx < row.size() ? row.get(typeIdx).trim() : "DEPOSIT";
+                String typeStr = typeIdx >= 0 && typeIdx < row.size() ? row.get(typeIdx).trim() : null;
                 String accountStr = accountIdx >= 0 && accountIdx < row.size() ? row.get(accountIdx).trim() : null;
 
                 if (docNumber == null || docNumber.isBlank() || amountStr == null || amountStr.isBlank()) {
                     throw new IllegalArgumentException("Documento ou montante ausente na linha");
                 }
+
+                // Validate the complete row before creating or mutating any client data.
+                LocalDate txDate = parseDate(dateStr);
+                BigDecimal amount = parseAmount(amountStr);
+                TransactionType txType = parseTransactionType(typeStr);
 
                 // 1. Obtém ou cadastra cliente
                 Client client = clientRepository.findByIdDocumentNumber(docNumber).orElseGet(() -> {
@@ -183,12 +189,7 @@ public class ImportService {
                     );
                 }
 
-                // 2. Parse da data e montante
-                LocalDate txDate = parseDate(dateStr);
-                BigDecimal amount = parseAmount(amountStr);
-                TransactionType txType = parseTransactionType(typeStr);
-
-                // 3. Criação da transação com retenção legal de 10 anos (Artigo 88)
+                // 2. Criação da transação com retenção legal de 10 anos (Artigo 88)
                 Transaction tx = new Transaction(client, amount, "MZN", txDate, txType);
                 tx.setImportBatch(batch);
                 if (accountStr != null) {
@@ -196,7 +197,7 @@ public class ImportService {
                 }
                 Transaction savedTx = transactionRepository.save(tx);
 
-                // 4. Execução síncrona dos motores regulatórios
+                // 3. Execução síncrona dos motores regulatórios
                 sanctionsScreeningService.screenClientAgainstSanctions(client, savedTx);
                 thresholdScreeningService.evaluateTransaction(savedTx);
                 structuringDetectionService.detectStructuring(savedTx);
@@ -209,7 +210,7 @@ public class ImportService {
             }
         }
 
-        batch.setTotalRows(successCount);
+        batch.setTotalRows(rows.size());
         batch.setErrorRows(errorCount);
         importBatchRepository.save(batch);
 
@@ -233,26 +234,39 @@ public class ImportService {
         return headers.indexOf(targetHeader);
     }
 
-    private LocalDate parseDate(String dateStr) {
-        if (dateStr == null || dateStr.isBlank()) return LocalDate.now();
-        dateStr = dateStr.trim();
+    LocalDate parseDate(String dateStr) {
+        if (dateStr == null || dateStr.isBlank()) {
+            throw new IllegalArgumentException("Data da transação ausente");
+        }
+        String normalizedDate = dateStr.trim();
         List<DateTimeFormatter> formatters = List.of(
                 DateTimeFormatter.ISO_LOCAL_DATE,
-                DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-                DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-                DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT),
+                DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT),
+                DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT)
         );
         for (DateTimeFormatter dtf : formatters) {
             try {
-                return LocalDate.parse(dateStr, dtf);
-            } catch (Exception ignored) {}
+                LocalDate parsed = LocalDate.parse(normalizedDate, dtf);
+                if (parsed.isAfter(LocalDate.now())) {
+                    throw new IllegalArgumentException("Data da transação não pode estar no futuro: " + dateStr);
+                }
+                return parsed;
+            } catch (java.time.format.DateTimeParseException ignored) {
+                // Try the next supported format.
+            }
         }
-        return LocalDate.now();
+        throw new IllegalArgumentException("Data da transação inválida: " + dateStr);
     }
 
-    private BigDecimal parseAmount(String amountStr) {
-        if (amountStr == null) return BigDecimal.ZERO;
+    BigDecimal parseAmount(String amountStr) {
+        if (amountStr == null || amountStr.isBlank()) {
+            throw new IllegalArgumentException("Montante da transação ausente");
+        }
         String clean = amountStr.replaceAll("[^0-9,.-]", "").trim();
+        if (clean.isBlank() || clean.equals("-") || clean.equals(".") || clean.equals(",")) {
+            throw new IllegalArgumentException("Montante da transação inválido: " + amountStr);
+        }
         if (clean.contains(",") && clean.contains(".")) {
             if (clean.lastIndexOf(",") > clean.lastIndexOf(".")) {
                 clean = clean.replace(".", "").replace(",", ".");
@@ -262,15 +276,28 @@ public class ImportService {
         } else if (clean.contains(",")) {
             clean = clean.replace(",", ".");
         }
-        return new BigDecimal(clean);
+        try {
+            BigDecimal amount = new BigDecimal(clean);
+            if (amount.signum() <= 0) {
+                throw new IllegalArgumentException("Montante da transação deve ser positivo");
+            }
+            return amount;
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Montante da transação inválido: " + amountStr, exception);
+        }
     }
 
-    private TransactionType parseTransactionType(String typeStr) {
-        if (typeStr == null) return TransactionType.DEPOSIT;
-        String upper = typeStr.toUpperCase();
+    TransactionType parseTransactionType(String typeStr) {
+        if (typeStr == null || typeStr.isBlank()) {
+            throw new IllegalArgumentException("Tipo de transação ausente");
+        }
+        String upper = typeStr.trim().toUpperCase(Locale.ROOT);
         if (upper.contains("LEV") || upper.contains("SAQ") || upper.contains("WITHDRAW")) return TransactionType.WITHDRAWAL;
         if (upper.contains("TRANS")) return TransactionType.TRANSFER;
         if (upper.contains("CRED") || upper.contains("EMP")) return TransactionType.CREDIT;
-        return TransactionType.DEPOSIT;
+        if (upper.contains("DEP") || upper.contains("DEPÓSITO") || upper.contains("DEPOSITO")) {
+            return TransactionType.DEPOSIT;
+        }
+        throw new IllegalArgumentException("Tipo de transação inválido: " + typeStr);
     }
 }
