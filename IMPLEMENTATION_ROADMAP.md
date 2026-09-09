@@ -21,7 +21,7 @@ Cada bloco de trabalho deve seguir este ciclo:
 4. Executar a validação definida no bloco.
 5. Criar um commit follow-up com mensagem específica.
 6. Abrir pull request para `main` e fazer revisão antes do merge.
-7. Após o merge, apagar o branch de trabalho.
+7. Após o merge, preservar o branch de trabalho para manter o histórico, facilitar auditorias, comparações e rollback. O branch só poderá ser removido mediante decisão explícita e documentada.
 
 Branches de documentação podem ser mescladas diretamente após revisão. Branches de código devem ser independentes e pequenos o suficiente para permitir rollback.
 
