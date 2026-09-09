@@ -4,9 +4,10 @@ Financial Compliance Intelligent is an auditable workspace for customer profiles
 
 ## Repository layout
 
-- `package/compliance-engine/` — Spring Boot compliance engine (migration target: `package/compliance-engine`).
-- `app/application/` — Next.js application (migration target: `app/application`).
+- `package/compliance-engine/` — Spring Boot compliance engine submodule.
+- `app/application/` — Next.js application submodule.
 - `docs/` — product, API, architecture, operations, and internal traceability documentation.
+- `fincomphub-workspace.yaml` — declarative workspace components, commands, infrastructure, and policies.
 - `scripts/workspace.sh` — unified workspace command surface.
 
 ## Quick start
@@ -28,7 +29,7 @@ Financial Compliance Intelligent is an auditable workspace for customer profiles
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`docs/api/README.md`](docs/api/README.md), and [`ROADMAP.md`](ROADMAP.md).
+Start with [`docs/README.md`](docs/README.md), [`docs/api/README.md`](docs/api/README.md), [`ROADMAP.md`](ROADMAP.md), and [`fincomphub-workspace.yaml`](fincomphub-workspace.yaml).
 
 ## Product language
 

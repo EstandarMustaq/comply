@@ -4,14 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND_DIR="${BACKEND_DIR:-${ROOT_DIR}/package/compliance-engine}"
 FRONTEND_DIR="${FRONTEND_DIR:-${ROOT_DIR}/app/application}"
-[[ -d "$BACKEND_DIR" ]] || BACKEND_DIR="${ROOT_DIR}/backend"
-[[ -d "$FRONTEND_DIR" ]] || FRONTEND_DIR="${ROOT_DIR}/frontend"
 
 backend() { mvn -q -f "$BACKEND_DIR/pom.xml" "$@"; }
 frontend() { (cd "$FRONTEND_DIR" && pnpm "$@"); }
 
 usage() {
-  printf '%s\n' "Usage: $0 {install|dev|build|test|typecheck|lint|quality|compose-config|migrate|deploy|help}"
+  printf '%s\n' "Usage: $0 {install|dev|build|test|typecheck|lint|quality|compose-config|migrate|deploy|backup|keys|help}"
 }
 
 case "${1:-help}" in
@@ -20,9 +18,13 @@ case "${1:-help}" in
     backend dependency:go-offline
     ;;
   dev)
-    printf '%s\n' "Start the backend and frontend in separate terminals:"
-    printf '  (cd %q && mvn spring-boot:run)\n' "$BACKEND_DIR"
-    printf '  (cd %q && pnpm dev)\n' "$FRONTEND_DIR"
+    if [[ "${2:-}" == "--docker" ]]; then
+      docker compose --profile app up -d --build
+    else
+      printf '%s\n' "Start the compliance engine and application in separate terminals:"
+      printf '  (cd %q && mvn spring-boot:run)\n' "$BACKEND_DIR"
+      printf '  (cd %q && pnpm dev)\n' "$FRONTEND_DIR"
+    fi
     ;;
   build)
     backend package -DskipTests
@@ -49,6 +51,8 @@ case "${1:-help}" in
     ;;
   migrate) backend validate ;;
   deploy) "$ROOT_DIR/scripts/prod-deploy.sh" ;;
+  backup) "$ROOT_DIR/scripts/backup-s3.sh" ;;
+  keys) "$ROOT_DIR/scripts/generate-keys.sh" "${@:2}" ;;
   help|-h|--help) usage ;;
   *) usage; exit 2 ;;
 esac

@@ -1,0 +1,42 @@
+version: 1
+name: fincomphub-platform
+product: Financial Compliance Intelligent
+
+components:
+  compliance-engine:
+    path: package/compliance-engine
+    repository: git@github.com:FinCompHub/compliance-engine.git
+    technology: spring-boot
+    build: mvn -q -f package/compliance-engine/pom.xml package -DskipTests
+    test: mvn -q -f package/compliance-engine/pom.xml test
+  application:
+    path: app/application
+    repository: git@github.com:FinCompHub/application.git
+    technology: nextjs
+    install: pnpm --dir app/application install --frozen-lockfile
+    build: pnpm --dir app/application build
+    typecheck: pnpm --dir app/application exec tsc --noEmit
+
+workspace:
+  install: ./scripts/workspace.sh install
+  dev: ./scripts/workspace.sh dev
+  build: ./scripts/workspace.sh build
+  test: ./scripts/workspace.sh test
+  quality: ./scripts/workspace.sh quality
+  compose-config: ./scripts/workspace.sh compose-config
+  migrate: ./scripts/workspace.sh migrate
+  deploy: ./scripts/workspace.sh deploy
+  backup: ./scripts/workspace.sh backup
+  keys: ./scripts/workspace.sh keys
+
+infrastructure:
+  compose:
+    development: docker-compose.yml
+    production: docker-compose.prod.yml
+  edge: Caddyfile
+
+policies:
+  tenant-scope: authenticated-user-organization
+  product-language: docs/product-language.md
+  internal-traceability: docs/traceability.md
+  submodules: recursive

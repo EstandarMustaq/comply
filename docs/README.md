@@ -10,6 +10,8 @@ FinComp is a **Financial Compliance Intelligent** product: a clear, auditable wo
 - [Operations](operations/README.md) — local development, configuration, quality gates, observability, backup, and FinOps.
 - [Traceability](traceability.md) — internal requirement and legal traceability. This is engineering documentation only and is not product/UI copy.
 - [Submodule migration](submodule-migration.md) — controlled migration to independently versioned component repositories.
+- [Archived engineering documents](archive/README.md) — historical plans, reviews, and implementation records.
+- [Workspace configuration](../fincomphub-workspace.yaml) — declarative component and command configuration.
 
 ## Product-language boundary
 

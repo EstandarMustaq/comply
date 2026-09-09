@@ -11,6 +11,8 @@
     "quality": "./scripts/workspace.sh quality",
     "compose:config": "./scripts/workspace.sh compose-config",
     "migrate": "./scripts/workspace.sh migrate",
-    "deploy": "./scripts/workspace.sh deploy"
+    "deploy": "./scripts/workspace.sh deploy",
+    "backup": "./scripts/workspace.sh backup",
+    "keys": "./scripts/workspace.sh keys"
   }
 }
