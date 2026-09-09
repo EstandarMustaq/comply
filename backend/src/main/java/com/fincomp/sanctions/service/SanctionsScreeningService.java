@@ -1,0 +1,116 @@
+package com.fincomp.sanctions.service;
+
+import com.fincomp.clients.entity.Client;
+import com.fincomp.clients.entity.RiskRating;
+import com.fincomp.clients.repository.ClientRepository;
+import com.fincomp.flags.entity.Flag;
+import com.fincomp.flags.entity.FlagType;
+import com.fincomp.flags.repository.FlagRepository;
+import com.fincomp.monitoring.entity.Transaction;
+import com.fincomp.sanctions.entity.SanctionsListEntry;
+import com.fincomp.sanctions.repository.SanctionsListRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.Normalizer;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class SanctionsScreeningService {
+
+    private final SanctionsListRepository sanctionsRepository;
+    private final FlagRepository flagRepository;
+    private final ClientRepository clientRepository;
+
+    @Value("${fincomp.compliance.sanctions.sla-hours:24}")
+    private int slaHours;
+
+    public SanctionsScreeningService(
+            SanctionsListRepository sanctionsRepository,
+            FlagRepository flagRepository,
+            ClientRepository clientRepository
+    ) {
+        this.sanctionsRepository = sanctionsRepository;
+        this.flagRepository = flagRepository;
+        this.clientRepository = clientRepository;
+    }
+
+    @Transactional
+    public Optional<Flag> screenClientAgainstSanctions(Client client, Transaction triggeringTx) {
+        if (client == null || client.getFullName() == null) return Optional.empty();
+
+        String normalizedClientName = normalize(client.getFullName());
+        List<SanctionsListEntry> candidates = sanctionsRepository.searchByNameLike(client.getFullName());
+
+        for (SanctionsListEntry entry : candidates) {
+            String normalizedSanctionName = normalize(entry.getFullName());
+            if (isFuzzyMatch(normalizedClientName, normalizedSanctionName)) {
+                Instant deadline = Instant.now().plus(slaHours, ChronoUnit.HOURS);
+                String reason = String.format(
+                        "Correspondência com Lista Restritiva (%s - Ref: %s): '%s'. " +
+                        "Obrigação legal de congelamento imediato de activos e comunicação ao GIFiM no prazo fatal de %d horas (Artigos 38 a 40 da Lei n.º 15/2023).",
+                        entry.getSourceList(), entry.getRawReference(), entry.getFullName(), slaHours
+                );
+
+                Flag flag = new Flag(client, triggeringTx, FlagType.SANCTIONS_MATCH, reason, deadline);
+                Flag savedFlag = flagRepository.save(flag);
+
+                // Eleva imediatamente a classificação de risco do cliente para HIGH
+                client.setRiskRating(RiskRating.HIGH);
+                client.setRiskRatingUpdatedAt(LocalDate.now());
+                clientRepository.save(client);
+
+                return Optional.of(savedFlag);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isFuzzyMatch(String s1, String s2) {
+        if (s1.equals(s2)) return true;
+        if (s1.contains(s2) || s2.contains(s1)) return true;
+        return calculateSimilarity(s1, s2) >= 0.85;
+    }
+
+    private double calculateSimilarity(String s1, String s2) {
+        int longer = Math.max(s1.length(), s2.length());
+        if (longer == 0) return 1.0;
+        int editDist = levenshteinDistance(s1, s2);
+        return (longer - editDist) / (double) longer;
+    }
+
+    private int levenshteinDistance(String s1, String s2) {
+        int[] costs = new int[s2.length() + 1];
+        for (int i = 0; i <= s1.length(); i++) {
+            int lastValue = i;
+            for (int j = 0; j <= s2.length(); j++) {
+                if (i == 0) {
+                    costs[j] = j;
+                } else if (j > 0) {
+                    int newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    }
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+            if (i > 0) costs[s2.length()] = lastValue;
+        }
+        return costs[s2.length()];
+    }
+
+    private String normalize(String input) {
+        if (input == null) return "";
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toUpperCase()
+                .trim();
+    }
+}
