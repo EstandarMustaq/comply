@@ -16,6 +16,7 @@ WORKDIR /app
 RUN addgroup -S fincomp && adduser -S fincomp -G fincomp
 
 COPY --from=builder --chown=fincomp:fincomp /build/target/fincomp-backend-*.jar app.jar
+RUN mkdir -p /var/lib/fincomp/imports && chown -R fincomp:fincomp /var/lib/fincomp
 
 USER fincomp
 EXPOSE 8080
