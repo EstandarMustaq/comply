@@ -2,7 +2,9 @@ package com.fincomp.compliance.service;
 
 import com.fincomp.clients.entity.Client;
 import com.fincomp.clients.entity.DueDiligenceRegime;
+import com.fincomp.clients.repository.ClientRepository;
 import com.fincomp.flags.entity.Flag;
+import com.fincomp.flags.entity.FlagStatus;
 import com.fincomp.flags.entity.FlagType;
 import com.fincomp.flags.repository.FlagRepository;
 import com.fincomp.monitoring.entity.Transaction;
@@ -21,6 +23,7 @@ public class DueDiligenceRegimeValidator {
 
     private final TransactionRepository transactionRepository;
     private final FlagRepository flagRepository;
+    private final ClientRepository clientRepository;
 
     @Value("${fincomp.compliance.simplified-regime.monthly-limit:30000.00}")
     private BigDecimal monthlyLimit;
@@ -28,9 +31,14 @@ public class DueDiligenceRegimeValidator {
     @Value("${fincomp.compliance.simplified-regime.annual-limit:240000.00}")
     private BigDecimal annualLimit;
 
-    public DueDiligenceRegimeValidator(TransactionRepository transactionRepository, FlagRepository flagRepository) {
+    public DueDiligenceRegimeValidator(
+            TransactionRepository transactionRepository,
+            FlagRepository flagRepository,
+            ClientRepository clientRepository
+    ) {
         this.transactionRepository = transactionRepository;
         this.flagRepository = flagRepository;
+        this.clientRepository = clientRepository;
     }
 
     @Transactional
@@ -42,18 +50,44 @@ public class DueDiligenceRegimeValidator {
         LocalDate txDate = newTransaction != null ? newTransaction.getTransactionDate() : LocalDate.now();
         LocalDate startOfMonth = txDate.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endOfMonth = txDate.with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate startOfYear = txDate.with(TemporalAdjusters.firstDayOfYear());
+        LocalDate endOfYear = txDate.with(TemporalAdjusters.lastDayOfYear());
 
-        BigDecimal monthlyTotal = transactionRepository.sumAmountByClientAndDateBetween(client.getId(), startOfMonth, endOfMonth);
+        BigDecimal transactionAmount = newTransaction != null && newTransaction.getAmount() != null
+                ? newTransaction.getAmount()
+                : BigDecimal.ZERO;
+        BigDecimal monthlyTotal = transactionRepository
+                .sumAmountByClientAndDateBetween(client.getId(), startOfMonth, endOfMonth);
+        BigDecimal annualTotal = transactionRepository
+                .sumAmountByClientAndDateBetween(client.getId(), startOfYear, endOfYear);
+        if (newTransaction != null && newTransaction.getId() == null) {
+            monthlyTotal = monthlyTotal.add(transactionAmount);
+            annualTotal = annualTotal.add(transactionAmount);
+        }
 
-        if (monthlyTotal.compareTo(monthlyLimit) > 0) {
+        boolean monthlyExceeded = monthlyTotal.compareTo(monthlyLimit) > 0;
+        boolean annualExceeded = annualTotal.compareTo(annualLimit) > 0;
+        if (monthlyExceeded || annualExceeded) {
+            client.setDueDiligenceRegime(DueDiligenceRegime.NORMAL);
+            client.setKycComplete(false);
+            clientRepository.save(client);
+
+            String exceededLimit = monthlyExceeded
+                    ? String.format("limiar mensal de %.2f MT (total movimentado no mês: %.2f MT)", monthlyLimit, monthlyTotal)
+                    : String.format("limiar anual de %.2f MT (total movimentado no ano: %.2f MT)", annualLimit, annualTotal);
             String reason = String.format(
-                    "Cliente em Regime Simplificado excedeu o limiar mensal de %.2f MT (total movimentado no mês: %.2f MT). " +
-                    "Obrigatória reclassificação para Regime Normal e recolha de diligência completa (Artigo 137 e 141 do Aviso 10/GBM/2024).",
-                    monthlyLimit, monthlyTotal
+                    "Cliente em Regime Simplificado excedeu o %s. " +
+                    "Reclassificado automaticamente para Regime Normal; é obrigatória a recolha de diligência completa " +
+                    "(Artigos 137 e 141 do Aviso 10/GBM/2024).",
+                    exceededLimit
             );
 
-            Flag flag = new Flag(client, newTransaction, FlagType.KYC_INCOMPLETE, reason, null);
-            return Optional.of(flagRepository.save(flag));
+            if (!flagRepository.existsByClientIdAndTypeAndStatus(
+                    client.getId(), FlagType.KYC_INCOMPLETE, FlagStatus.PENDING
+            )) {
+                Flag flag = new Flag(client, newTransaction, FlagType.KYC_INCOMPLETE, reason, null);
+                return Optional.of(flagRepository.save(flag));
+            }
         }
 
         return Optional.empty();

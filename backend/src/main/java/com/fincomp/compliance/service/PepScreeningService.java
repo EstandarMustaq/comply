@@ -36,12 +36,14 @@ public class PepScreeningService {
     @Transactional
     public int checkAndGeneratePepReviewFlags() {
         LocalDate cutoffDate = LocalDate.now().minusDays(maxReviewIntervalDays);
-        List<Client> overduePeps = clientRepository.findByPepTrueAndPepLastReviewedAtBefore(cutoffDate);
+        List<Client> overduePeps = clientRepository
+                .findByPepTrueAndPepLastReviewedAtBeforeOrPepTrueAndPepLastReviewedAtIsNull(cutoffDate);
 
         int count = 0;
         for (Client client : overduePeps) {
-            boolean hasPendingFlag = flagRepository.findByTypeAndStatus(FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING).stream()
-                    .anyMatch(f -> f.getClient() != null && f.getClient().getId().equals(client.getId()));
+            boolean hasPendingFlag = flagRepository.existsByClientIdAndTypeAndStatus(
+                    client.getId(), FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING
+            );
 
             if (!hasPendingFlag) {
                 String reason = String.format(

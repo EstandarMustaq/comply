@@ -16,7 +16,7 @@ public interface ClientRepository extends JpaRepository<Client, UUID>, JpaSpecif
     Optional<Client> findByIdDocumentNumber(String idDocumentNumber);
     Optional<Client> findByNuib(String nuib);
     List<Client> findByDueDiligenceRegime(DueDiligenceRegime regime);
-    List<Client> findByPepTrueAndPepLastReviewedAtBefore(LocalDate date);
+    List<Client> findByPepTrueAndPepLastReviewedAtBeforeOrPepTrueAndPepLastReviewedAtIsNull(LocalDate date);
     long countByKycCompleteTrue();
     long countByDueDiligenceRegime(DueDiligenceRegime regime);
 }
