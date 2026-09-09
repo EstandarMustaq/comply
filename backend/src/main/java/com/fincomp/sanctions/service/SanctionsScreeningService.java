@@ -17,8 +17,11 @@ import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SanctionsScreeningService {
@@ -45,7 +48,7 @@ public class SanctionsScreeningService {
         if (client == null || client.getFullName() == null) return Optional.empty();
 
         String normalizedClientName = normalize(client.getFullName());
-        List<SanctionsListEntry> candidates = sanctionsRepository.searchByNameLike(client.getFullName());
+        List<SanctionsListEntry> candidates = sanctionsRepository.findAll();
 
         for (SanctionsListEntry entry : candidates) {
             String normalizedSanctionName = normalize(entry.getFullName());
@@ -60,9 +63,12 @@ public class SanctionsScreeningService {
                 Flag flag = new Flag(client, triggeringTx, FlagType.SANCTIONS_MATCH, reason, deadline);
                 Flag savedFlag = flagRepository.save(flag);
 
-                // Eleva imediatamente a classificação de risco do cliente para HIGH
+                // Freeze is persisted before the transaction leaves this compliance boundary.
                 client.setRiskRating(RiskRating.HIGH);
                 client.setRiskRatingUpdatedAt(LocalDate.now());
+                client.setSanctionsFrozen(true);
+                client.setSanctionsFrozenAt(Instant.now());
+                client.setSanctionsFreezeReason(reason);
                 clientRepository.save(client);
 
                 return Optional.of(savedFlag);
@@ -75,7 +81,11 @@ public class SanctionsScreeningService {
     private boolean isFuzzyMatch(String s1, String s2) {
         if (s1.equals(s2)) return true;
         if (s1.contains(s2) || s2.contains(s1)) return true;
-        return calculateSimilarity(s1, s2) >= 0.85;
+        if (calculateSimilarity(s1, s2) >= 0.85) return true;
+
+        String sortedTokens1 = sortedTokens(s1);
+        String sortedTokens2 = sortedTokens(s2);
+        return sortedTokens1.equals(sortedTokens2) || calculateSimilarity(sortedTokens1, sortedTokens2) >= 0.85;
     }
 
     private double calculateSimilarity(String s1, String s2) {
@@ -111,6 +121,15 @@ public class SanctionsScreeningService {
         return Normalizer.normalize(input, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toUpperCase()
-                .trim();
+                .replaceAll("[^A-Z0-9]+", " ")
+                .trim()
+                .replaceAll("\\s+", " ");
+    }
+
+    private String sortedTokens(String value) {
+        return Arrays.stream(value.split(" "))
+                .filter(token -> !token.isBlank())
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.joining(" "));
     }
 }

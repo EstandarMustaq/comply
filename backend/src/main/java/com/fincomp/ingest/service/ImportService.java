@@ -177,6 +177,12 @@ public class ImportService {
                     return clientRepository.save(newClient);
                 });
 
+                if (client.isSanctionsFrozen()) {
+                    throw new IllegalStateException(
+                            "Operação bloqueada: cliente congelado por correspondência em lista de sanções"
+                    );
+                }
+
                 // 2. Parse da data e montante
                 LocalDate txDate = parseDate(dateStr);
                 BigDecimal amount = parseAmount(amountStr);
