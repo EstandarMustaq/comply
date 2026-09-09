@@ -112,6 +112,9 @@ check_var "POSTGRES_PASSWORD"
 check_var "REDIS_PASSWORD"
 check_var "JWT_SECRET"
 check_var "MFA_ENCRYPTION_KEY"
+check_var "S3_BACKUP_BUCKET"
+check_var "AWS_REGION"
+check_var "BACKUP_ENCRYPTION_PASSPHRASE"
 
 if [ ${FAILED_CHECKS} -gt 0 ]; then
     echo -e "${RED}Pre-flight validation failed: Missing required environment variables.${NC}" >&2
@@ -139,6 +142,11 @@ if [ "${SKIP_SECURITY_CHECK}" = false ]; then
 
     if [[ "${REDIS_PASSWORD}" == "redis_dev_password" ]] || [[ ${#REDIS_PASSWORD} -lt 12 ]]; then
         echo -e "${RED}[✗] Insecure REDIS_PASSWORD detected! Must be at least 12 characters and not default dev password.${NC}" >&2
+        FAILED_CHECKS=$((FAILED_CHECKS + 1))
+    fi
+
+    if [[ ${#BACKUP_ENCRYPTION_PASSPHRASE} -lt 32 ]]; then
+        echo -e "${RED}[✗] BACKUP_ENCRYPTION_PASSPHRASE is too short! Use at least 32 characters.${NC}" >&2
         FAILED_CHECKS=$((FAILED_CHECKS + 1))
     fi
 
