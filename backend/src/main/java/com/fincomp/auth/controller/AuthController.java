@@ -112,12 +112,20 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Utilizador não encontrado"));
         }
 
+        if (mfaVerificationService.isAttemptRateLimited(token, userId, httpRequest.getRemoteAddr())) {
+            mfaVerificationService.consumeChallenge(token);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(Map.of("message", "Desafio MFA bloqueado após tentativas inválidas. Reinicie o login."));
+        }
+
         boolean valid = mfaVerificationService.verifyTotpCode(user, code);
         if (!valid) {
+            mfaVerificationService.registerFailedAttempt(token, userId, httpRequest.getRemoteAddr());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Código TOTP inválido ou já utilizado"));
         }
 
         mfaVerificationService.consumeChallenge(token);
+        mfaVerificationService.resetAttempts(token, userId, httpRequest.getRemoteAddr());
         tokenBlacklistService.resetFailedLogins(user.getEmail(), httpRequest.getRemoteAddr());
 
         user.setLastLoginAt(Instant.now());
