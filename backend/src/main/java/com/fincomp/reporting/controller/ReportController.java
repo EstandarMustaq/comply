@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -63,6 +64,7 @@ public class ReportController {
     ) {}
 
     @PutMapping("/str/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
     public ResponseEntity<?> updateStr(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateStrRequest request,
@@ -91,6 +93,7 @@ public class ReportController {
     public record SubmitStrRequest(@NotBlank String gifimRegistrationNumber) {}
 
     @PostMapping("/str/{id}/submit")
+    @PreAuthorize("hasRole('OCOS')")
     public ResponseEntity<?> submitStr(
             @PathVariable UUID id,
             @Valid @RequestBody SubmitStrRequest request,
@@ -115,6 +118,7 @@ public class ReportController {
     }
 
     @PostMapping("/ctr/{id}/submit")
+    @PreAuthorize("hasRole('OCOS')")
     public ResponseEntity<?> submitCtr(@PathVariable UUID id, Authentication authentication) {
         CurrencyTransactionReport ctr = ctrRepository.findById(id).orElse(null);
         if (ctr == null) return ResponseEntity.notFound().build();

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -75,6 +76,7 @@ public class ClientController {
     public record UpdateRiskRatingRequest(@NotNull RiskRating riskRating) {}
 
     @PatchMapping("/{id}/risk-rating")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> updateRiskRating(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateRiskRatingRequest request,
@@ -97,6 +99,7 @@ public class ClientController {
     }
 
     @PatchMapping("/{id}/pep-review")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> registerPepReview(@PathVariable UUID id, Authentication authentication) {
         Client client = clientRepository.findById(id).orElse(null);
         if (client == null) {
@@ -125,6 +128,7 @@ public class ClientController {
     ) {}
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> createClient(
             @Valid @RequestBody CreateClientRequest request,
             Authentication authentication

@@ -6,6 +6,7 @@ import com.fincomp.ingest.service.ImportService;
 import com.fincomp.users.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ public class ImportController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> uploadBatch(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
@@ -37,6 +39,7 @@ public class ImportController {
     }
 
     @PostMapping("/{id}/confirm-mapping")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> confirmMapping(
             @PathVariable UUID id,
             @RequestBody Map<String, String> mapping,

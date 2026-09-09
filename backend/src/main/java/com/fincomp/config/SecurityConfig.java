@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/mfa/verify", "/api/auth/mfa/enroll", "/api/auth/mfa/confirm").permitAll()
                         .requestMatchers("/actuator/**", "/error").permitAll()
                         .requestMatchers("/api/settings/users/**").hasRole("ADMIN")
-                        .requestMatchers("/api/audit-log/**").hasAnyRole("ADMIN", "OCOS", "AUDITOR_READONLY")
+                        .requestMatchers("/api/audit-log/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
