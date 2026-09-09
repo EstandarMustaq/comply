@@ -3,6 +3,7 @@ package com.fincomp.clients.controller;
 import com.fincomp.audit.entity.AuditAction;
 import com.fincomp.audit.service.AuditService;
 import com.fincomp.clients.entity.Client;
+import com.fincomp.clients.entity.ClientType;
 import com.fincomp.clients.entity.DueDiligenceRegime;
 import com.fincomp.clients.entity.RiskRating;
 import com.fincomp.clients.repository.ClientRepository;
@@ -120,6 +121,7 @@ public class ClientController {
             @NotBlank String fullName,
             @NotBlank String idDocumentType,
             @NotBlank String idDocumentNumber,
+            ClientType clientType,
             String nuib,
             DueDiligenceRegime dueDiligenceRegime,
             boolean isPep,
@@ -134,6 +136,9 @@ public class ClientController {
             Authentication authentication
     ) {
         Client client = new Client(request.fullName(), request.idDocumentType(), request.idDocumentNumber());
+        if (request.clientType() != null) {
+            client.setClientType(request.clientType());
+        }
         client.setNuib(request.nuib());
         if (request.dueDiligenceRegime() != null) {
             client.setDueDiligenceRegime(request.dueDiligenceRegime());
