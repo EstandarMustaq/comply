@@ -22,9 +22,14 @@ public class MfaVerificationService {
 
     private static final String CHALLENGE_PREFIX = "mfa_challenge:";
     private static final String REPLAY_PREFIX = "totp_used:";
+    private static final String ATTEMPT_PREFIX = "mfa_attempts:";
+    private static final String BACKUP_CLAIM_PREFIX = "mfa_backup_claim:";
     private static final int TIME_STEP_SECONDS = 30;
     private static final int DIGITS = 6;
     private static final int MODULUS = 1_000_000;
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final int ATTEMPT_WINDOW_MINUTES = 5;
+    private static final int CLAIM_TTL_SECONDS = 60;
 
     private final StringRedisTemplate redisTemplate;
     private final EncryptionService encryptionService;
@@ -56,6 +61,22 @@ public class MfaVerificationService {
         redisTemplate.delete(CHALLENGE_PREFIX + challengeToken);
     }
 
+    public boolean isAttemptRateLimited(String challengeToken, UUID userId, String ipAddress) {
+        return getAttemptCount(challengeToken, userId, ipAddress) >= MAX_FAILED_ATTEMPTS;
+    }
+
+    public void registerFailedAttempt(String challengeToken, UUID userId, String ipAddress) {
+        incrementAttempt("challenge:" + challengeToken);
+        incrementAttempt("user:" + userId);
+        incrementAttempt("ip:" + normalizeIp(ipAddress));
+    }
+
+    public void resetAttempts(String challengeToken, UUID userId, String ipAddress) {
+        redisTemplate.delete(attemptKey("challenge:" + challengeToken));
+        redisTemplate.delete(attemptKey("user:" + userId));
+        redisTemplate.delete(attemptKey("ip:" + normalizeIp(ipAddress)));
+    }
+
     public boolean verifyTotpCode(User user, String code) {
         if (code == null || code.isBlank() || user == null) {
             return false;
@@ -81,20 +102,16 @@ public class MfaVerificationService {
         if (base32Secret == null || code == null) return false;
 
         String replayKey = REPLAY_PREFIX + (userId != null ? userId.toString() : "anon") + ":" + code;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(replayKey))) {
-            // Replay detectado: código já utilizado dentro da janela
-            return false;
-        }
-
         long currentUnixTime = Instant.now().getEpochSecond();
         long currentStep = currentUnixTime / TIME_STEP_SECONDS;
 
         // Janela de tolerância: passo atual, anterior (-1) e posterior (+1)
         for (long step = currentStep - 1; step <= currentStep + 1; step++) {
             if (generateCodeForStep(base32Secret, step).equals(code)) {
-                // Código válido: registrar no Redis por 60s para prevenir replay
-                redisTemplate.opsForValue().set(replayKey, "1", 60, TimeUnit.SECONDS);
-                return true;
+                // SET NX makes replay protection atomic across concurrent requests and instances.
+                Boolean claimed = redisTemplate.opsForValue()
+                        .setIfAbsent(replayKey, "1", CLAIM_TTL_SECONDS, TimeUnit.SECONDS);
+                return Boolean.TRUE.equals(claimed);
             }
         }
 
@@ -126,12 +143,56 @@ public class MfaVerificationService {
     private boolean verifyAndConsumeBackupCode(User user, String code) {
         String codeHash = DigestUtils.sha256Hex(code.toUpperCase());
         List<String> hashes = new ArrayList<>(user.getMfaBackupCodesHash());
-        if (hashes.remove(codeHash)) {
-            user.setMfaBackupCodesHash(hashes);
-            userRepository.save(user);
-            return true;
+        if (!hashes.contains(codeHash)) {
+            return false;
         }
-        return false;
+
+        String claimKey = BACKUP_CLAIM_PREFIX + user.getId() + ":" + codeHash;
+        Boolean claimed = redisTemplate.opsForValue()
+                .setIfAbsent(claimKey, "1", CLAIM_TTL_SECONDS, TimeUnit.SECONDS);
+        if (!Boolean.TRUE.equals(claimed)) {
+            return false;
+        }
+
+        hashes.remove(codeHash);
+        user.setMfaBackupCodesHash(hashes);
+        userRepository.save(user);
+        return true;
+    }
+
+    private int getAttemptCount(String challengeToken, UUID userId, String ipAddress) {
+        int challengeAttempts = readAttempt("challenge:" + challengeToken);
+        int userAttempts = readAttempt("user:" + userId);
+        int ipAttempts = readAttempt("ip:" + normalizeIp(ipAddress));
+        return Math.max(challengeAttempts, Math.max(userAttempts, ipAttempts));
+    }
+
+    private void incrementAttempt(String scope) {
+        String key = attemptKey(scope);
+        Long attempts = redisTemplate.opsForValue().increment(key);
+        if (attempts != null && attempts == 1) {
+            redisTemplate.expire(key, ATTEMPT_WINDOW_MINUTES, TimeUnit.MINUTES);
+        }
+    }
+
+    private int readAttempt(String scope) {
+        String value = redisTemplate.opsForValue().get(attemptKey(scope));
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            return MAX_FAILED_ATTEMPTS;
+        }
+    }
+
+    private String attemptKey(String scope) {
+        return ATTEMPT_PREFIX + scope;
+    }
+
+    private String normalizeIp(String ipAddress) {
+        return ipAddress == null || ipAddress.isBlank() ? "unknown" : ipAddress;
     }
 
     private String generateCodeForStep(String base32Secret, long step) {
