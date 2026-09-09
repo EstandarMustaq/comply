@@ -141,7 +141,7 @@ Na prática, `rbac-authorization`, `token-lifecycle`, `mfa-hardening`, `sanction
 
 ### Frontend e contrato
 
-- Testes de contrato para cada chamada em `frontend/lib/api-client.ts`.
+- Testes de contrato para cada chamada em `app/application/lib/api-client.ts`.
 - Testes de fluxo para login/MFA, upload, mapeamento, revisão de flag, cliente e STR.
 - Validação de DTOs e erros HTTP reais, não apenas build estático.
 
@@ -183,6 +183,6 @@ Próxima fase — Documentação de produto e modularização:
 - [ ] Consolidar `README.md`, `ROADMAP.md` e a linguagem Financial Compliance Intelligent.
 - [ ] Aplicar o bloqueio de referências legais em UI, backend e respostas de produto.
 - [ ] Unificar comandos de workspace na raiz.
-- [ ] Migrar `backend/` e `frontend/` para submódulos Git após obter URLs reais e preservar o histórico.
+- [x] Migrar `package/compliance-engine/` e `app/application/` para submódulos Git com histórico local preservado e URLs configuradas; [ ] publicar os commits nos remotos e validar clone externo.
 
 Observação: os blocos de implementação P0, P1 e P2 foram executados em branches específicas, validados e mesclados em `main`, preservando os branches de trabalho. O estado atual da entrega é "funcional para evolução operacional/cumprimento, mas ainda pendente de homologação regulatória final e autorização de produção".
