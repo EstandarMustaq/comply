@@ -8,6 +8,7 @@ import com.fincomp.flags.entity.FlagType;
 import com.fincomp.flags.repository.FlagRepository;
 import com.fincomp.monitoring.entity.Transaction;
 import com.fincomp.sanctions.entity.SanctionsListEntry;
+import com.fincomp.sanctions.entity.SanctionsVersionStatus;
 import com.fincomp.sanctions.repository.SanctionsListRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,14 @@ public class SanctionsScreeningService {
         if (client == null || client.getFullName() == null) return Optional.empty();
 
         String normalizedClientName = normalize(client.getFullName());
-        List<SanctionsListEntry> candidates = sanctionsRepository.findAll();
+        Instant now = Instant.now();
+        List<SanctionsListEntry> candidates = sanctionsRepository.findAll().stream()
+                .filter(entry -> entry.getVersion() == null
+                        || (entry.getVersion().getStatus() == SanctionsVersionStatus.ACTIVE
+                        && !entry.getVersion().getValidFrom().isAfter(now)
+                        && (entry.getVersion().getValidUntil() == null
+                        || entry.getVersion().getValidUntil().isAfter(now))))
+                .toList();
 
         for (SanctionsListEntry entry : candidates) {
             String normalizedSanctionName = normalize(entry.getFullName());

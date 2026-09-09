@@ -14,6 +14,7 @@ import java.util.UUID;
 public interface SanctionsListRepository extends JpaRepository<SanctionsListEntry, UUID> {
 
     List<SanctionsListEntry> findBySourceList(SanctionsSourceList sourceList);
+    List<SanctionsListEntry> findByVersionId(UUID versionId);
 
     @Query("SELECT s FROM SanctionsListEntry s WHERE LOWER(s.fullName) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<SanctionsListEntry> searchByNameLike(@Param("query") String query);
