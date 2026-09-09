@@ -29,6 +29,10 @@ public class SanctionsListEntry {
     @Column(name = "imported_at", nullable = false, updatable = false)
     private Instant importedAt = Instant.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "version_id")
+    private SanctionsListVersion version;
+
     public SanctionsListEntry() {
     }
 
@@ -86,5 +90,13 @@ public class SanctionsListEntry {
 
     public void setImportedAt(Instant importedAt) {
         this.importedAt = importedAt;
+    }
+
+    public SanctionsListVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(SanctionsListVersion version) {
+        this.version = version;
     }
 }

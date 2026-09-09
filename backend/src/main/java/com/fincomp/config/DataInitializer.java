@@ -5,6 +5,7 @@ import com.fincomp.sanctions.entity.SanctionsEntityType;
 import com.fincomp.sanctions.entity.SanctionsListEntry;
 import com.fincomp.sanctions.entity.SanctionsSourceList;
 import com.fincomp.sanctions.repository.SanctionsListRepository;
+import com.fincomp.sanctions.service.SanctionsDataLifecycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -20,13 +21,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private final SanctionsListRepository sanctionsListRepository;
     private final ObjectMapper objectMapper;
+    private final SanctionsDataLifecycleService lifecycleService;
 
     public DataInitializer(
             SanctionsListRepository sanctionsListRepository,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            SanctionsDataLifecycleService lifecycleService
     ) {
         this.sanctionsListRepository = sanctionsListRepository;
         this.objectMapper = objectMapper;
+        this.lifecycleService = lifecycleService;
     }
 
     @Override
@@ -37,20 +41,37 @@ public class DataInitializer implements CommandLineRunner {
                     throw new IllegalStateException("Seed obrigatório de sanções não encontrado");
                 }
 
-                List<Map<String, String>> entries = objectMapper.readValue(is, List.class);
+                byte[] seedContent = is.readAllBytes();
+                List<Map<String, String>> entries = objectMapper.readValue(seedContent, List.class);
                 if (entries.isEmpty()) {
                     throw new IllegalStateException("Seed obrigatório de sanções está vazio");
                 }
 
+                List<SanctionsListEntry> parsedEntries = new java.util.ArrayList<>();
                 for (Map<String, String> entry : entries) {
                     validateEntry(entry);
-                    SanctionsListEntry sle = new SanctionsListEntry(
+                    parsedEntries.add(new SanctionsListEntry(
                             entry.get("fullName"),
                             SanctionsEntityType.valueOf(entry.get("entityType")),
                             SanctionsSourceList.valueOf(entry.get("sourceList")),
                             entry.get("rawReference")
-                    );
-                    sanctionsListRepository.save(sle);
+                    ));
+                }
+                for (SanctionsSourceList source : SanctionsSourceList.values()) {
+                    List<SanctionsListEntry> sourceEntries = parsedEntries.stream()
+                            .filter(entry -> entry.getSourceList() == source)
+                            .toList();
+                    if (!sourceEntries.isEmpty()) {
+                        String version = "seed-2026-09-" + source.name().toLowerCase();
+                        lifecycleService.registerVersion(
+                                version,
+                                source,
+                                "classpath:/sanctions_nacional_seed.json",
+                                seedContent,
+                                sourceEntries
+                        );
+                        lifecycleService.activate(version);
+                    }
                 }
                 log.info("Carga inicial de sanções concluída: {} registos carregados (Lista Nacional e ONU)", entries.size());
             } catch (Exception e) {
