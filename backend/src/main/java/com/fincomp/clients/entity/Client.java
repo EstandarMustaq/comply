@@ -55,6 +55,15 @@ public class Client {
     @Column(name = "kyc_complete", nullable = false)
     private boolean kycComplete = false;
 
+    @Column(name = "sanctions_frozen", nullable = false)
+    private boolean sanctionsFrozen = false;
+
+    @Column(name = "sanctions_frozen_at")
+    private Instant sanctionsFrozenAt;
+
+    @Column(name = "sanctions_freeze_reason")
+    private String sanctionsFreezeReason;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BeneficialOwner> beneficialOwners = new ArrayList<>();
 
@@ -182,6 +191,30 @@ public class Client {
 
     public void setKycComplete(boolean kycComplete) {
         this.kycComplete = kycComplete;
+    }
+
+    public boolean isSanctionsFrozen() {
+        return sanctionsFrozen;
+    }
+
+    public void setSanctionsFrozen(boolean sanctionsFrozen) {
+        this.sanctionsFrozen = sanctionsFrozen;
+    }
+
+    public Instant getSanctionsFrozenAt() {
+        return sanctionsFrozenAt;
+    }
+
+    public void setSanctionsFrozenAt(Instant sanctionsFrozenAt) {
+        this.sanctionsFrozenAt = sanctionsFrozenAt;
+    }
+
+    public String getSanctionsFreezeReason() {
+        return sanctionsFreezeReason;
+    }
+
+    public void setSanctionsFreezeReason(String sanctionsFreezeReason) {
+        this.sanctionsFreezeReason = sanctionsFreezeReason;
     }
 
     public List<BeneficialOwner> getBeneficialOwners() {
