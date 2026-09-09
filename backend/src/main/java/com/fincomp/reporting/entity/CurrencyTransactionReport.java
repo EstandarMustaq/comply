@@ -60,8 +60,15 @@ public class CurrencyTransactionReport {
     }
 
     public void markAsSubmitted() {
+        if (submittedAt != null) {
+            throw new IllegalStateException("Relatório CTR já foi submetido e não pode ser alterado");
+        }
         this.submittedAt = Instant.now();
         this.retentionUntil = LocalDate.ofInstant(this.submittedAt, ZoneId.systemDefault()).plusYears(10);
+    }
+
+    public boolean isSubmitted() {
+        return submittedAt != null;
     }
 
     public UUID getId() {

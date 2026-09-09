@@ -102,7 +102,12 @@ public class ReportController {
         SuspiciousActivityReport str = strRepository.findById(id).orElse(null);
         if (str == null) return ResponseEntity.notFound().build();
 
-        str.markAsSubmitted(request.gifimRegistrationNumber());
+        try {
+            validateStrReadyForSubmission(str);
+            str.markAsSubmitted(request.gifimRegistrationNumber());
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            return ResponseEntity.status(409).body(Map.of("message", exception.getMessage()));
+        }
         SuspiciousActivityReport saved = strRepository.save(str);
 
         User actor = (User) authentication.getPrincipal();
@@ -123,7 +128,11 @@ public class ReportController {
         CurrencyTransactionReport ctr = ctrRepository.findById(id).orElse(null);
         if (ctr == null) return ResponseEntity.notFound().build();
 
-        ctr.markAsSubmitted();
+        try {
+            ctr.markAsSubmitted();
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.status(409).body(Map.of("message", exception.getMessage()));
+        }
         CurrencyTransactionReport saved = ctrRepository.save(ctr);
 
         User actor = (User) authentication.getPrincipal();
@@ -131,5 +140,16 @@ public class ReportController {
                 "{\"retentionUntil\": \"" + ctr.getRetentionUntil() + "\"}");
 
         return ResponseEntity.ok(saved);
+    }
+
+    private void validateStrReadyForSubmission(SuspiciousActivityReport str) {
+        if (str.getAccountHolder() == null || str.getAccountHolder().isBlank()
+                || str.getSuspicionDescription() == null || str.getSuspicionDescription().isBlank()
+                || str.getBusinessRelationshipDescription() == null
+                || str.getBusinessRelationshipDescription().isBlank()
+                || str.getReportingInstitution() == null || str.getReportingInstitution().isBlank()
+                || str.getOcosName() == null || str.getOcosName().isBlank()) {
+            throw new IllegalArgumentException("STR incompleto: preencha instituição, titular, descrição da suspeita, relação de negócio e OCOS");
+        }
     }
 }
