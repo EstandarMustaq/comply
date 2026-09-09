@@ -21,6 +21,8 @@ public interface FlagRepository extends JpaRepository<Flag, UUID>, JpaSpecificat
 
     List<Flag> findByTypeAndStatus(FlagType type, FlagStatus status);
 
+    boolean existsByClientIdAndTypeAndStatus(UUID clientId, FlagType type, FlagStatus status);
+
     long countByStatus(FlagStatus status);
 
     long countByType(FlagType type);
