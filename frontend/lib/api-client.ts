@@ -73,7 +73,24 @@ class ApiClient {
 
     if (response.status === 401) {
       if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+        const refreshToken = localStorage.getItem("fincomp_refresh_token");
+        if (refreshToken && !endpoint.includes("/auth/refresh")) {
+          try {
+            const refreshed = await this.request<AuthResponse>("/auth/refresh", {
+              method: "POST",
+              body: JSON.stringify({ refreshToken }),
+            });
+            if (refreshed.accessToken) {
+              this.setToken(refreshed.accessToken);
+              if (refreshed.refreshToken) localStorage.setItem("fincomp_refresh_token", refreshed.refreshToken);
+              return this.request<T>(endpoint, options);
+            }
+          } catch {
+            // Clear credentials below when rotation fails.
+          }
+        }
         this.clearToken();
+        localStorage.removeItem("fincomp_refresh_token");
         window.location.href = "/login";
       }
       throw new Error("Session expired. Please sign in again.");
@@ -108,6 +125,7 @@ class ApiClient {
     if (token) {
       this.setToken(token);
     }
+    if (res.refreshToken && typeof window !== "undefined") localStorage.setItem("fincomp_refresh_token", res.refreshToken);
     return res;
   }
 
@@ -125,6 +143,7 @@ class ApiClient {
     if (token) {
       this.setToken(token);
     }
+    if (res.refreshToken && typeof window !== "undefined") localStorage.setItem("fincomp_refresh_token", res.refreshToken);
     return res;
   }
 
@@ -144,6 +163,7 @@ class ApiClient {
     if (token) {
       this.setToken(token);
     }
+    if (res.refreshToken && typeof window !== "undefined") localStorage.setItem("fincomp_refresh_token", res.refreshToken);
     return res;
   }
 
@@ -158,6 +178,7 @@ class ApiClient {
       // Best-effort: always clear the local token
     } finally {
       this.clearToken();
+      if (typeof window !== "undefined") localStorage.removeItem("fincomp_refresh_token");
     }
   }
 
@@ -168,37 +189,51 @@ class ApiClient {
 
   // --- Insights & Dashboard ---
   async getInsights(): Promise<InsightsData> {
-    return this.request<InsightsData>("/insights");
+    return this.request<InsightsData>("/insights/summary").then((data) => ({
+      ...data,
+      simplifiedRegimeClients: data.simplifiedRegimeCount,
+      normalRegimeClients: data.normalRegimeCount,
+      totalTransactions: data.totalTransactionsCount,
+      urgentSanctionsFlagsCount: data.sanctionsMatchCount,
+    }));
   }
 
   // --- Clients & KYC ---
   async getClients(page = 0, size = 50, search?: string): Promise<Client[]> {
-    const query = search ? `?search=${encodeURIComponent(search)}` : "";
-    return this.request<Client[]>(`/clients${query}`);
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (search) params.set("search", search);
+    return this.request<{ content: BackendClient[] }>(`/clients?${params}`)
+      .then((response) => response.content.map(mapClient));
   }
 
   async getClientById(id: string): Promise<Client> {
-    return this.request<Client>(`/clients/${id}`);
+    return this.request<BackendClient>(`/clients/${id}`).then(mapClient);
   }
 
   async createClient(clientData: Partial<Client>): Promise<Client> {
-    return this.request<Client>("/clients", {
+    return this.request<BackendClient>("/clients", {
       method: "POST",
-      body: JSON.stringify(clientData),
-    });
+      body: JSON.stringify({
+        fullName: clientData.fullName,
+        idDocumentType: clientData.idDocumentType ?? "BI",
+        idDocumentNumber: clientData.idDocumentNumber ?? clientData.documentNumber,
+        nuib: clientData.nuib,
+        dueDiligenceRegime: clientData.dueDiligenceRegime ??
+          (clientData.regime === "SIMPLIFICADO" ? "SIMPLIFIED" : "NORMAL"),
+        isPep: clientData.isPep ?? false,
+        pepCategory: clientData.pepCategory,
+        seniorManagementApproved: false,
+      }),
+    }).then(mapClient);
   }
 
   // --- Flags & Risk Queue ---
   async getFlags(status?: string, flagType?: string): Promise<Flag[]> {
     const params = new URLSearchParams();
     if (status) params.append("status", status);
-    if (flagType) params.append("flagType", flagType);
+    if (flagType) params.append("type", flagType);
     const queryString = params.toString() ? `?${params.toString()}` : "";
-    return this.request<Flag[]>(`/flags${queryString}`);
-  }
-
-  async getFlagById(id: string): Promise<Flag> {
-    return this.request<Flag>(`/flags/${id}`);
+    return this.request<BackendFlag[]>(`/flags${queryString}`).then((flags) => flags.map(mapFlag));
   }
 
   async reviewFlag(
@@ -206,71 +241,90 @@ class ApiClient {
     action: "DISMISS" | "RESOLVE",
     notes: string
   ): Promise<Flag> {
-    return this.request<Flag>(`/flags/${id}/review`, {
-      method: "POST",
-      body: JSON.stringify({ action, notes }),
-    });
+    return this.request<BackendFlag>(`/flags/${id}/review`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        note: notes,
+        status: action === "DISMISS" ? "DISMISSED" : "RESOLVED",
+      }),
+    }).then(mapFlag);
   }
 
-  async escalateFlagToStr(id: string, notes: string): Promise<SuspiciousActivityReport> {
-    return this.request<SuspiciousActivityReport>(`/flags/${id}/escalate-str`, {
+  async escalateFlagToStr(id: string, _notes: string): Promise<SuspiciousActivityReport> {
+    const result = await this.request<{ strId: string }>(`/flags/${id}/escalate-to-str`, {
       method: "POST",
-      body: JSON.stringify({ notes }),
     });
+    return this.getStrById(result.strId);
   }
 
   // --- Ingestion / Batches ---
   async uploadBatch(file: File): Promise<ImportBatch> {
     const formData = new FormData();
     formData.append("file", file);
-    return this.request<ImportBatch>("/import/upload", {
+    const response = await this.request<BackendUploadPreview>("/import-batches", {
       method: "POST",
       body: formData,
     });
+    return {
+      id: response.batchId,
+      fileName: response.fileName,
+      fileType: response.format,
+      format: response.format,
+      status: "UPLOADED",
+      totalRows: 0,
+      processedRows: 0,
+      errorRows: 0,
+      createdAt: new Date().toISOString(),
+      headers: response.headers,
+      previewRows: response.previewRows,
+      suggestedMapping: response.suggestedMapping,
+      columnMapping: response.suggestedMapping,
+    };
   }
 
-  async confirmMapping(batchId: string, mapping: Record<string, string>): Promise<any> {
-    return this.request(`/import/${batchId}/confirm-mapping`, {
+  async confirmMapping(batchId: string, mapping: Record<string, string>): Promise<Record<string, unknown>> {
+    return this.request(`/import-batches/${batchId}/confirm-mapping`, {
       method: "POST",
       body: JSON.stringify(mapping),
     });
   }
 
   async getBatches(): Promise<ImportBatch[]> {
-    return this.request<ImportBatch[]>("/import/batches");
+    return this.request<BackendImportBatch[]>("/import-batches")
+      .then((batches) => batches.map(mapImportBatch));
   }
 
   async getBatchById(id: string): Promise<ImportBatch> {
-    return this.request<ImportBatch>(`/import/batches/${id}`);
+    return this.request<BackendImportBatch>(`/import-batches/${id}`).then(mapImportBatch);
   }
 
   // --- Reports (STR & CTR) ---
   async getStrs(): Promise<SuspiciousActivityReport[]> {
-    return this.request<SuspiciousActivityReport[]>("/reports/str");
+    return this.request<BackendStr[]>("/reports/str").then((reports) => reports.map(mapStr));
   }
 
   async getStrById(id: string): Promise<SuspiciousActivityReport> {
-    return this.request<SuspiciousActivityReport>(`/reports/str/${id}`);
+    return this.request<BackendStr>(`/reports/str/${id}`).then(mapStr);
   }
 
   async submitStr(
     id: string,
     submissionData: {
-      suspicionGrounds: string;
-      operationDetails: string;
-      evidenceSummary: string;
-      actionTaken: string;
+      suspicionGrounds?: string;
+      operationDetails?: string;
+      evidenceSummary?: string;
+      actionTaken?: string;
       gifimProtocolNumber: string;
     }
   ): Promise<SuspiciousActivityReport> {
-    return this.request<SuspiciousActivityReport>(`/reports/str/${id}/submit`, {
+    return this.request<BackendStr>(`/reports/str/${id}/submit`, {
       method: "POST",
-      body: JSON.stringify(submissionData),
-    });
+      body: JSON.stringify({ gifimRegistrationNumber: submissionData.gifimProtocolNumber }),
+    }).then(mapStr);
   }
 
   async getCtrs(): Promise<CurrencyTransactionReport[]> {
-    return this.request<CurrencyTransactionReport[]>("/reports/ctr");
+    return this.request<BackendCtr[]>("/reports/ctr").then((reports) => reports.map(mapCtr));
   }
 
   // --- Threshold Rules & Admin Settings ---
@@ -294,3 +348,139 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
+
+type BackendClient = {
+  id: string;
+  fullName: string;
+  idDocumentType: string;
+  idDocumentNumber: string;
+  nuib?: string;
+  dueDiligenceRegime: "NORMAL" | "SIMPLIFIED";
+  riskRating: string;
+  pep: boolean;
+  pepCategory?: string;
+  pepLastReviewedAt?: string;
+  createdAt: string;
+};
+
+type BackendFlag = {
+  id: string;
+  type: Flag["flagType"];
+  status: Flag["status"];
+  reason: string;
+  slaDeadline?: string;
+  createdAt: string;
+  client?: BackendClient;
+};
+
+type BackendUploadPreview = {
+  batchId: string;
+  fileName: string;
+  format: "CSV" | "XLSX";
+  headers: string[];
+  previewRows: string[][];
+  suggestedMapping: Record<string, string>;
+};
+
+type BackendImportBatch = {
+  id: string;
+  fileName: string;
+  format: "CSV" | "XLSX";
+  totalRows: number;
+  errorRows: number;
+  importedAt: string;
+  columnMapping?: Record<string, string>;
+};
+
+type BackendStr = {
+  id: string;
+  reportingInstitution: string;
+  accountNumber?: string;
+  accountHolder: string;
+  transactionExecutor?: string;
+  monetaryValue?: number;
+  suspicionDescription: string;
+  businessRelationshipDescription: string;
+  internalEmployeeInvolved: boolean;
+  voluntaryStatement?: string;
+  ocosName: string;
+  gifimRegistrationNumber?: string;
+  submittedAt?: string;
+  retentionUntil?: string;
+  createdAt: string;
+};
+
+type BackendCtr = {
+  id: string;
+  aggregationPeriodStart: string;
+  aggregationPeriodEnd: string;
+  aggregateValue: number;
+  currency: string;
+  submittedAt?: string;
+  retentionUntil?: string;
+};
+
+function mapClient(client: BackendClient): Client {
+  return {
+    ...client,
+    clientType: "INDIVIDUAL",
+    documentNumber: client.idDocumentNumber,
+    regime: client.dueDiligenceRegime === "SIMPLIFIED" ? "SIMPLIFICADO" : "NORMAL",
+    riskRating: client.riskRating === "HIGH" ? "ALTO" : client.riskRating === "MEDIUM" ? "MEDIO" : "BAIXO",
+    isPep: client.pep,
+  };
+}
+
+function mapFlag(flag: BackendFlag): Flag {
+  return {
+    ...flag,
+    flagType: flag.type,
+    ruleTriggered: flag.reason,
+    client: flag.client ? mapClient(flag.client) : undefined,
+  };
+}
+
+function mapImportBatch(batch: BackendImportBatch): ImportBatch {
+  return {
+    id: batch.id,
+    fileName: batch.fileName,
+    fileType: batch.format,
+    format: batch.format,
+    status: "COMPLETED",
+    totalRows: batch.totalRows,
+    processedRows: batch.totalRows - batch.errorRows,
+    errorRows: batch.errorRows,
+    createdAt: batch.importedAt,
+    importedAt: batch.importedAt,
+    columnMapping: batch.columnMapping,
+  };
+}
+
+function mapStr(report: BackendStr): SuspiciousActivityReport {
+  return {
+    ...report,
+    strReference: report.id,
+    suspicionGrounds: report.suspicionDescription,
+    operationDetails: report.accountNumber ?? "",
+    evidenceSummary: report.voluntaryStatement ?? "",
+    actionTaken: "",
+    gifimProtocolNumber: report.gifimRegistrationNumber,
+    submissionDate: report.submittedAt,
+    retentionDeadline: report.retentionUntil,
+    status: report.submittedAt ? "SUBMITTED" : "DRAFT",
+  };
+}
+
+function mapCtr(report: BackendCtr): CurrencyTransactionReport {
+  return {
+    ...report,
+    ctrReference: report.id,
+    reportingMonth: Number(report.aggregationPeriodStart.slice(5, 7)),
+    reportingYear: Number(report.aggregationPeriodStart.slice(0, 4)),
+    aggregateAmount: report.aggregateValue,
+    transactionCount: 0,
+    status: report.submittedAt ? "SUBMITTED" : "PENDING_SUBMISSION",
+    gifimSubmissionDate: report.submittedAt,
+    createdAt: report.aggregationPeriodStart,
+  };
+}

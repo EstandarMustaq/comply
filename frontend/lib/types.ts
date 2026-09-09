@@ -42,16 +42,23 @@ export interface MfaEnrollResponse {
 
 export interface InsightsData {
   totalClients: number;
-  simplifiedRegimeClients: number;
-  normalRegimeClients: number;
-  totalTransactions: number;
-  totalVolumeMt: number;
+  kycCompleteCount: number;
+  kycCompletenessPercentage: number;
+  simplifiedRegimeCount: number;
+  normalRegimeCount: number;
   pendingFlagsCount: number;
-  urgentSanctionsFlagsCount: number;
-  unreportedCtrsCount: number;
-  reportedStrsCount: number;
-  complianceScorePercent: number;
-  lastUpdated: string;
+  sanctionsMatchCount: number;
+  overdueSlaCount: number;
+  pepReviewDueCount: number;
+  totalTransactionsCount: number;
+  retentionExpiringCount: number;
+  simplifiedRegimeClients?: number;
+  normalRegimeClients?: number;
+  totalTransactions?: number;
+  urgentSanctionsFlagsCount?: number;
+  totalVolumeMt?: number;
+  reportedStrsCount?: number;
+  complianceScorePercent?: number;
 }
 
 export type ClientRegime = "SIMPLIFICADO" | "NORMAL";
@@ -61,9 +68,12 @@ export interface Client {
   id: string;
   fullName: string;
   documentNumber: string;
+  idDocumentType?: string;
+  idDocumentNumber?: string;
   nuib?: string;
   clientType: "INDIVIDUAL" | "CORPORATE";
   regime: ClientRegime;
+  dueDiligenceRegime?: "NORMAL" | "SIMPLIFIED";
   riskRating: ClientRiskRating;
   monthlyVolumeMt?: number;
   annualVolumeMt?: number;
@@ -112,8 +122,10 @@ export type FlagStatus = "PENDING" | "UNDER_REVIEW" | "ESCALATED" | "DISMISSED" 
 export interface Flag {
   id: string;
   flagType: FlagType;
+  type?: FlagType;
   status: FlagStatus;
   ruleTriggered: string;
+  reason?: string;
   details?: Record<string, any>;
   slaDeadline?: string;
   notes?: string;
@@ -135,6 +147,11 @@ export interface ImportBatch {
   detectedHeaders?: string[];
   columnMapping?: Record<string, string>;
   createdAt: string;
+  format?: "CSV" | "XLSX";
+  importedAt?: string;
+  headers?: string[];
+  previewRows?: string[][];
+  suggestedMapping?: Record<string, string>;
 }
 
 export interface SuspiciousActivityReport {
@@ -150,6 +167,19 @@ export interface SuspiciousActivityReport {
   submissionDate?: string;
   retentionDeadline?: string;
   status: "DRAFT" | "SUBMITTED" | "ARCHIVED";
+  accountNumber?: string;
+  accountHolder?: string;
+  transactionExecutor?: string;
+  monetaryValue?: number;
+  suspicionDescription?: string;
+  businessRelationshipDescription?: string;
+  internalEmployeeInvolved?: boolean;
+  voluntaryStatement?: string;
+  reportingInstitution?: string;
+  ocosName?: string;
+  gifimRegistrationNumber?: string;
+  submittedAt?: string;
+  retentionUntil?: string;
   submittedBy?: User;
   createdAt: string;
 }
@@ -165,6 +195,12 @@ export interface CurrencyTransactionReport {
   status: "PENDING_SUBMISSION" | "SUBMITTED" | "ARCHIVED";
   gifimSubmissionDate?: string;
   createdAt: string;
+  aggregationPeriodStart?: string;
+  aggregationPeriodEnd?: string;
+  aggregateValue?: number;
+  currency?: string;
+  submittedAt?: string;
+  retentionUntil?: string;
 }
 
 export interface ThresholdRule {
