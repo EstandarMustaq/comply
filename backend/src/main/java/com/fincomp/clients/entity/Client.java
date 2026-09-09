@@ -26,6 +26,10 @@ public class Client {
     @Column(name = "id_document_number", nullable = false)
     private String idDocumentNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "client_type", nullable = false)
+    private ClientType clientType = ClientType.INDIVIDUAL;
+
     @Column(name = "nuib")
     private String nuib; // Número Único de Identificação Bancária (Art. 138)
 
@@ -119,6 +123,14 @@ public class Client {
 
     public void setIdDocumentNumber(String idDocumentNumber) {
         this.idDocumentNumber = idDocumentNumber;
+    }
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientType clientType) {
+        this.clientType = clientType;
     }
 
     public String getNuib() {
