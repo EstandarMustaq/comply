@@ -1,6 +1,6 @@
 # API contract details
 
-This page complements the endpoint inventory with the stable payload families used by the application client. Exact optionality follows the Java DTOs and `frontend/lib/types.ts`; generated OpenAPI should become the next source of machine validation.
+This page complements the endpoint inventory with the stable payload families used by the application client. Exact optionality follows the Java DTOs and `app/application/lib/types.ts`; generated OpenAPI should become the next source of machine validation.
 
 ## Authentication payloads
 
