@@ -42,7 +42,7 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: false
 
@@ -53,6 +53,12 @@ jobs:
           test -n "$SUBMODULES_TOKEN" || { echo "::error::Configure the SUBMODULES_TOKEN repository secret with read access to both private submodules."; exit 1; }
           git config --global url."https://x-access-token:${SUBMODULES_TOKEN}@github.com/".insteadOf "git@github.com:"
           git submodule update --init --recursive
+
+      - name: Normalize image namespace
+        id: image-names
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: echo "owner=${REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials with OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -66,7 +72,7 @@ jobs:
         with:
           task-definition: ${{ inputs.task-definition }}
           container-name: compliance-engine
-          image: ghcr.io/${{ github.repository_owner }}/compliance-engine:${{ inputs.image-tag }}
+          image: ghcr.io/${{ steps.image-names.outputs.owner }}/compliance-engine:${{ inputs.image-tag }}
 
       - name: Render application image
         id: application-task-definition
@@ -74,7 +80,7 @@ jobs:
         with:
           task-definition: ${{ steps.task-definition.outputs.task-definition }}
           container-name: application
-          image: ghcr.io/${{ github.repository_owner }}/application:${{ inputs.image-tag }}
+          image: ghcr.io/${{ steps.image-names.outputs.owner }}/application:${{ inputs.image-tag }}
 
       - name: Deploy ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
