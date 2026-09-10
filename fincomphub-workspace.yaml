@@ -16,6 +16,7 @@ components:
     install: pnpm --dir app/application install --frozen-lockfile
     build: pnpm --dir app/application build
     typecheck: pnpm --dir app/application exec tsc --noEmit
+    lint: pnpm --dir app/application lint
 
 workspace:
   install: ./scripts/workspace.sh install

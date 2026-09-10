@@ -1,0 +1,82 @@
+name: Deploy to Amazon ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub environment that contains the AWS deployment controls
+        required: true
+        default: production
+        type: environment
+      image-tag:
+        description: Immutable GHCR image tag to deploy
+        required: true
+        type: string
+      task-definition:
+        description: Repository path to the ECS task definition JSON
+        required: true
+        type: string
+      cluster:
+        description: ECS cluster name
+        required: true
+        type: string
+      service:
+        description: ECS service name
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+  packages: read
+
+concurrency:
+  group: deploy-ecs-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy approved revision to ECS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Initialize submodules over HTTPS
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git submodule update --init --recursive
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+
+      - name: Render ECS task definition
+        id: task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ inputs.task-definition }}
+          container-name: compliance-engine
+          image: ghcr.io/${{ github.repository_owner }}/compliance-engine:${{ inputs.image-tag }}
+
+      - name: Render application image
+        id: application-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-definition.outputs.task-definition }}
+          container-name: application
+          image: ghcr.io/${{ github.repository_owner }}/application:${{ inputs.image-tag }}
+
+      - name: Deploy ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.application-task-definition.outputs.task-definition }}
+          service: ${{ inputs.service }}
+          cluster: ${{ inputs.cluster }}
+          wait-for-service-stability: true

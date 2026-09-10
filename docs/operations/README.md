@@ -7,7 +7,7 @@ Use `./scripts/workspace.sh help` to list the unified commands. The root command
 ## Validation
 
 - Backend: Maven tests and package.
-- Frontend: TypeScript check and production build.
+- Application: dependency install, ESLint, TypeScript check, and production build.
 - Configuration: Docker Compose config validation.
 - Scripts: `bash -n` for shell scripts.
 - Repository: secret scan and generated-artifact checks.

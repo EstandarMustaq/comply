@@ -39,6 +39,7 @@ case "${1:-help}" in
   quality)
     backend test
     frontend exec tsc --noEmit
+    frontend lint
     bash -n "$ROOT_DIR"/scripts/*.sh
     "$ROOT_DIR/scripts/check-product-language.sh"
     docker compose config --quiet

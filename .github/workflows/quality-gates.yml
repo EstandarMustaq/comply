@@ -2,7 +2,7 @@ name: Quality Gates
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -14,14 +14,19 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend tests and package
+    name: Compliance engine tests and package
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+
+      - name: Initialize submodules over HTTPS
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git submodule update --init --recursive
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -37,7 +42,7 @@ jobs:
         run: mvn -B -f package/compliance-engine/pom.xml package -DskipTests
 
   frontend:
-    name: Frontend typecheck and build
+    name: Application typecheck, lint, and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -47,7 +52,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+
+      - name: Initialize submodules over HTTPS
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git submodule update --init --recursive
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -64,10 +74,13 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run frontend typecheck
+      - name: Run application typecheck
         run: pnpm exec tsc --noEmit --pretty false
 
-      - name: Build frontend
+      - name: Run application lint
+        run: pnpm lint
+
+      - name: Build application
         run: pnpm build
 
   configuration:
@@ -78,9 +91,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
 
-      - name: Set up Docker Compose
+      - name: Initialize submodules over HTTPS
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git submodule update --init --recursive
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Run product-language check
@@ -116,3 +134,9 @@ jobs:
             echo "Local environment files must not be tracked."
             exit 1
           fi
+
+      - name: Check workspace manifest
+        run: |
+          test -f fincomphub-workspace.yaml
+          grep -q 'package/compliance-engine' fincomphub-workspace.yaml
+          grep -q 'app/application' fincomphub-workspace.yaml
