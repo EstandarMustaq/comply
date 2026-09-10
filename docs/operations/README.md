@@ -21,7 +21,7 @@ The workspace separates verification, publication, and deployment:
 - `publish-containers.yml` publishes immutable SHA-tagged compliance-engine and application images to GHCR after successful `main` quality gates, or by explicit manual dispatch.
 - `deploy-ecs.yml` is a manually dispatched, GitHub-environment-protected deployment. It uses AWS OIDC and requires the ECS cluster, service, task definition, image tag, AWS region, and deploy role to be configured by the repository administrators.
 
-The workflows initialize the SSH-configured submodules through HTTPS on GitHub-hosted runners. This keeps the repository URLs aligned with `.gitmodules` while avoiding a dependency on runner SSH keys.
+The workflows initialize the SSH-configured private submodules through HTTPS on GitHub-hosted runners. Configure a repository or organization secret named `SUBMODULES_TOKEN` with read-only access to `FinCompHub/application` and `FinCompHub/compliance-engine`. The default `GITHUB_TOKEN` cannot read sibling private repositories, so the dedicated token is required. This keeps the repository URLs aligned with `.gitmodules` while avoiding a dependency on runner SSH keys.
 
 ## Environment
 

@@ -33,9 +33,10 @@ jobs:
 
       - name: Initialize submodules over HTTPS
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUBMODULES_TOKEN: ${{ secrets.SUBMODULES_TOKEN }}
         run: |
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+          test -n "$SUBMODULES_TOKEN" || { echo "::error::Configure the SUBMODULES_TOKEN repository secret with read access to both private submodules."; exit 1; }
+          git config --global url."https://x-access-token:${SUBMODULES_TOKEN}@github.com/".insteadOf "git@github.com:"
           git submodule update --init --recursive
 
       - name: Log in to GitHub Container Registry
