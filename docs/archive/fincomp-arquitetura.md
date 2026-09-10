@@ -1,5 +1,7 @@
 # FinComp — Arquitetura Completa (v2)
 
+> **Arquivo histórico — terminologia atualizada:** Este documento registra uma arquitetura anterior. O produto atual é **Financial Compliance Intelligent**, organizado como workspace FinCompHub com `package/compliance-engine` e `app/application`. Os requisitos atuais estão em `docs/architecture/README.md`, `docs/api/README.md` e `fincomphub-workspace.yaml`.
+
 Ferramenta de compliance/auditoria AML-CFT para instituições de microfinança e microcrédito em Moçambique. Deploy single-tenant, uma instância por cliente.
 
 **Base legal coberta com profundidade** (não apenas citada):

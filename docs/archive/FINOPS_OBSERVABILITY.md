@@ -1,5 +1,7 @@
 # FinComp Observability and FinOps Baseline
 
+> **Historical baseline — current terminology:** This document records the earlier FinComp baseline. The current product is **Financial Compliance Intelligent**, with the service in `package/compliance-engine`, the application in `app/application`, and workspace operations exposed through `scripts/workspace.sh`.
+
 This repository now exposes a production baseline for operational telemetry and resource governance.
 
 ## Observability

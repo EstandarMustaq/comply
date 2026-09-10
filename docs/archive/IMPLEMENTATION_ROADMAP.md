@@ -1,5 +1,7 @@
 # FinComp — Plano de Implementação da Revisão
 
+> **Arquivo histórico — terminologia atualizada:** Este roadmap registra a execução inicial antes da consolidação FinCompHub. O produto vigente é **Financial Compliance Intelligent** e a estrutura atual usa `package/compliance-engine`, `app/application` e `fincomphub-workspace.yaml`.
+
 **Data:** 2026-09-09  
 **Documento de origem:** `review.md`  
 **Commit-base:** `fcd45dd chore: establish versioned project baseline`  

@@ -1,5 +1,7 @@
 # FinComp — Plano de Execução Detalhado (25 a 28 Dias para MVP Regulatório)
 
+> **Arquivo histórico — terminologia atualizada:** Este plano descreve uma fase anterior do FinCompHub. A nomenclatura corrente é **Financial Compliance Intelligent**; os componentes atuais são `package/compliance-engine` e `app/application`. Consulte `ROADMAP.md` e `fincomphub-workspace.yaml` para o estado vigente.
+
 Plano operacional e técnico calibrado para a implementação do **FinComp (v2)**, ferramenta de auditoria e compliance AML-CFT para instituições de microfinanças e microcrédito em Moçambique.
 
 Base regulatória estrita:

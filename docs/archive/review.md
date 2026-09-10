@@ -1,5 +1,7 @@
 # Revisão Completa do Backend
 
+> **Arquivo histórico — terminologia atualizada:** Esta revisão registra o estado anterior do serviço que hoje é o `package/compliance-engine`. O produto vigente é **Financial Compliance Intelligent**, com a aplicação em `app/application`; os achados abaixo são históricos e não substituem a documentação atual.
+
 **Data:** 2026-09-06  
 **Escopo:** Backend, arquitetura, plano de implementação, fases funcionais, segurança, conformidade, configuração, scripts, práticas SaaS/micro-SaaS e FinOps.  
 **Alterações realizadas:** Nenhuma alteração em código, configuração ou scripts.
