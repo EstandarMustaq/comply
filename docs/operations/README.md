@@ -17,8 +17,9 @@ Use `./scripts/workspace.sh help` to list the unified commands. The root command
 The workspace separates verification, publication, and deployment:
 
 - `quality-gates.yml` runs on pull requests and pushes to `main`. It checks the recursive submodules, Java/Maven, pnpm/ESLint/TypeScript, Compose files, shell scripts, product language, workspace manifest, secrets, and diff integrity.
-- `publish-maven.yml` publishes the compliance engine to GitHub Packages only when manually dispatched or when a `v*` tag is pushed.
-- `publish-containers.yml` publishes immutable SHA-tagged compliance-engine and application images to GHCR after successful `main` quality gates, or by explicit manual dispatch.
+- The compliance-engine submodule publishes `com.fincomphub:compliance-engine` to GitHub Packages from its own `publish-maven.yml` when manually dispatched or when a `v*` tag is pushed.
+- The application submodule publishes its independently versioned container from its own `release.yml` when manually dispatched or when a `v*` tag is pushed.
+- The workspace `publish-containers.yml` remains available for an integrated, validated snapshot of both components after the parent Quality Gates workflow.
 - `deploy-ecs.yml` is a manually dispatched, GitHub-environment-protected deployment. It uses AWS OIDC and requires the ECS cluster, service, task definition, image tag, AWS region, and deploy role to be configured by the repository administrators.
 
 The workflows initialize the SSH-configured private submodules through HTTPS on GitHub-hosted runners. Configure a repository or organization secret named `SUBMODULES_TOKEN` with read-only access to `FinCompHub/application` and `FinCompHub/compliance-engine`. The default `GITHUB_TOKEN` cannot read sibling private repositories, so the dedicated token is required. This keeps the repository URLs aligned with `.gitmodules` while avoiding a dependency on runner SSH keys.
