@@ -46,11 +46,11 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  compliance-engine:
+  grc-engine:
     build:
-      context: ./package/compliance-engine
+      context: ./package/grc-engine
       dockerfile: Dockerfile
-    container_name: fincomp-compliance-engine
+    container_name: fincomp-grc-engine
     restart: unless-stopped
     ports:
       - "${SERVER_PORT:-8080}:8080"
@@ -89,14 +89,14 @@ services:
         max-file: "3"
     profiles: ["app", "full"]
 
-  application:
+  design-system:
     build:
-      context: ./app/application
+      context: ./app/design-system
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-FinComp}
-    container_name: fincomp-application
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Fincomp}
+    container_name: fincomp-design-system
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -104,7 +104,7 @@ services:
       NODE_ENV: production
       PORT: 3000
     depends_on:
-      - compliance-engine
+      - grc-engine
     networks:
       - fincomp-net
     logging:

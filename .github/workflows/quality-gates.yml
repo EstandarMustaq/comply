@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  backend:
-    name: Compliance engine tests and package
+  grc-engine:
+    name: GRC engine tests and package
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -38,19 +38,19 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Run backend tests
-        run: mvn -B -f package/compliance-engine/pom.xml test
+      - name: Run GRC engine tests
+        run: mvn -B -f package/grc-engine/pom.xml test
 
-      - name: Build backend package
-        run: mvn -B -f package/compliance-engine/pom.xml package -DskipTests
+      - name: Build GRC engine package
+        run: mvn -B -f package/grc-engine/pom.xml package -DskipTests
 
-  frontend:
-    name: Application typecheck, lint, and build
+  design-system:
+    name: Design system checks and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: app/application
+        working-directory: app/design-system
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -68,26 +68,123 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10
+          version: 11.20.0
 
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24"
           cache: pnpm
-          cache-dependency-path: app/application/pnpm-lock.yaml
+          cache-dependency-path: app/design-system/pnpm-lock.yaml
 
-      - name: Install frontend dependencies
+      - name: Install design system dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run application typecheck
-        run: pnpm exec tsc --noEmit --pretty false
+      - name: Run design system checks
+        run: pnpm run check
 
-      - name: Run application lint
-        run: pnpm lint
+      - name: Run design system unit tests
+        run: pnpm run test:unit
 
-      - name: Build application
+      - name: Build design system
         run: pnpm build
+
+  api-contract:
+    name: GRC engine and design system API contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: fincomp_contract
+          POSTGRES_USER: fincomp_app
+          POSTGRES_PASSWORD: fincomp_contract_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fincomp_app -d fincomp_contract"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 6379:6379
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          submodules: false
+
+      - name: Initialize submodules over HTTPS
+        env:
+          SUBMODULES_TOKEN: ${{ secrets.SUBMODULES_TOKEN }}
+        run: |
+          test -n "$SUBMODULES_TOKEN" || { echo "::error::Configure the SUBMODULES_TOKEN repository secret with read access to both private submodules."; exit 1; }
+          git config --global url."https://x-access-token:${SUBMODULES_TOKEN}@github.com/".insteadOf "git@github.com:"
+          git submodule update --init --recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.20.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: app/design-system/pnpm-lock.yaml
+
+      - name: Install design system dependencies
+        working-directory: app/design-system
+        run: pnpm install --frozen-lockfile
+
+      - name: Start GRC engine with OpenAPI enabled
+        env:
+          SPRING_PROFILES_ACTIVE: contract
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_NAME: fincomp_contract
+          DB_USER: fincomp_app
+          DB_PASSWORD: fincomp_contract_password
+          REDIS_HOST: 127.0.0.1
+          REDIS_PORT: 6379
+          REDIS_PASSWORD: ""
+          JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+          MFA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef
+          FINCOMP_API_DOCS_ENABLED: "true"
+        run: mvn -B -f package/grc-engine/pom.xml spring-boot:run > /tmp/grc-engine.log 2>&1 &
+
+      - name: Wait for GRC engine readiness
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/readiness; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/grc-engine.log
+          exit 1
+
+      - name: Run OpenAPI contract test
+        working-directory: app/design-system
+        env:
+          FINCOMP_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
+        run: pnpm run test:contract
 
   configuration:
     name: Configuration and scripts
@@ -139,13 +236,13 @@ jobs:
 
       - name: Check ignored environment files are not tracked
         run: |
-          if [ -n "$(git ls-files .env app/application/.env.local)" ]; then
+          if [ -n "$(git ls-files .env app/design-system/.env.local)" ]; then
             echo "Local environment files must not be tracked."
             exit 1
           fi
 
       - name: Check workspace manifest
         run: |
-          test -f fincomphub-workspace.yaml
-          grep -q 'package/compliance-engine' fincomphub-workspace.yaml
-          grep -q 'app/application' fincomphub-workspace.yaml
+          test -f fincomp-workspace.yaml
+          grep -q 'package/grc-engine' fincomp-workspace.yaml
+          grep -q 'app/design-system' fincomp-workspace.yaml

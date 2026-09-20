@@ -1,6 +1,6 @@
-# FinComp — Arquitetura Completa (v2)
+# Fincomp — Arquitetura Completa (v2)
 
-> **Arquivo histórico — terminologia atualizada:** Este documento registra uma arquitetura anterior. O produto atual é **Financial Compliance Intelligent**, organizado como workspace FinCompHub com `package/compliance-engine` e `app/application`. Os requisitos atuais estão em `docs/architecture/README.md`, `docs/api/README.md` e `fincomphub-workspace.yaml`.
+> **Arquivo histórico — terminologia atualizada:** Este documento registra uma arquitetura anterior. O produto atual é **Financial Compliance Intelligent**, organizado como workspace Fincomp com `package/grc-engine` e `app/design-system`. Os requisitos atuais estão em `docs/architecture/README.md`, `docs/api/README.md` e `fincomp-workspace.yaml`.
 
 Ferramenta de compliance/auditoria AML-CFT para instituições de microfinança e microcrédito em Moçambique. Deploy single-tenant, uma instância por cliente.
 
@@ -14,9 +14,9 @@ Ferramenta de compliance/auditoria AML-CFT para instituições de microfinança 
 
 ## 1. Visão geral
 
-- **Backend**: Spring Boot (monólito modular), PostgreSQL, Flyway, Redis.
-- **Frontend**: Next.js, 100% shadcn/ui, dashboard única (não navegação multi-página).
-- **Deploy**: EC2 t4g.small por cliente, Docker Compose (app + frontend + db + redis + caddy).
+- **GRC Engine**: Spring Boot (monólito modular), PostgreSQL, Flyway, Redis.
+- **Design System**: Next.js, 100% shadcn/ui, dashboard única (não navegação multi-página).
+- **Deploy**: EC2 t4g.small por cliente, Docker Compose (app + design system + db + redis + caddy).
 - **Escopo**: single-tenant por entrega. Multi-tenant só acima de 5 clientes.
 - **Gestão**: sistema assume múltiplos utilizadores por instituição (ADMIN, COMPLIANCE_OFFICER, OCOS, AUDITOR_READONLY), não uma pessoa só. Autenticação reforçada com 2FA obrigatório para ADMIN e OCOS.
 
@@ -233,7 +233,7 @@ Reporte anual até **31 de Janeiro** do ano seguinte, em formato Excel, conforme
 
 ---
 
-## 4. Backend package structure (Spring Boot, English)
+## 4. GRC Engine package structure (Spring Boot, English)
 
 ```
 com.fincomp
@@ -264,7 +264,7 @@ Não é decoração, cada uso resolve um problema concreto de um sistema gerido 
 - **Rate limiting de login e MFA**: chave `login_attempts:{email}:{ip}` com TTL, bloqueio temporário após N tentativas falhadas, protecção contra força bruta num sistema que guarda dados de compliance sensíveis.
 - **Desafio MFA pendente**: entre a validação de password e a validação do código TOTP, um `mfaChallengeToken` de curta duração (5 min) fica em Redis, nunca na base de dados principal.
 - **Janela de replay do TOTP**: cada código usado fica registado por 30-60 segundos para impedir reutilização do mesmo código dentro da janela de validade.
-- **Fila de processamento de importação**: uploads grandes (histórico de anos de transacções) são processados de forma assíncrona; o endpoint de upload responde de imediato e o estado do processamento fica em Redis, consultável pelo frontend.
+- **Fila de processamento de importação**: uploads grandes (histórico de anos de transacções) são processados de forma assíncrona; o endpoint de upload responde de imediato e o estado do processamento fica em Redis, consultável pelo design system.
 - **Cache de agregações de insights**: TTL curto (poucos minutos) para evitar recalcular agregações pesadas a cada carregamento do dashboard.
 
 ---
@@ -274,7 +274,7 @@ Não é decoração, cada uso resolve um problema concreto de um sistema gerido 
 Fluxo de enrolamento:
 
 1. `POST /api/auth/mfa/enroll` (autenticado) — gera um segredo TOTP, guarda-o temporariamente em Redis (não na base de dados até confirmação), devolve um URI `otpauth://` convertido em QR code (biblioteca ZXing) para digitalizar com Google Authenticator ou Authy, mais a chave em texto para inserção manual.
-2. `POST /api/auth/mfa/confirm` — utilizador insere o código gerado pela app, o backend valida contra o segredo pendente, persiste `mfa_secret_encrypted` e `mfa_enabled=true` na tabela `users`, gera códigos de recuperação de uso único (guardados apenas como hash) e devolve-os uma única vez.
+2. `POST /api/auth/mfa/confirm` — utilizador insere o código gerado pela app, o GRC engine valida contra o segredo pendente, persiste `mfa_secret_encrypted` e `mfa_enabled=true` na tabela `users`, gera códigos de recuperação de uso único (guardados apenas como hash) e devolve-os uma única vez.
 
 Fluxo de login com MFA activo:
 
@@ -313,7 +313,7 @@ MFA obrigatório para os papéis ADMIN e OCOS, dado que são estes que têm aces
 
 ---
 
-## 8. Frontend (Next.js, 100% shadcn/ui, dashboard única)
+## 8. Design System (Next.js, 100% shadcn/ui, dashboard única)
 
 Shell persistente baseado nos blocos `dashboard-01` e `login-04` do shadcn. Secções trocam dentro do mesmo shell; detalhe e revisão abrem em `Sheet`/`Dialog`.
 
@@ -362,7 +362,7 @@ EC2 `t4g.small` por cliente, Docker Compose com cinco serviços:
 ```
 services:
   app:       # Spring Boot, porta 8080
-  frontend:  # Next.js, porta 3000
+  design system:  # Next.js, porta 3000
   db:        # Postgres 16
   redis:     # Redis 7, sessões/rate-limit/fila de importação
   caddy:     # reverse proxy + TLS automático
@@ -388,7 +388,7 @@ Com a profundidade legal, Redis, 2FA e configurações agora incluídas, catorze
 | 8 | Flags com SLA de 24h para sanções, audit log integrado |
 | 9 | Reporting: STR com campos do Art. 98, CTR |
 | 10 | Insights |
-| 11-12 | Frontend Next.js/shadcn completo |
+| 11-12 | Design System Next.js/shadcn completo |
 | 13 | Settings (gestão de utilizadores, regras) |
 | 14 | Deploy AWS, teste com dados reais de um cliente |
 

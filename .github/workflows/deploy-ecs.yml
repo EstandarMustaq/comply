@@ -71,21 +71,21 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ inputs.task-definition }}
-          container-name: compliance-engine
-          image: ghcr.io/${{ steps.image-names.outputs.owner }}/compliance-engine:${{ inputs.image-tag }}
+          container-name: grc-engine
+          image: ghcr.io/${{ steps.image-names.outputs.owner }}/grc-engine:${{ inputs.image-tag }}
 
-      - name: Render application image
-        id: application-task-definition
+      - name: Render design system image
+        id: design-system-task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ steps.task-definition.outputs.task-definition }}
-          container-name: application
-          image: ghcr.io/${{ steps.image-names.outputs.owner }}/application:${{ inputs.image-tag }}
+          container-name: design-system
+          image: ghcr.io/${{ steps.image-names.outputs.owner }}/design-system:${{ inputs.image-tag }}
 
       - name: Deploy ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: ${{ steps.application-task-definition.outputs.task-definition }}
+          task-definition: ${{ steps.design-system-task-definition.outputs.task-definition }}
           service: ${{ inputs.service }}
           cluster: ${{ inputs.cluster }}
           wait-for-service-stability: true

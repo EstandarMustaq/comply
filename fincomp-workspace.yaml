@@ -1,22 +1,24 @@
 version: 1
-name: fincomphub-platform
+name: fincomp-platform
 product: Financial Compliance Intelligent
 
 components:
-  compliance-engine:
-    path: package/compliance-engine
-    repository: git@github.com:FinCompHub/compliance-engine.git
+  grc-engine:
+    path: package/grc-engine
+    repository: git@github.com:tryfincomp/grc-engine.git
     technology: spring-boot
-    build: mvn -q -f package/compliance-engine/pom.xml package -DskipTests
-    test: mvn -q -f package/compliance-engine/pom.xml test
-  application:
-    path: app/application
-    repository: git@github.com:FinCompHub/application.git
+    build: mvn -q -f package/grc-engine/pom.xml package -DskipTests
+    test: mvn -q -f package/grc-engine/pom.xml test
+  design-system:
+    path: app/design-system
+    repository: git@github.com:tryfincomp/design-system.git
     technology: nextjs
-    install: pnpm --dir app/application install --frozen-lockfile
-    build: pnpm --dir app/application build
-    typecheck: pnpm --dir app/application exec tsc --noEmit
-    lint: pnpm --dir app/application lint
+    install: pnpm --dir app/design-system install --frozen-lockfile
+    build: pnpm --dir app/design-system build
+    test: pnpm --dir app/design-system run test:unit
+    contract-test: pnpm --dir app/design-system run test:contract
+    typecheck: pnpm --dir app/design-system run typecheck
+    lint: pnpm --dir app/design-system run lint
 
 workspace:
   install: ./scripts/workspace.sh install

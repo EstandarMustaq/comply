@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# FinComp Production Deployment Script
+# Fincomp Production Deployment Script
 # Pre-flight environment validation, security audits, and zero-downtime deployment
 # ==============================================================================
 
@@ -60,14 +60,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ "${DOWN_MODE}" = true ]; then
-    echo -e "${YELLOW}Shutting down FinComp Production stack...${NC}"
+    echo -e "${YELLOW}Shutting down Fincomp production stack...${NC}"
     docker compose -f "${COMPOSE_FILE}" down
     echo -e "${GREEN}Production services stopped.${NC}"
     exit 0
 fi
 
 echo -e "${BOLD}${CYAN}==================================================================${NC}"
-echo -e "${BOLD}FinComp Production Deployment Pre-Flight Checks${NC}"
+echo -e "${BOLD}Fincomp production deployment pre-flight checks${NC}"
 echo -e "${BOLD}${CYAN}==================================================================${NC}"
 
 # 1. Verify Docker environment
@@ -161,7 +161,7 @@ if [ "${SKIP_SECURITY_CHECK}" = false ]; then
 fi
 
 # 4. Deployment execution
-echo -e "\n${BOLD}${YELLOW}Deploying FinComp via Production Compose...${NC}"
+echo -e "\n${BOLD}${YELLOW}Deploying Fincomp via production Compose...${NC}"
 
 DOCKER_BUILD_ARGS=""
 if [ "${BUILD_NO_CACHE}" = true ]; then
@@ -197,18 +197,18 @@ wait_for_container() {
 
 wait_for_container "fincomp-prod-db" 30
 wait_for_container "fincomp-prod-redis" 20
-wait_for_container "fincomp-prod-backend" 45
-wait_for_container "fincomp-prod-frontend" 30
+wait_for_container "fincomp-grc-engine" 45
+wait_for_container "fincomp-design-system" 30
 wait_for_container "fincomp-prod-caddy" 15
 
 echo ""
 echo -e "${BOLD}${GREEN}==================================================================${NC}"
-echo -e "${BOLD}FinComp Production Stack Successfully Deployed!${NC}"
+echo -e "${BOLD}Fincomp production stack successfully deployed.${NC}"
 echo -e "${BOLD}${GREEN}==================================================================${NC}"
 echo -e "  ${BOLD}Domain:${NC}            https://${DOMAIN}"
 echo -e "  ${BOLD}Reverse Proxy:${NC}     Caddy (Auto-HTTPS / TLS terminating at :80 & :443)"
-echo -e "  ${BOLD}Frontend:${NC}          http://localhost:3000 (Internal upstream)"
-echo -e "  ${BOLD}Backend API:${NC}       http://localhost:8080/api (Internal upstream)"
+echo -e "  ${BOLD}Design System:${NC}     http://localhost:3000 (Internal upstream)"
+echo -e "  ${BOLD}GRC Engine API:${NC}    http://localhost:8080/api (Internal upstream)"
 echo ""
 echo -e "  ${BOLD}Monitor logs:${NC}      docker compose -f docker-compose.prod.yml logs -f"
 echo -e "  ${BOLD}Tear down:${NC}         ./scripts/prod-deploy.sh --down"

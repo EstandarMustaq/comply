@@ -1,6 +1,6 @@
 # API contract details
 
-This page complements the endpoint inventory with the stable payload families used by the application client. Exact optionality follows the Java DTOs and `app/application/lib/types.ts`; generated OpenAPI should become the next source of machine validation.
+This page complements the endpoint inventory with the stable payload families used by the design system client. Exact optionality follows the Java DTOs and `app/design-system/lib/types.ts`; generated OpenAPI should become the next source of machine validation.
 
 ## Authentication payloads
 
@@ -29,6 +29,6 @@ Draft investigation reports can contain account details, suspicion description, 
 
 ## Compatibility rules
 
-- The application client may map legacy aliases such as `token` to `accessToken` and `tempToken` to challenge/enrollment tokens while the migration is in progress.
+- The design system client may map legacy aliases such as `token` to `accessToken` and `tempToken` to challenge/enrollment tokens while the migration is in progress.
 - New endpoints must add a typed client method and a documented error/state contract before UI integration.
 - DTOs must not expose persistence-only fields such as internal legal traceability metadata.

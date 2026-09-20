@@ -1,6 +1,6 @@
-[submodule "package/compliance-engine"]
-	path = package/compliance-engine
-	url = git@github.com:FinCompHub/compliance-engine.git
-[submodule "app/application"]
-	path = app/application
-	url = git@github.com:FinCompHub/application.git
+[submodule "package/grc-engine"]
+	path = package/grc-engine
+	url = git@github.com:tryfincomp/grc-engine.git
+[submodule "app/design-system"]
+	path = app/design-system
+	url = git@github.com:tryfincomp/design-system.git

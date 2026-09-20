@@ -2,11 +2,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BACKEND_DIR="${BACKEND_DIR:-${ROOT_DIR}/package/compliance-engine}"
-FRONTEND_DIR="${FRONTEND_DIR:-${ROOT_DIR}/app/application}"
+GRC_ENGINE_DIR="${GRC_ENGINE_DIR:-${ROOT_DIR}/package/grc-engine}"
+DESIGN_SYSTEM_DIR="${DESIGN_SYSTEM_DIR:-${ROOT_DIR}/app/design-system}"
 
-backend() { mvn -q -f "$BACKEND_DIR/pom.xml" "$@"; }
-frontend() { (cd "$FRONTEND_DIR" && pnpm "$@"); }
+grc_engine() { mvn -q -f "$GRC_ENGINE_DIR/pom.xml" "$@"; }
+design_system() { (cd "$DESIGN_SYSTEM_DIR" && pnpm "$@"); }
 
 usage() {
   printf '%s\n' "Usage: $0 {install|dev|build|test|typecheck|lint|quality|compose-config|migrate|deploy|backup|keys|help}"
@@ -14,32 +14,32 @@ usage() {
 
 case "${1:-help}" in
   install)
-    (cd "$FRONTEND_DIR" && pnpm install --frozen-lockfile)
-    backend dependency:go-offline
+    design_system install --frozen-lockfile
+    grc_engine dependency:go-offline
     ;;
   dev)
     if [[ "${2:-}" == "--docker" ]]; then
       docker compose --profile app up -d --build
     else
-      printf '%s\n' "Start the compliance engine and application in separate terminals:"
-      printf '  (cd %q && mvn spring-boot:run)\n' "$BACKEND_DIR"
-      printf '  (cd %q && pnpm dev)\n' "$FRONTEND_DIR"
+      printf '%s\n' "Start the GRC engine and design system app in separate terminals:"
+      printf '  (cd %q && mvn spring-boot:run)\n' "$GRC_ENGINE_DIR"
+      printf '  (cd %q && pnpm dev)\n' "$DESIGN_SYSTEM_DIR"
     fi
     ;;
   build)
-    backend package -DskipTests
-    frontend build
+    grc_engine package -DskipTests
+    design_system build
     ;;
   test)
-    backend test
-    frontend exec tsc --noEmit
+    grc_engine test
+    design_system run test:unit
     ;;
-  typecheck) frontend exec tsc --noEmit ;;
-  lint) frontend lint ;;
+  typecheck) design_system run typecheck ;;
+  lint) design_system run lint ;;
   quality)
-    backend test
-    frontend exec tsc --noEmit
-    frontend lint
+    grc_engine test
+    design_system run check
+    design_system run test:unit
     bash -n "$ROOT_DIR"/scripts/*.sh
     "$ROOT_DIR/scripts/check-product-language.sh"
     docker compose config --quiet
@@ -50,7 +50,7 @@ case "${1:-help}" in
     docker compose config --quiet
     docker compose -f "$ROOT_DIR/docker-compose.prod.yml" config --quiet
     ;;
-  migrate) backend validate ;;
+  migrate) grc_engine validate ;;
   deploy) "$ROOT_DIR/scripts/prod-deploy.sh" ;;
   backup) "$ROOT_DIR/scripts/backup-s3.sh" ;;
   keys) "$ROOT_DIR/scripts/generate-keys.sh" "${@:2}" ;;

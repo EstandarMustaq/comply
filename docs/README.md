@@ -1,6 +1,6 @@
-# FinComp documentation
+# Fincomp documentation
 
-FinComp is a **Financial Compliance Intelligent** product: a clear, auditable workspace for financial risk operations, customer due diligence, transaction monitoring, investigation, and reporting workflows.
+Fincomp is a **Financial Compliance Intelligent** product: a clear, auditable workspace for financial risk operations, customer due diligence, transaction monitoring, investigation, and reporting workflows.
 
 ## Documentation map
 
@@ -11,7 +11,7 @@ FinComp is a **Financial Compliance Intelligent** product: a clear, auditable wo
 - [Traceability](traceability.md) — internal requirement and legal traceability. This is engineering documentation only and is not product/UI copy.
 - [Submodule migration](submodule-migration.md) — controlled migration to independently versioned component repositories.
 - [Archived engineering documents](archive/README.md) — historical plans, reviews, and implementation records.
-- [Workspace configuration](../fincomphub-workspace.yaml) — declarative component and command configuration.
+- [Workspace configuration](../fincomp-workspace.yaml) — declarative component and command configuration.
 
 ## Product-language boundary
 

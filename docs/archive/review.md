@@ -1,14 +1,14 @@
-# Revisão Completa do Backend
+# Revisão Completa do GRC Engine
 
-> **Arquivo histórico — terminologia atualizada:** Esta revisão registra o estado anterior do serviço que hoje é o `package/compliance-engine`. O produto vigente é **Financial Compliance Intelligent**, com a aplicação em `app/application`; os achados abaixo são históricos e não substituem a documentação atual.
+> **Arquivo histórico — terminologia atualizada:** Esta revisão registra o estado anterior do serviço que hoje é o `package/grc-engine`. O produto vigente é **Financial Compliance Intelligent**, com a aplicação em `app/design-system`; os achados abaixo são históricos e não substituem a documentação atual.
 
 **Data:** 2026-09-06  
-**Escopo:** Backend, arquitetura, plano de implementação, fases funcionais, segurança, conformidade, configuração, scripts, práticas SaaS/micro-SaaS e FinOps.  
+**Escopo:** GRC Engine, arquitetura, plano de implementação, fases funcionais, segurança, conformidade, configuração, scripts, práticas SaaS/micro-SaaS e FinOps.
 **Alterações realizadas:** Nenhuma alteração em código, configuração ou scripts.
 
 ## Base da revisão
 
-A revisão completa do backend foi concluída sem alterar código, arquivos ou configuração. O estado atual está em `main`, porém o repositório não possui commits; todos os arquivos estão sem histórico versionado. Portanto, é possível confirmar o que existe hoje, mas não verificar evolução histórica ou aderência a commits anteriores.
+A revisão completa do GRC engine foi concluída sem alterar código, arquivos ou configuração. O estado atual está em `main`, porém o repositório não possui commits; todos os arquivos estão sem histórico versionado. Portanto, é possível confirmar o que existe hoje, mas não verificar evolução histórica ou aderência a commits anteriores.
 
 ## Estado de implementação por fase
 
@@ -21,17 +21,17 @@ A revisão completa do backend foi concluída sem alterar código, arquivos ou c
 | 5. Threshold e structuring monitoring | **Parcial / incorreto** | Serviços existem, mas agregam tipos indevidos, geram duplicidades e não implementam corretamente o conceito de structuring abaixo do limite. |
 | 6. Sanções, SLA de 24h e auditoria | **Parcial / inseguro** | Há seed, tentativa de fuzzy matching e trigger de auditoria, mas não existe bloqueio efetivo de ativos, sincronização de listas ou fail-closed. |
 | 7. STR, CTR, relatório anual e insights | **Parcial** | Entidades e endpoints existem; faltam PDF, Excel anual, campos legais completos, controle de estado imutável e restrições de submissão. |
-| 8. Frontend Next.js/shadcn | **Compilável, mas desconectado** | O frontend compila, porém diversas rotas, verbos, campos e respostas não correspondem ao backend. |
+| 8. Design System Next.js/shadcn | **Compilável, mas desconectado** | O design system compila, porém diversas rotas, verbos, campos e respostas não correspondem ao GRC engine. |
 | 9. AWS, backups e operação | **Parcial / não produtivo** | Existem Dockerfiles, Caddy, Compose e scripts, mas backup seguro, Object Lock, restore testing, health checks, limites e gestão adequada de secrets não estão concluídos. |
-| CI/CD e regressão automatizada | **Ausente** | Não foram encontrados workflows de CI/CD, testes backend, testes de regras de compliance ou testes de contrato. |
+| CI/CD e regressão automatizada | **Ausente** | Não foram encontrados workflows de CI/CD, testes GRC engine, testes de regras de compliance ou testes de contrato. |
 
 ## Vulnerabilidades e inconformidades prioritárias
 
 | # | Severidade | Arquivo / linhas | Problema |
 |---:|---|---|---|
-| 1 | **Crítica** | `backend/src/main/java/com/fincomp/config/DataInitializer.java:44-63` | Usuários `admin` e `ocos` são criados automaticamente com senhas hardcoded conhecidas. Isso permite comprometimento imediato de novas instalações. |
+| 1 | **Crítica** | `package/grc-engine/src/main/java/com/fincomp/config/DataInitializer.java:44-63` | Usuários `admin` e `ocos` são criados automaticamente com senhas hardcoded conhecidas. Isso permite comprometimento imediato de novas instalações. |
 | 2 | **Alta** | `flags/controller/FlagController.java:33-66`; `reporting/controller/ReportController.java:39-129`; `clients/controller/ClientController.java:68-149` | Endpoints estão autenticados, mas não devidamente autorizados por função. Usuários comuns e `AUDITOR_READONLY` podem revisar flags, alterar clientes e submeter STR/CTR. |
-| 3 | **Alta** | `frontend/lib/api-client.ts:170-269` | O contrato frontend/backend está incompatível: rotas, métodos HTTP, nomes de campos e formatos de resposta divergem. Fluxos de dashboard, importação, flags, clientes e STR podem falhar em produção. |
+| 3 | **Alta** | `app/design-system/lib/api-client.ts:170-269` | O contrato design system/GRC engine está incompatível: rotas, métodos HTTP, nomes de campos e formatos de resposta divergem. Fluxos de dashboard, importação, flags, clientes e STR podem falhar em produção. |
 | 4 | **Alta** | `auth/service/JwtService.java:58-71,106-116`; `JwtAuthenticationFilter.java:44-60` | Refresh tokens possuem `tokenType=REFRESH`, mas esse claim não é validado no filtro. Um refresh token válido funciona como access token por até sete dias. |
 | 5 | **Alta** | `auth/service/MfaVerificationService.java:80-97,126-134` | Verificação MFA não possui rate limiting adequado. O replay TOTP utiliza sequência não atômica `hasKey` + validação + `set`; códigos podem ser reutilizados sob concorrência. |
 | 6 | **Alta** | `sanctions/service/SanctionsScreeningService.java:44-52` | O fuzzy matching só é executado depois de uma busca `LIKE` pelo nome completo. Erros de grafia, ordem dos nomes, acentos ou transliterações podem impedir qualquer candidato de chegar ao algoritmo fuzzy. |
@@ -55,12 +55,12 @@ A revisão completa do backend foi concluída sem alterar código, arquivos ou c
 - Não existe serviço completo de validação de KYC.
 - Não existe sincronização ou atualização versionada das listas de sanções.
 - Importação não possui processamento assíncrono real nem endpoint de status persistente.
-- Não há testes backend automatizados relevantes; o `mvn test` passa sem fontes de teste backend.
+- Não há testes GRC engine automatizados relevantes; o `mvn test` passa sem fontes de teste GRC engine.
 - Não há testes de autorização por papel.
 - Não há testes de regras de threshold, structuring, PEP, sanções, KYC ou migrações.
-- Não há testes de contrato frontend/backend.
+- Não há testes de contrato design system/GRC engine.
 - Não há workflows de CI/CD.
-- Compose de produção não possui health checks completos para aplicação, frontend e Caddy.
+- Compose de produção não possui health checks completos para aplicação, design system e Caddy.
 - O script de deploy trata containers iniciados como prontos, sem readiness real.
 - Não há limites explícitos de CPU/memória para produção.
 - Não há métricas, alertas, tracing ou observabilidade operacional suficiente.
@@ -110,7 +110,7 @@ As principais não conformidades de FinOps são:
 5. Adicionar rate limiting e consumo atômico de MFA.
 6. Fazer carregamento de sanções fail-closed.
 7. Implementar bloqueio/freeze efetivo após match.
-8. Corrigir o contrato frontend/backend.
+8. Corrigir o contrato design system/GRC engine.
 9. Fazer backup falhar quando não houver criptografia.
 10. Corrigir permissões do `.env` e migrar secrets para AWS Secrets Manager/SSM.
 
@@ -136,4 +136,4 @@ As principais não conformidades de FinOps são:
 
 ## Conclusão
 
-O projeto possui uma base técnica funcional e compilável, mas está em estado **parcial de implementação**. Os problemas de credenciais padrão, autorização, tokens, sanções, backups, importação e contrato frontend/backend são bloqueadores de produção. A solução ainda não atende integralmente aos requisitos regulatórios, de segurança, SaaS multi-tenant ou FinOps descritos na arquitetura.
+O projeto possui uma base técnica funcional e compilável, mas está em estado **parcial de implementação**. Os problemas de credenciais padrão, autorização, tokens, sanções, backups, importação e contrato design system/GRC engine são bloqueadores de produção. A solução ainda não atende integralmente aos requisitos regulatórios, de segurança, SaaS multi-tenant ou FinOps descritos na arquitetura.
