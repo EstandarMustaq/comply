@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# FinComp Secret & Encryption Key Generator
+# Fincomp Secret & Encryption Key Generator
 # Generates cryptographically secure keys for JWT, MFA (AES-256), DB, and Redis
 # ==============================================================================
 
@@ -83,7 +83,7 @@ NEW_BACKUP_PASS=$(openssl rand -hex 16)
 
 if [[ "${WRITE_MODE}" == false ]]; then
     echo -e "${CYAN}==================================================================${NC}"
-    echo -e "${BOLD}FinComp Cryptographic Keys Generated Successfully${NC}"
+    echo -e "${BOLD}Fincomp Cryptographic Keys Generated Successfully${NC}"
     echo -e "${CYAN}==================================================================${NC}"
     echo ""
     echo -e "${YELLOW}# Security Keys (Spring Boot & Auth)${NC}"

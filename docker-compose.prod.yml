@@ -13,9 +13,9 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      compliance-engine:
+      grc-engine:
         condition: service_healthy
-      application:
+      design-system:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
@@ -36,14 +36,14 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  application:
+  design-system:
     build:
-      context: ./app/application
+      context: ./app/design-system
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-FinComp}
-    container_name: fincomp-application
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Fincomp}
+    container_name: fincomp-design-system
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -51,18 +51,18 @@ services:
     expose:
       - "3000"
     depends_on:
-      compliance-engine:
+      grc-engine:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
-    cpus: "${FRONTEND_CPU_LIMIT:-0.50}"
-    mem_limit: "${FRONTEND_MEMORY_LIMIT:-512m}"
+    cpus: "${DESIGN_SYSTEM_CPU_LIMIT:-0.50}"
+    mem_limit: "${DESIGN_SYSTEM_MEMORY_LIMIT:-512m}"
     labels:
       com.fincomp.environment: production
-      com.fincomp.service: application
+      com.fincomp.service: design-system
       com.fincomp.cost-center: product
     networks:
       - fincomp-net
@@ -72,11 +72,11 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  compliance-engine:
+  grc-engine:
     build:
-      context: ./package/compliance-engine
+      context: ./package/grc-engine
       dockerfile: Dockerfile
-    container_name: fincomp-compliance-engine
+    container_name: fincomp-grc-engine
     restart: unless-stopped
     expose:
       - "8080"
@@ -109,11 +109,11 @@ services:
       timeout: 10s
       start_period: 45s
       retries: 5
-    cpus: "${BACKEND_CPU_LIMIT:-1.00}"
-    mem_limit: "${BACKEND_MEMORY_LIMIT:-1024m}"
+    cpus: "${GRC_ENGINE_CPU_LIMIT:-1.00}"
+    mem_limit: "${GRC_ENGINE_MEMORY_LIMIT:-1024m}"
     labels:
       com.fincomp.environment: production
-      com.fincomp.service: compliance-engine
+      com.fincomp.service: grc-engine
       com.fincomp.cost-center: product
     volumes:
       - fincomp_imports:/var/lib/fincomp/imports

@@ -1,8 +1,8 @@
-# FinComp — Plano de Execução Detalhado (25 a 28 Dias para MVP Regulatório)
+# Fincomp — Plano de Execução Detalhado (25 a 28 Dias para MVP Regulatório)
 
-> **Arquivo histórico — terminologia atualizada:** Este plano descreve uma fase anterior do FinCompHub. A nomenclatura corrente é **Financial Compliance Intelligent**; os componentes atuais são `package/compliance-engine` e `app/application`. Consulte `ROADMAP.md` e `fincomphub-workspace.yaml` para o estado vigente.
+> **Arquivo histórico — terminologia atualizada:** Este plano descreve uma fase anterior do Fincomp. A nomenclatura corrente é **Financial Compliance Intelligent**; os componentes atuais são `package/grc-engine` e `app/design-system`. Consulte `ROADMAP.md` e `fincomp-workspace.yaml` para o estado vigente.
 
-Plano operacional e técnico calibrado para a implementação do **FinComp (v2)**, ferramenta de auditoria e compliance AML-CFT para instituições de microfinanças e microcrédito em Moçambique.
+Plano operacional e técnico calibrado para a implementação do **Fincomp (v2)**, ferramenta de auditoria e compliance AML-CFT para instituições de microfinanças e microcrédito em Moçambique.
 
 Base regulatória estrita:
 - **Lei n.º 14/2023** (Prevenção e Combate ao Branqueamento de Capitais e Financiamento do Terrorismo)
@@ -31,7 +31,7 @@ Base regulatória estrita:
 
 ```mermaid
 gantt
-    title FinComp — Cronograma de Execução Calibrado (28 Dias)
+    title Fincomp — Cronograma de Execução Calibrado (28 Dias)
     dateFormat  YYYY-MM-DD
     axisFormat  Dia %d
     section Bloco 1: Infra & Banco
@@ -48,7 +48,7 @@ gantt
     Dias 17-19 : Sanções (PDF Nacional + ONU), SLA 24h & Audit :b6, after b5, 3d
     section Bloco 7: Relatórios & Insights
     Dias 20-22 : STR (Art.98), CTR & Insights com Cache Redis :b7, after b6, 3d
-    section Bloco 8: Frontend Next.js
+    section Bloco 8: Design System Next.js
     Dias 23-26 : Shell shadcn/ui, Upload, Sheets & Relatórios :b8, after b7, 4d
     section Bloco 9: Deploy & Go-Live
     Dias 27-28 : Settings, Deploy EC2, Caddy TLS & Homologação :b9, after b8, 2d
@@ -63,7 +63,7 @@ gantt
 - **Atividades**:
   1. Configurar `docker-compose.yml` local com PostgreSQL 16 (`uuid-ossp`) e Redis 7 Alpine.
   2. Inicializar Spring Boot com: `spring-boot-starter-data-jpa`, `spring-boot-starter-security`, `spring-boot-starter-data-redis`, `flyway-core`, `flyway-database-postgresql`, `zxing`, `commons-codec`, `apache-poi` e `opencsv`.
-  3. Criar e versionar as migrações Flyway em `backend/src/main/resources/db/migration/`:
+  3. Criar e versionar as migrações Flyway em `package/grc-engine/src/main/resources/db/migration/`:
      - `V1__init_users.sql`: Utilizadores, RBAC (`ADMIN`, `COMPLIANCE_OFFICER`, `OCOS`, `AUDITOR_READONLY`), campos MFA com segredo criptografado e hashes de códigos de backup.
      - `V2__init_clients.sql`: Clientes, campos `due_diligence_regime` (`NORMAL`/`SIMPLIFIED`), `nuib`, flags PEP e datas de controle.
      - `V3__init_beneficial_owners.sql`: Beneficiários efetivos com papéis legais e limiar ≥10% (Art. 51.1.e).
@@ -194,7 +194,7 @@ gantt
 
 ---
 
-### Bloco 8: Frontend Next.js — Shell shadcn/ui, Mapeamento, Dossiês e Relatórios (Dias 23 a 26)
+### Bloco 8: Design System Next.js — Shell shadcn/ui, Mapeamento, Dossiês e Relatórios (Dias 23 a 26)
 - **Objetivo**: Desenvolver interface SPA baseada em Next.js (App Router) e shadcn/ui, proporcionando fluidez operacional em tela única com `Sheet` e `Dialog`.
 - **Atividades**:
   1. **Shell e Autenticação**:
@@ -211,7 +211,7 @@ gantt
      - Tabela de clientes com filtros por regime (Normal/Simplificado), risco e PEP.
      - `ClientDetailSheet.tsx`: Visualização de beneficiários efetivos, NUIB e histórico de operações.
      - Telas de emissão de STR/CTR com formulários validados via Zod e download de PDF.
-- **Critério de Aceitação (DoD)**: Operações de ponta a ponta (login com 2FA, upload de arquivo real, revisão de flag na Sheet lateral e geração de STR) executadas sem erros no frontend.
+- **Critério de Aceitação (DoD)**: Operações de ponta a ponta (login com 2FA, upload de arquivo real, revisão de flag na Sheet lateral e geração de STR) executadas sem erros no design system.
 
 ---
 
@@ -222,7 +222,7 @@ gantt
      - Interface restrita ao `ADMIN` para gestão de contas, perfis e redefinição de MFA.
      - Ajuste de parâmetros legais (limites de 30.000 MT / 240.000 MT e limiares de transação).
   2. **Deploy EC2 e Orquestração Docker**:
-     - `docker-compose.prod.yml` com os 5 contêineres: `app` (Spring Boot ARM64), `frontend` (Next.js standalone), `db` (PostgreSQL 16), `redis` (Redis 7 AOF com senha) e `caddy`.
+     - `docker-compose.prod.yml` com os 5 contêineres: `app` (Spring Boot ARM64), `design system` (Next.js standalone), `db` (PostgreSQL 16), `redis` (Redis 7 AOF com senha) e `caddy`.
      - Configuração do `Caddyfile` com TLS automático (Let's Encrypt), proxy reverso e cabeçalhos de segurança (HSTS, CSP, X-Frame-Options).
   3. **Backup e Contingência**:
      - Script cron diário de `pg_dump` criptografado para bucket S3 com Object Lock.

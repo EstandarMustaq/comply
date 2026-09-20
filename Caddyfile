@@ -5,9 +5,9 @@
 {$DOMAIN:localhost} {
     encode gzip zstd
 
-    # API endpoints routed to compliance engine
+    # API endpoints routed to GRC engine
     handle /api/* {
-        reverse_proxy compliance-engine:8080 {
+        reverse_proxy grc-engine:8080 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up X-Forwarded-For {remote_host}
@@ -15,9 +15,9 @@
         }
     }
 
-    # All application and static assets routed to Next.js
+    # All design-system and static assets routed to Next.js
     handle {
-        reverse_proxy application:3000 {
+        reverse_proxy design-system:3000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up X-Forwarded-For {remote_host}

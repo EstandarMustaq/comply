@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish engine and application images
+    name: Publish GRC engine and design system images
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -57,8 +57,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/${{ steps.image-names.outputs.owner }}/compliance-engine
-            ghcr.io/${{ steps.image-names.outputs.owner }}/application
+            ghcr.io/${{ steps.image-names.outputs.owner }}/grc-engine
+            ghcr.io/${{ steps.image-names.outputs.owner }}/design-system
           tags: |
             type=sha,prefix=
             type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
@@ -66,24 +66,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and publish compliance engine
+      - name: Build and publish GRC engine
         uses: docker/build-push-action@v6
         with:
-          context: package/compliance-engine
-          file: package/compliance-engine/Dockerfile
+          context: package/grc-engine
+          file: package/grc-engine/Dockerfile
           push: true
-          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/compliance-engine:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/grc-engine:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=compliance-engine
-          cache-to: type=gha,mode=max,scope=compliance-engine
+          cache-from: type=gha,scope=grc-engine
+          cache-to: type=gha,mode=max,scope=grc-engine
 
-      - name: Build and publish application
+      - name: Build and publish design system
         uses: docker/build-push-action@v6
         with:
-          context: app/application
-          file: app/application/Dockerfile
+          context: app/design-system
+          file: app/design-system/Dockerfile
           push: true
-          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/application:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/design-system:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=application
-          cache-to: type=gha,mode=max,scope=application
+          cache-from: type=gha,scope=design-system
+          cache-to: type=gha,mode=max,scope=design-system

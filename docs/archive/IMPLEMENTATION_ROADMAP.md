@@ -1,6 +1,6 @@
-# FinComp — Plano de Implementação da Revisão
+# Fincomp — Plano de Implementação da Revisão
 
-> **Arquivo histórico — terminologia atualizada:** Este roadmap registra a execução inicial antes da consolidação FinCompHub. O produto vigente é **Financial Compliance Intelligent** e a estrutura atual usa `package/compliance-engine`, `app/application` e `fincomphub-workspace.yaml`.
+> **Arquivo histórico — terminologia atualizada:** Este roadmap registra a execução inicial antes da consolidação Fincomp. O produto vigente é **Financial Compliance Intelligent** e a estrutura atual usa `package/grc-engine`, `app/design-system` e `fincomp-workspace.yaml`.
 
 **Data:** 2026-09-09  
 **Documento de origem:** `review.md`  
@@ -9,7 +9,7 @@
 
 ## 1. Estado inicial confirmado
 
-O repositório agora possui histórico versionado com um commit-base. O commit inclui o estado existente do projeto, a documentação disponível e os testes/scripts já presentes, sem incluir `.env` ou `frontend/.env.local`.
+O repositório agora possui histórico versionado com um commit-base. O commit inclui o estado existente do projeto, a documentação disponível e os testes/scripts já presentes, sem incluir `.env` ou `design system/.env.local`.
 
 O sistema está em estado **parcial de implementação**. Nenhuma entrega deve ser considerada pronta para produção antes da conclusão do bloco P0 e da validação dos critérios de aceitação correspondentes.
 
@@ -64,7 +64,7 @@ Exemplos:
 ```text
 fix(auth): reject refresh tokens in API authentication
 test(compliance): cover overdue and never-reviewed PEPs
-ci: add backend, frontend and migration quality gates
+ci: add GRC engine, design system and migration quality gates
 ```
 
 ## 3. Ordem de implementação
@@ -74,12 +74,12 @@ ci: add backend, frontend and migration quality gates
 | Ordem | Branch | Entrega | Critério de conclusão |
 |---:|---|---|---|
 | 1 | `fix/p0-bootstrap-secrets` | Remover criação automática com credenciais hardcoded; criar bootstrap seguro, rotação obrigatória e proteção de secrets. | Nenhuma senha de produção no código; inicialização sem credenciais conhecidas; teste de bootstrap e rotação. |
-| 2 | `fix/p0-rbac-authorization` | Aplicar autorização por método/endpoint para ADMIN, COMPLIANCE_OFFICER, OCOS e AUDITOR_READONLY. | Matriz RBAC da arquitetura refletida no backend; testes positivos e negativos por papel. |
+| 2 | `fix/p0-rbac-authorization` | Aplicar autorização por método/endpoint para ADMIN, COMPLIANCE_OFFICER, OCOS e AUDITOR_READONLY. | Matriz RBAC da arquitetura refletida no GRC engine; testes positivos e negativos por papel. |
 | 3 | `fix/p0-token-lifecycle` | Separar access/refresh tokens, validar `tokenType` e audience, criar refresh rotation, revogação e reuse detection. | Refresh token não acessa APIs; refresh endpoint protegido por rotação; logout e revogação testados. |
 | 4 | `fix/p0-mfa-hardening` | Rate limiting de MFA, limites por usuário/IP/desafio, consumo atômico de TOTP e backup codes. | Brute force bloqueado; replay concorrente rejeitado; desafio invalidado após sucesso. |
 | 5 | `fix/p0-sanctions-blocking` | Corrigir candidate retrieval/fuzzy matching, carregamento fail-closed, estado de congelamento, bloqueio de transações e SLA de 24h. | Match positivo, typo e nome reordenado cobertos; sistema não sobe com lista inválida; transação bloqueada após freeze. |
 | 6 | `fix/p0-backup-secrets` | Backup fail-closed, criptografia obrigatória, gestão de Object Lock/versionamento e restore drill documentado. | Ausência de chave impede upload; backup criptografado; restore validado em ambiente isolado. |
-| 7 | `fix/p0-api-contract` | Alinhar frontend/backend e criar contrato OpenAPI ou DTOs compartilhados. | Login, upload, dashboard, flags, clientes e STR funcionam ponta a ponta. |
+| 7 | `fix/p0-api-contract` | Alinhar design system/GRC engine e criar contrato OpenAPI ou DTOs compartilhados. | Login, upload, dashboard, flags, clientes e STR funcionam ponta a ponta. |
 
 **Gate P0:** não liberar produção sem todos os sete branches mesclados, testes automatizados verdes e revisão manual dos fluxos regulatórios críticos.
 
@@ -133,7 +133,7 @@ Na prática, `rbac-authorization`, `token-lifecycle`, `mfa-hardening`, `sanction
 
 ## 5. Estratégia de testes por camada
 
-### Backend
+### GRC Engine
 
 - Testes unitários para serviços de autenticação, MFA, sanções, KYC, PEP, threshold e structuring.
 - Testes de integração com PostgreSQL, Redis e Flyway.
@@ -141,16 +141,16 @@ Na prática, `rbac-authorization`, `token-lifecycle`, `mfa-hardening`, `sanction
 - Testes de concorrência para replay, backup codes, confirmação de importação e submissão de relatórios.
 - Testes de idempotência para retry e reprocessamento.
 
-### Frontend e contrato
+### Design System e contrato
 
-- Testes de contrato para cada chamada em `app/application/lib/api-client.ts`.
+- Testes de contrato para cada chamada em `app/design-system/lib/api-client.ts`.
 - Testes de fluxo para login/MFA, upload, mapeamento, revisão de flag, cliente e STR.
 - Validação de DTOs e erros HTTP reais, não apenas build estático.
 
 ### Operação
 
 - `docker compose config` para configurações.
-- Build backend e frontend.
+- Build GRC engine e design system.
 - Smoke tests com ambiente limpo.
 - Restore de backup em banco temporário.
 - Verificação de permissões de arquivos e ausência de secrets rastreados.
@@ -183,8 +183,8 @@ Próxima fase — Documentação de produto e modularização:
 
 - [ ] Documentar todos os endpoints, contratos, comportamento e arquitetura em `docs/`.
 - [ ] Consolidar `README.md`, `ROADMAP.md` e a linguagem Financial Compliance Intelligent.
-- [ ] Aplicar o bloqueio de referências legais em UI, backend e respostas de produto.
+- [ ] Aplicar o bloqueio de referências legais em UI, GRC engine e respostas de produto.
 - [ ] Unificar comandos de workspace na raiz.
-- [x] Migrar `package/compliance-engine/` e `app/application/` para submódulos Git com histórico local preservado e URLs configuradas; [ ] publicar os commits nos remotos e validar clone externo.
+- [x] Migrar `package/grc-engine/` e `app/design-system/` para submódulos Git com histórico local preservado e URLs configuradas; [ ] publicar os commits nos remotos e validar clone externo.
 
 Observação: os blocos de implementação P0, P1 e P2 foram executados em branches específicas, validados e mesclados em `main`, preservando os branches de trabalho. O estado atual da entrega é "funcional para evolução operacional/cumprimento, mas ainda pendente de homologação regulatória final e autorização de produção".

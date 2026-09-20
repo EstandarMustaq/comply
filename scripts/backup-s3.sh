@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# FinComp AML-CFT Automated Database Backup Script to AWS S3
+# Fincomp AML-CFT Automated Database Backup Script to AWS S3
 # Legal Mandate: Aviso n.º 10/GBM/2024 (Art. 89) - 10 Year Retention & Immutability
 # ==============================================================================
 

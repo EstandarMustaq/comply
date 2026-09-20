@@ -2,24 +2,24 @@
 .env
 .env.local
 .env.*.local
-app/application/.env.local
+app/system-design/.env.local
 *.pem
 *.key
 
-# Backend
-package/compliance-engine/target/
-package/compliance-engine/.mvn/timing.properties
-package/compliance-engine/.flattened-pom.xml
+# GRC engine
+package/grc-engine/target/
+package/grc-engine/.mvn/timing.properties
+package/grc-engine/.flattened-pom.xml
 
-# Frontend
-app/application/node_modules/
-app/application/.pnp
-app/application/.pnp.js
-app/application/.next/
-app/application/out/
-app/application/build/
-app/application/*.tsbuildinfo
-app/application/next-env.d.ts
+# System design
+app/system-design/node_modules/
+app/system-design/.pnp
+app/system-design/.pnp.js
+app/system-design/.next/
+app/system-design/out/
+app/system-design/build/
+app/system-design/*.tsbuildinfo
+app/system-design/next-env.d.ts
 
 # Logs & temp files
 *.log

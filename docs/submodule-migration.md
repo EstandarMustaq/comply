@@ -2,12 +2,12 @@
 
 ## Target layout
 
-- `package/compliance-engine` — independently versioned backend repository.
-- `app/application` — independently versioned frontend repository.
+- `package/grc-engine` — independently versioned GRC engine repository.
+- `app/design-system` — independently versioned design system repository.
 
 ## Current status
 
-The repository still contains `package/compliance-engine/` and `app/application/`. Real remote URLs are required before adding Git submodules. The URLs are now configured in `.gitmodules`; the current environment cannot authenticate to GitHub over SSH, so the extracted commits still need to be pushed to those remotes before a clean external clone can initialize them.
+The repository still contains `package/grc-engine/` and `app/design-system/`. Real remote URLs are required before adding Git submodules. The URLs are now configured in `.gitmodules`; the current environment cannot authenticate to GitHub over SSH, so the extracted commits still need to be pushed to those remotes before a clean external clone can initialize them.
 
 ## Controlled procedure
 
@@ -22,14 +22,14 @@ The CI checkout must use recursive submodules.`.
 
 ## Required inputs before execution
 
-- Backend remote URL.
-- Frontend remote URL.
+- GRC Engine remote URL.
+- Design System remote URL.
 - Default branch and release/tag policy for each component.
 - Ownership and access policy for the two repositories.
 
 ## Local extraction commits
 
-- Compliance engine history: `df31ae7e5614b396b8b49a6b3c0d9c9e211d81d9`.
-- Application history: `e205dc667c9e2ee4fd316d76f1096d1cedc7e2a4`.
+- GRC engine history: `df31ae7e5614b396b8b49a6b3c0d9c9e211d81d9`.
+- Design system history: `e205dc667c9e2ee4fd316d76f1096d1cedc7e2a4`.
 
 Push these histories to the default branches of the two component repositories before publishing the parent workspace commit.
