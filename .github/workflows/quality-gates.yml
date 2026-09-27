@@ -86,6 +86,22 @@ jobs:
       - name: Run design system unit tests
         run: pnpm run test:unit
 
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run design system interface tests
+        run: pnpm run test:e2e
+
+      - name: Upload design system interface artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-system-playwright-artifacts
+          path: |
+            app/design-system/test-results
+            app/design-system/playwright-report
+          if-no-files-found: ignore
+
       - name: Build design system
         run: pnpm build
 
