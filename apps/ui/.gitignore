@@ -1,0 +1,38 @@
+# Dependências (raiz e pacotes)
+node_modules/
+.pnpm-store/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testes e cobertura
+/coverage/
+
+# Compilação Next.js
+.next/
+out/
+build/
+dist/
+
+# Turbo e caches de build
+.turbo/
+
+# Ficheiros diversos de sistema
+.DS_Store
+*.pem
+
+# Logs de depuração
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variáveis de ambiente locais
+.env*.local
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
