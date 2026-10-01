@@ -1,6 +1,6 @@
 [submodule "package/grc-engine"]
-	path = package/grc-engine
+	path = apps/api
 	url = git@github.com:tryfincomp/grc-engine.git
 [submodule "app/design-system"]
-	path = app/design-system
+	path = apps/ui
 	url = git@github.com:tryfincomp/design-system.git
