@@ -1,0 +1,32 @@
+[
+  {
+    "fullName": "AHLU SUNNAH WAL JUMMAH (AL-SHABAAB MOZAMBIQUE)",
+    "entityType": "ORGANIZATION",
+    "sourceList": "LISTA_DESIGNADA_NACIONAL"
+  },
+  {
+    "fullName": "ISLAMIC STATE IN MOZAMBIQUE (ISIS-MOZAMBIQUE)",
+    "entityType": "ORGANIZATION",
+    "sourceList": "LISTA_DESIGNADA_NACIONAL"
+  },
+  {
+    "fullName": "ABU YASIR HASSAN",
+    "entityType": "INDIVIDUAL",
+    "sourceList": "LISTA_DESIGNADA_NACIONAL"
+  },
+  {
+    "fullName": "IBONDO SALIMO",
+    "entityType": "INDIVIDUAL",
+    "sourceList": "LISTA_DESIGNADA_NACIONAL"
+  },
+  {
+    "fullName": "OSAMA BIN LADEN NETWORK (AL-QAIDA)",
+    "entityType": "ORGANIZATION",
+    "sourceList": "UN_CONSOLIDATED"
+  },
+  {
+    "fullName": "ISIL (DA'ESH)",
+    "entityType": "ORGANIZATION",
+    "sourceList": "UN_CONSOLIDATED"
+  }
+]

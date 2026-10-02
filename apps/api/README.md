@@ -1,42 +1,29 @@
-# Fincomp GRC Engine
+# Complyz API
 
-The GRC Engine is the Spring Boot service for Financial Compliance Intelligent. It owns authentication, MFA, organization scope, customer profiles, KYC, transaction ingestion, monitoring, restricted-party screening, reporting, exports, audit history, and persistence migrations.
+The API connects the Complyz workspace to its operational data. It manages
+customer profiles, access, transaction imports, monitoring alerts, restricted
+party screening, investigations, reports, and activity history.
 
-The published Maven coordinates are:
+## Run and test
 
-```text
-com.fincomp:grc-engine
-```
-
-## Requirements
-
-- Java 21
-- Maven 3.9+
-- PostgreSQL 16+
-- Redis 7+
-
-## Commands
+Use the commands at the repository root:
 
 ```bash
-mvn test
-mvn package -DskipTests
-mvn spring-boot:run
+pnpm api:run
+pnpm api:test
+pnpm api:build
 ```
 
-From the platform workspace, use `./scripts/workspace.sh test`, `build`, or `dev`.
+`pnpm dev` starts the API and web app with local PostgreSQL and Redis services.
+The API listens on port `8080`; its resources are served under `/api`.
 
-## Configuration
+## Data and access
 
-Runtime configuration is provided through environment variables and Spring profiles. Do not commit secrets, local environment files, build output, or generated reports.
+Every customer and operational record is scoped to the signed-in organization.
+Access is based on the operator's role. Important changes are recorded, and
+submitted reports remain unchanged.
 
-## API
-
-The service exposes REST resources under `/api`. The platform-level endpoint catalog and behavioral contracts are documented in the parent repository under `docs/api/`.
-
-## Design boundaries
-
-- Organization scope is derived from the authenticated principal.
-- Access and refresh tokens have separate lifecycles.
-- Important workflow transitions are auditable and report submission is immutable.
-- Screening data is versioned, checksummed, time-bounded, and activated through a controlled lifecycle.
-- Product responses use operational language; internal traceability is kept outside API responses.
+Runtime settings are provided through environment variables and Spring
+profiles. Keep secrets and local environment files out of source control. The
+[API catalog](../../docs/api/index.mdx) describes the available operations and
+their behavior.

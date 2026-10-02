@@ -6,13 +6,13 @@ server:
 
 spring:
   application:
-    name: grc-engine
+    name: complyz-api
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:fincomp_db}}
-    username: ${DB_USER:${POSTGRES_USER:fincomp_app}}
-    password: ${DB_PASSWORD:${POSTGRES_PASSWORD:fincomp_dev_password}}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:complyz_db}}
+    username: ${DB_USER:${POSTGRES_USER:complyz_app}}
+    password: ${DB_PASSWORD:${POSTGRES_PASSWORD:complyz_dev_password}}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -44,19 +44,19 @@ spring:
 
 springdoc:
   api-docs:
-    enabled: ${FINCOMP_API_DOCS_ENABLED:false}
+    enabled: ${COMPLYZ_API_DOCS_ENABLED:false}
 
-fincomp:
+complyz:
   bootstrap:
-    enabled: ${FINCOMP_BOOTSTRAP_ENABLED:false}
+    enabled: ${COMPLYZ_BOOTSTRAP_ENABLED:false}
     admin:
-      full-name: ${FINCOMP_BOOTSTRAP_ADMIN_FULL_NAME:}
-      email: ${FINCOMP_BOOTSTRAP_ADMIN_EMAIL:}
-      password: ${FINCOMP_BOOTSTRAP_ADMIN_PASSWORD:}
+      full-name: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:}
+      email: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:}
+      password: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:}
     ocos:
-      full-name: ${FINCOMP_BOOTSTRAP_OCOS_FULL_NAME:}
-      email: ${FINCOMP_BOOTSTRAP_OCOS_EMAIL:}
-      password: ${FINCOMP_BOOTSTRAP_OCOS_PASSWORD:}
+      full-name: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:}
+      email: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:}
+      password: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:}
   security:
     jwt:
       secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
@@ -77,12 +77,12 @@ fincomp:
     retention:
       standard-years: 10
   imports:
-    storage-path: ${FINCOMP_IMPORT_STORAGE_PATH:${java.io.tmpdir}/fincomp-imports}
-    pending-ttl-hours: ${FINCOMP_IMPORT_PENDING_TTL_HOURS:24}
+    storage-path: ${COMPLYZ_IMPORT_STORAGE_PATH:${java.io.tmpdir}/complyz-imports}
+    pending-ttl-hours: ${COMPLYZ_IMPORT_PENDING_TTL_HOURS:24}
 
 logging:
   level:
-    com.fincomp: DEBUG
+    com.complyz: DEBUG
     org.springframework.security: INFO
     org.flywaydb: INFO
 

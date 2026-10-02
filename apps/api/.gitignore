@@ -1,8 +1,0 @@
-target/
-.mvn/timing.properties
-.flattened-pom.xml
-*.log
-.env
-.env.local
-*.pem
-*.key
