@@ -1,0 +1,4 @@
+{
+  "extends": "@complyz/config-typescript/base.json",
+  "include": ["src/**/*.ts"]
+}

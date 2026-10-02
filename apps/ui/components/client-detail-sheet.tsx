@@ -53,8 +53,8 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               ID: {client.id.substring(0, 8)}
             </Badge>
           </div>
-          <SheetTitle className="mt-2 flex items-center gap-2 text-base font-bold text-foreground">
-            <User className="h-5 w-5 text-primary" />
+          <SheetTitle className="text-foreground mt-2 flex items-center gap-2 text-base font-bold">
+            <User className="text-primary h-5 w-5" />
             {client.fullName}
           </SheetTitle>
           <SheetDescription className="text-xs">
@@ -64,12 +64,12 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
         </SheetHeader>
 
         <div className="space-y-6 py-4 text-xs">
-          {/* Identificação e Documentos */}
+          {/* Identity and documents */}
           <div className="space-y-2">
-            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground">
+            <h4 className="text-muted-foreground font-semibold uppercase tracking-wider">
               Identificação e Documentação
             </h4>
-            <div className="space-y-2 rounded-lg border bg-muted/40 p-3">
+            <div className="bg-muted/40 space-y-2 rounded-lg border p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   Documento (BI/DIRE/Passaporte/NUIT):
@@ -93,7 +93,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             </div>
           </div>
 
-          {/* PEP Status */}
+          {/* Politically exposed person status */}
           {client.isPep ? (
             <div className="space-y-1 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-amber-900">
               <div className="flex items-center gap-1.5 font-bold">
@@ -123,23 +123,23 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             </div>
           )}
 
-          {/* Limites do Regime Simplificado */}
+          {/* Simplified regime limits */}
           {isSimplified && (
-            <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-3">
+            <div className="border-border bg-muted/40 space-y-3 rounded-lg border p-3">
               <div className="flex items-center justify-between">
-                <h4 className="flex items-center gap-1.5 font-semibold text-foreground">
-                  <DollarSign className="h-4 w-4 text-primary" />
+                <h4 className="text-foreground flex items-center gap-1.5 font-semibold">
+                  <DollarSign className="text-primary h-4 w-4" />
                   Monitorização de limiares
                 </h4>
                 <Badge
                   variant="outline"
-                  className="border-border text-[10px] text-foreground"
+                  className="border-border text-foreground text-[10px]"
                 >
                   Regime simplificado
                 </Badge>
               </div>
 
-              {/* Mensal */}
+              {/* Monthly limit */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
@@ -151,7 +151,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                     {monthlyPercent}%
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
                   <div
                     className={`h-full transition-all ${
                       monthlyPercent > 90 ? "bg-destructive" : "bg-primary"
@@ -161,7 +161,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 </div>
               </div>
 
-              {/* Anual */}
+              {/* Annual limit */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
@@ -173,7 +173,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                     {annualPercent}%
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
                   <div
                     className={`h-full transition-all ${
                       annualPercent > 90 ? "bg-destructive" : "bg-primary"
@@ -182,17 +182,17 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-muted-foreground text-[10px]">
                 Ultrapassar o limite mensal (30.000 MT) ou anual (240.000 MT) exige
                 transição para diligência reforçada.
               </p>
             </div>
           )}
 
-          {/* Beneficiários Efectivos */}
+          {/* Beneficial owners */}
           <div className="space-y-2">
-            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
-              <Layers className="h-3.5 w-3.5 text-primary" />
+            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
+              <Layers className="text-primary h-3.5 w-3.5" />
               Beneficiários efectivos
             </h4>
             {client.beneficialOwners && client.beneficialOwners.length > 0 ? (
@@ -200,7 +200,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 {client.beneficialOwners.map((ubo) => (
                   <div
                     key={ubo.id}
-                    className="space-y-1 rounded-lg border bg-muted/40 p-2.5"
+                    className="bg-muted/40 space-y-1 rounded-lg border p-2.5"
                   >
                     <div className="flex justify-between font-semibold">
                       <span>{ubo.fullName}</span>
@@ -208,7 +208,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                         {ubo.ownershipPercentage}% Participação
                       </span>
                     </div>
-                    <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <div className="text-muted-foreground flex justify-between text-[11px]">
                       <span>
                         Doc: {ubo.documentNumber} ({ubo.nationality})
                       </span>
@@ -222,7 +222,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 ))}
               </div>
             ) : (
-              <div className="rounded-lg border bg-muted/20 p-3 text-center text-muted-foreground">
+              <div className="bg-muted/20 text-muted-foreground rounded-lg border p-3 text-center">
                 Sem beneficiários efectivos indiretos declarados (titular direto único).
               </div>
             )}

@@ -3,9 +3,10 @@ import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Fincomp | Financial Compliance Intelligence",
+  applicationName: "Complyz",
+  title: "Complyz | Conformidade financeira",
   description:
-    "Monitor transactions, score risk, and resolve compliance decisions — in one place.",
+    "Acompanhe transacções, reveja riscos e mantenha cada decisão documentada num só lugar.",
 }
 
 export default function RootLayout({
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-MZ" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="bg-background text-foreground min-h-screen antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

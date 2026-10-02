@@ -104,9 +104,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       }
       setIsMappingModalOpen(true)
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Falha ao enviar o arquivo de extrato."
-      )
+      setError(err instanceof Error ? err.message : "Não foi possível enviar o ficheiro.")
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -126,7 +124,9 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       if (onSuccess) onSuccess()
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : "Erro ao processar as transações do lote."
+        err instanceof Error
+          ? err.message
+          : "Não foi possível processar as transacções do lote."
       )
     } finally {
       setIsProcessing(false)
@@ -154,7 +154,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
             className="hidden"
             onChange={handleFileInput}
           />
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div className="bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-full">
             {isUploading ? (
               <Loader2 className="h-7 w-7 animate-spin" />
             ) : (
@@ -168,7 +168,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                 ? "A carregar e a analisar cabeçalhos..."
                 : "Clique ou arraste a folha de cálculo aqui"}
             </h3>
-            <p className="max-w-md text-xs text-muted-foreground">
+            <p className="text-muted-foreground max-w-md text-xs">
               Compatível com extratos operacionais de instituições de microfinança e
               microcrédito (CSV ou XLSX). Detetação automática de delimitadores, encodings
               e linhas de cabeçalho.
@@ -188,7 +188,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
 
       {/* Error alert */}
       {error && (
-        <div className="flex items-center gap-2 rounded-md border border-destructive/40 p-3 text-xs text-destructive">
+        <div className="border-destructive/40 text-destructive flex items-center gap-2 rounded-md border p-3 text-xs">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -202,25 +202,25 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
         </div>
       )}
 
-      {/* Mapping Confirmation Dialog */}
+      {/* Confirm the selected column mapping before import. */}
       <Dialog open={isMappingModalOpen} onOpenChange={setIsMappingModalOpen}>
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5 text-primary" />
+              <FileSpreadsheet className="text-primary h-5 w-5" />
               Confirmação de Mapeamento de Colunas
             </DialogTitle>
             <DialogDescription className="text-xs">
               Arquivo: <strong>{currentBatch?.fileName}</strong>. Confirme a
               correspondência dos cabeçalhos do extrato com os campos de conformidade do
-              Fincomp.
+              Complyz.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-3">
-            <div className="grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase text-muted-foreground">
-              <div>Fincomp field</div>
-              <div>Detected column</div>
+            <div className="text-muted-foreground grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase">
+              <div>Campo do Complyz</div>
+              <div>Coluna identificada</div>
             </div>
 
             {REQUIRED_TARGET_FIELDS.map((target) => {
@@ -231,8 +231,8 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                   className="grid grid-cols-2 items-center gap-3 py-1 text-sm"
                 >
                   <div>
-                    <span className="font-medium text-foreground">{target.label}</span>
-                    {target.required && <span className="ml-1 text-destructive">*</span>}
+                    <span className="text-foreground font-medium">{target.label}</span>
+                    {target.required && <span className="text-destructive ml-1">*</span>}
                   </div>
                   <div>
                     <Select

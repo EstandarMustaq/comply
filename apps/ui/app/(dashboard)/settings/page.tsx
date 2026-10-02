@@ -23,6 +23,12 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { api } from "@/lib/api-client"
 import { type ThresholdRule, type AuditLog } from "@/lib/types"
+import {
+  getAuditActionLabel,
+  getResourceTypeLabel,
+  getRuleTypeLabel,
+  getUserRoleLabel,
+} from "@/lib/labels"
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<string>("RULES")
@@ -31,13 +37,13 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const _userRole = useMemo(() => {
     try {
-      const stored = localStorage.getItem("fincomp_user")
+      const stored = localStorage.getItem("complyz_user")
       if (stored) {
         const u = JSON.parse(stored) as { role?: string }
         return u.role || ""
       }
     } catch {
-      // Sem permissão para ler o registo de actividade; a secção fica vazia.
+      // Keep the activity section empty when the user cannot access its records.
     }
     return ""
   }, [])
@@ -77,7 +83,7 @@ export default function SettingsPage() {
   return (
     <div>
       <SiteHeader
-        title="Configurações Regulatórias & Auditoria Imutável"
+        title="Regras e registo de actividade"
         action={
           <Button
             variant="outline"
@@ -93,7 +99,7 @@ export default function SettingsPage() {
       />
 
       <div className="space-y-6">
-        {/* Navigation Tabs */}
+        {/* Settings tabs */}
         <div className="flex items-center justify-between">
           <Tabs
             value={activeTab}
@@ -112,12 +118,12 @@ export default function SettingsPage() {
         </div>
 
         {activeTab === "RULES" ? (
-          /* Rules Card */
+          /* Monitoring rules */
           <div className="space-y-6">
             <Card className="border-border shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                  <Scale className="h-4 w-4 text-primary" />
+                  <Scale className="text-primary h-4 w-4" />
                   Regras de triagem
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -126,18 +132,17 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 {rules.length === 0 ? (
-                  <div className="py-8 text-center text-xs text-muted-foreground">
-                    A carregar regras…
+                  <div className="text-muted-foreground py-8 text-center text-xs">
+                    {isLoading ? "A carregar regras…" : "Não há regras configuradas."}
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Código</TableHead>
+                        <TableHead>Tipo</TableHead>
                         <TableHead>Regra</TableHead>
                         <TableHead>Limiar</TableHead>
-                        <TableHead>Janela</TableHead>
-                        <TableHead>Regime</TableHead>
+                        <TableHead>Janela de agregação</TableHead>
                         <TableHead>Estado</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -145,35 +150,29 @@ export default function SettingsPage() {
                       {rules.map((rule) => (
                         <TableRow key={rule.id}>
                           <TableCell className="font-mono text-xs font-semibold">
-                            {rule.ruleCode}
+                            {getRuleTypeLabel(rule.type)}
                           </TableCell>
                           <TableCell className="text-xs">
-                            <span className="font-medium text-foreground">
+                            <span className="text-foreground font-medium">
                               {rule.name}
                             </span>
-                            <div className="text-[10px] text-muted-foreground">
-                              {rule.description}
-                            </div>
                           </TableCell>
-                          <TableCell className="text-xs font-bold text-foreground">
-                            {formatMt(rule.thresholdAmount)}
+                          <TableCell className="text-foreground text-xs font-bold">
+                            {rule.valueThreshold === null
+                              ? "Não aplicável"
+                              : formatMt(rule.valueThreshold)}
                           </TableCell>
                           <TableCell className="text-xs">
-                            {rule.timeWindowDays > 0
-                              ? `${rule.timeWindowDays}d`
+                            {rule.aggregationWindowDays && rule.aggregationWindowDays > 0
+                              ? `${rule.aggregationWindowDays} dias`
                               : "Por transacção"}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="text-[10px]">
-                              {rule.regime || "TODOS"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
                             <Badge
-                              variant={rule.isActive ? "success" : "secondary"}
+                              variant={rule.active ? "success" : "secondary"}
                               className="text-[10px]"
                             >
-                              {rule.isActive ? "ACTIVO" : "INACTIVO"}
+                              {rule.active ? "ACTIVA" : "INACTIVA"}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -184,7 +183,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* Regime thresholds summary */}
+            {/* Monitoring threshold summary */}
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="border-border">
                 <CardHeader className="pb-2">
@@ -199,7 +198,7 @@ export default function SettingsPage() {
                     <span>Limite anual</span>
                     <span className="font-bold">240.000 MT</span>
                   </div>
-                  <p className="pt-1 text-[11px] text-muted-foreground">
+                  <p className="text-muted-foreground pt-1 text-[11px]">
                     Aplica-se a clientes de baixo risco com diligência simplificada.
                     Ultrapassar o limite exige transição para diligência reforçada.
                   </p>
@@ -208,11 +207,11 @@ export default function SettingsPage() {
 
               <Card className="border-destructive/40">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold text-destructive">
+                  <CardTitle className="text-destructive text-sm font-bold">
                     Rastreio de sanções
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-muted-foreground">
+                <CardContent className="text-muted-foreground space-y-2 text-xs">
                   <div className="flex justify-between border-b pb-1">
                     <span>Janela de decisão</span>
                     <span className="font-bold text-red-700">24 horas</span>
@@ -221,7 +220,7 @@ export default function SettingsPage() {
                     <span>Acção necessária</span>
                     <span className="font-bold">Bloquear e escalar</span>
                   </div>
-                  <p className="pt-1 text-[11px] text-muted-foreground">
+                  <p className="text-muted-foreground pt-1 text-[11px]">
                     Verificação automática contra listas oficiais e consolidadas de
                     sanções.
                   </p>
@@ -230,13 +229,12 @@ export default function SettingsPage() {
             </div>
           </div>
         ) : (
-          /* Audit Logs Card */
           <Card className="shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                    <History className="h-4 w-4 text-primary" />
+                    <History className="text-primary h-4 w-4" />
                     Registo de auditoria permanente
                   </CardTitle>
                   <CardDescription className="text-xs">
@@ -254,7 +252,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               {logs.length === 0 ? (
-                <div className="py-8 text-center text-xs text-muted-foreground">
+                <div className="text-muted-foreground py-8 text-center text-xs">
                   Nenhum evento de auditoria registado ou sem permissão de acesso
                   (exclusivo para ADMIN).
                 </div>
@@ -267,32 +265,28 @@ export default function SettingsPage() {
                       <TableHead>Perfil</TableHead>
                       <TableHead>Acção realizada</TableHead>
                       <TableHead>Recurso afectado</TableHead>
-                      <TableHead>Endereço IP</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {logs.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                        <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
                           {new Date(log.createdAt).toLocaleString("pt-MZ")}
                         </TableCell>
                         <TableCell className="text-xs font-semibold">
-                          {log.userEmail}
+                          {log.actor?.email || "Utilizador desconhecido"}
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="text-[10px]">
-                            {log.userRole}
+                            {getUserRoleLabel(log.actor?.role || "")}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-xs font-medium text-foreground">
-                          {log.action}
+                        <TableCell className="text-foreground font-mono text-xs font-medium">
+                          {getAuditActionLabel(log.action)}
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
-                          {log.resourceType}{" "}
-                          {log.resourceId ? `(${log.resourceId.substring(0, 8)}...)` : ""}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">
-                          {log.ipAddress || "127.0.0.1"}
+                        <TableCell className="text-muted-foreground text-xs">
+                          {getResourceTypeLabel(log.entity)}{" "}
+                          {log.entityId ? `(${log.entityId.substring(0, 8)}...)` : ""}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -1,0 +1,15 @@
+{
+  "name": "@complyz/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Configurações TypeScript partilhadas do Complyz",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react-library.json"
+  ]
+}

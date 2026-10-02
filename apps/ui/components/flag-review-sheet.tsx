@@ -8,7 +8,6 @@ import {
   FileSpreadsheet,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   FileWarning,
   Loader2,
 } from "lucide-react"
@@ -25,6 +24,7 @@ import { Button } from "./ui/button"
 import { Label } from "./ui/label"
 import { type Flag } from "@/lib/types"
 import { api } from "@/lib/api-client"
+import { getFlagTypeLabel, getRegimeLabel, getTransactionTypeLabel } from "@/lib/labels"
 import { useRouter } from "next/navigation"
 
 interface FlagReviewSheetProps {
@@ -48,11 +48,10 @@ export function FlagReviewSheet({
   if (!flag) return null
 
   const isSanctions = flag.flagType === "SANCTIONS_MATCH"
-
   const calculateSlaRemaining = (deadline?: string) => {
     if (!deadline) return null
     const diff = new Date(deadline).getTime() - new Date().getTime()
-    if (diff <= 0) return "SLA Expirado (Atraso crítico!)"
+    if (diff <= 0) return "Prazo de revisão ultrapassado"
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
     return `${hours}h ${minutes}m restantes`
@@ -60,20 +59,22 @@ export function FlagReviewSheet({
 
   const slaText = calculateSlaRemaining(flag.slaDeadline)
 
-  const handleReviewAction = async (action: "DISMISS" | "RESOLVE") => {
+  const handleReviewAction = async () => {
     if (!notes.trim()) {
-      setActionError("Review notes are required before archiving or resolving an alert.")
+      setActionError("Registe as notas de análise antes de resolver o alerta.")
       return
     }
     try {
       setIsSubmitting(true)
       setActionError(null)
-      await api.reviewFlag(flag.id, action, notes)
+      await api.reviewFlag(flag.id, notes)
       setNotes("")
       onFlagUpdated()
       onClose()
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Failed to update alert.")
+      setActionError(
+        err instanceof Error ? err.message : "Não foi possível atualizar o alerta."
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -85,14 +86,16 @@ export function FlagReviewSheet({
       setActionError(null)
       const str = await api.escalateFlagToStr(
         flag.id,
-        notes || "Escalated for formal reporting."
+        notes || "Escalado para comunicação formal."
       )
       setNotes("")
       onFlagUpdated()
       onClose()
       router.push(`/reports?strId=${str.id}`)
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Failed to escalate alert.")
+      setActionError(
+        err instanceof Error ? err.message : "Não foi possível escalar o alerta."
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -115,13 +118,13 @@ export function FlagReviewSheet({
               variant={isSanctions ? "urgent" : "secondary"}
               className="px-2.5 py-0.5 text-xs uppercase tracking-wider"
             >
-              {flag.flagType.replace(/_/g, " ")}
+              {getFlagTypeLabel(flag.flagType)}
             </Badge>
             <Badge variant="outline" className="text-[11px]">
               ID: {flag.id.substring(0, 8)}...
             </Badge>
           </div>
-          <SheetTitle className="mt-2 text-base font-bold text-foreground">
+          <SheetTitle className="text-foreground mt-2 text-base font-bold">
             Análise do alerta
           </SheetTitle>
           <SheetDescription className="text-xs">
@@ -129,10 +132,10 @@ export function FlagReviewSheet({
           </SheetDescription>
         </SheetHeader>
 
-        {/* SLA Banner for Sanctions */}
+        {/* Deadline status for restricted-party matches */}
         {isSanctions && (
-          <div className="my-4 flex items-start gap-2.5 rounded-lg border border-destructive/40 p-3 text-xs text-destructive">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+          <div className="border-destructive/40 text-destructive my-4 flex items-start gap-2.5 rounded-lg border p-3 text-xs">
+            <Clock className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
             <div>
               <p className="font-bold">Correspondência de sanções — acção necessária</p>
               <p className="mt-0.5">
@@ -143,15 +146,15 @@ export function FlagReviewSheet({
         )}
 
         <div className="space-y-5 py-4 text-xs">
-          {/* Client Details Section */}
+          {/* Customer details */}
           <div className="space-y-2">
-            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
-              <User className="h-3.5 w-3.5 text-primary" /> Cliente
+            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
+              <User className="text-primary h-3.5 w-3.5" /> Cliente
             </h4>
-            <div className="space-y-1.5 rounded-lg border bg-muted/40 p-3">
+            <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Nome</span>
-                <span className="font-semibold text-foreground">
+                <span className="text-foreground font-semibold">
                   {flag.client?.fullName || "—"}
                 </span>
               </div>
@@ -169,7 +172,7 @@ export function FlagReviewSheet({
                     flag.client?.regime === "SIMPLIFICADO" ? "outline" : "secondary"
                   }
                 >
-                  {flag.client?.regime || "STANDARD"}
+                  {getRegimeLabel(flag.client?.regime || "NORMAL")}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
@@ -193,22 +196,24 @@ export function FlagReviewSheet({
             </div>
           </div>
 
-          {/* Transaction Section */}
+          {/* Transaction details */}
           {flag.transaction && (
             <div className="space-y-2">
-              <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
-                <CreditCard className="h-3.5 w-3.5 text-primary" /> Transacção
+              <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
+                <CreditCard className="text-primary h-3.5 w-3.5" /> Transacção
               </h4>
-              <div className="space-y-1.5 rounded-lg border bg-muted/40 p-3">
+              <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Montante</span>
-                  <span className="text-base font-bold text-foreground">
+                  <span className="text-foreground text-base font-bold">
                     {formatMt(flag.transaction.amount)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tipo</span>
-                  <span className="font-medium">{flag.transaction.transactionType}</span>
+                  <span className="font-medium">
+                    {getTransactionTypeLabel(flag.transaction.transactionType)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Conta</span>
@@ -233,12 +238,12 @@ export function FlagReviewSheet({
             </div>
           )}
 
-          {/* Technical details */}
+          {/* Match details */}
           <div className="space-y-2">
-            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
-              <FileSpreadsheet className="h-3.5 w-3.5 text-primary" /> Detalhes do alerta
+            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
+              <FileSpreadsheet className="text-primary h-3.5 w-3.5" /> Detalhes do alerta
             </h4>
-            <div className="break-all rounded-lg border bg-muted/20 p-3 font-mono text-[11px] leading-relaxed">
+            <div className="bg-muted/20 break-all rounded-lg border p-3 font-mono text-[11px] leading-relaxed">
               {flag.details
                 ? typeof flag.details === "string"
                   ? flag.details
@@ -249,7 +254,7 @@ export function FlagReviewSheet({
 
           {/* Review notes */}
           <div className="space-y-2 pt-2">
-            <Label htmlFor="reviewNotes" className="font-semibold text-foreground">
+            <Label htmlFor="reviewNotes" className="text-foreground font-semibold">
               Notas de análise <span className="text-destructive">*</span>
             </Label>
             <textarea
@@ -258,10 +263,10 @@ export function FlagReviewSheet({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Descreva a sua análise e a fundamentação da decisão…"
-              className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
             />
             {actionError && (
-              <p className="flex items-center gap-1 text-xs font-medium text-destructive">
+              <p className="text-destructive flex items-center gap-1 text-xs font-medium">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                 {actionError}
               </p>
@@ -273,18 +278,7 @@ export function FlagReviewSheet({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleReviewAction("DISMISS")}
-            disabled={isSubmitting}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            <XCircle className="mr-1 h-3.5 w-3.5" />
-            Descartar
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => handleReviewAction("RESOLVE")}
+            onClick={handleReviewAction}
             disabled={isSubmitting}
             className="text-xs"
           >

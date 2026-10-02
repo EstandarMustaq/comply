@@ -61,7 +61,7 @@ export function CommandSearch({
   const [query, setQuery] = React.useState("")
   const [activeIndex, setActiveIndex] = React.useState(0)
 
-  // Cmd/Ctrl + K abre a paleta
+  // Open the command palette with Cmd/Ctrl + K.
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
@@ -104,7 +104,7 @@ export function CommandSearch({
     [filteredGroups]
   )
 
-  // Índice global de cada item, calculado uma vez, para não mutar nada durante o render
+  // Cache each item's global index to avoid mutating state during render.
   const indexById = React.useMemo(() => {
     const map = new Map<string, number>()
     flatItems.forEach((item, index) => map.set(item.id, index))
@@ -143,7 +143,7 @@ export function CommandSearch({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "flex h-8 items-center gap-2 rounded-md border border-border bg-background/60 px-2.5 text-left text-xs text-muted-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "border-border bg-background/60 text-muted-foreground hover:bg-background focus-visible:ring-ring flex h-8 items-center gap-2 rounded-md border px-2.5 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-1",
             triggerWidths[triggerWidth]
           )}
         >
@@ -157,12 +157,12 @@ export function CommandSearch({
         <DialogContent className="top-[20%] max-w-xl translate-y-0 gap-0 overflow-hidden p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">Pesquisar</DialogTitle>
           <DialogDescription className="sr-only">
-            Pesquisar e navegar pelo Fincomp
+            Pesquisar e navegar pelo Complyz
           </DialogDescription>
 
           <div className="p-3 pb-2">
-            <div className="flex items-center gap-2.5 rounded-lg border border-border/80 bg-muted/60 px-3 transition-colors">
-              <Search className="size-4 shrink-0 text-muted-foreground" />
+            <div className="border-border/80 bg-muted/60 flex items-center gap-2.5 rounded-lg border px-3 transition-colors">
+              <Search className="text-muted-foreground size-4 shrink-0" />
               <input
                 autoFocus
                 value={query}
@@ -172,7 +172,7 @@ export function CommandSearch({
                 }}
                 onKeyDown={handleListKeyDown}
                 placeholder={placeholder}
-                className="h-8 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                className="text-foreground placeholder:text-muted-foreground h-8 flex-1 bg-transparent text-sm outline-none"
               />
               <Kbd>Esc</Kbd>
             </div>
@@ -181,14 +181,14 @@ export function CommandSearch({
           <ScrollArea className="max-h-80">
             <div className="p-2 pt-0">
               {flatItems.length === 0 && (
-                <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+                <p className="text-muted-foreground px-3 py-6 text-center text-sm">
                   {emptyText}
                 </p>
               )}
 
               {filteredGroups.map((group) => (
                 <div key={group.id} className="mb-1 last:mb-0">
-                  <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium uppercase tracking-wider">
                     {group.label}
                   </div>
                   <div className="space-y-0.5">

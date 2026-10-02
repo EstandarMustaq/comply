@@ -14,35 +14,8 @@ import {
 
 const API_BASE_URL = env.NEXT_PUBLIC_API_URL
 
-// This public catalog keeps the typed client coupled to the GRC Engine OpenAPI
-// surface. The contract test validates it against a running contract profile.
-export const apiContract = [
-  ["post", "/api/auth/login"],
-  ["post", "/api/auth/mfa/verify"],
-  ["post", "/api/auth/mfa/enroll"],
-  ["post", "/api/auth/mfa/confirm"],
-  ["post", "/api/auth/refresh"],
-  ["post", "/api/auth/logout"],
-  ["get", "/api/auth/me"],
-  ["get", "/api/insights/summary"],
-  ["get", "/api/clients"],
-  ["post", "/api/clients"],
-  ["get", "/api/clients/{id}"],
-  ["get", "/api/flags"],
-  ["patch", "/api/flags/{id}/review"],
-  ["post", "/api/flags/{id}/escalate-to-str"],
-  ["post", "/api/import-batches"],
-  ["get", "/api/import-batches"],
-  ["get", "/api/import-batches/{id}"],
-  ["post", "/api/import-batches/{id}/confirm-mapping"],
-  ["get", "/api/reports/str"],
-  ["get", "/api/reports/str/{id}"],
-  ["post", "/api/reports/str/{id}/submit"],
-  ["get", "/api/reports/ctr"],
-  ["get", "/api/settings/threshold-rules"],
-  ["put", "/api/settings/threshold-rules/{id}"],
-  ["get", "/api/audit-log"],
-] as const
+// The contract test validates these routes against the running API schema.
+export { apiContract } from "@complyz/api-clients"
 
 export interface CurrentUser {
   id: string
@@ -55,29 +28,29 @@ export interface CurrentUser {
 class ApiClient {
   private getToken(): string | null {
     if (typeof window === "undefined") return null
-    return localStorage.getItem("fincomp_token")
+    return localStorage.getItem("complyz_token")
   }
 
   public setToken(token: string) {
     if (typeof window !== "undefined") {
-      localStorage.setItem("fincomp_token", token)
+      localStorage.setItem("complyz_token", token)
     }
   }
 
   public clearToken() {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("fincomp_token")
+      localStorage.removeItem("complyz_token")
     }
   }
 
   public hasToken(): boolean {
     if (typeof window === "undefined") return false
-    return !!localStorage.getItem("fincomp_token")
+    return !!localStorage.getItem("complyz_token")
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     if (!API_BASE_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL is not configured.")
+      throw new Error("A variável NEXT_PUBLIC_API_URL não está configurada.")
     }
     const token = this.getToken()
     const headers: Record<string, string> = {
@@ -99,7 +72,7 @@ class ApiClient {
 
     if (response.status === 401) {
       if (typeof window !== "undefined") {
-        const refreshToken = localStorage.getItem("fincomp_refresh_token")
+        const refreshToken = localStorage.getItem("complyz_refresh_token")
         if (refreshToken && !endpoint.includes("/auth/refresh")) {
           try {
             const refreshed = await this.request<AuthResponse>("/auth/refresh", {
@@ -109,7 +82,7 @@ class ApiClient {
             if (refreshed.accessToken) {
               this.setToken(refreshed.accessToken)
               if (refreshed.refreshToken)
-                localStorage.setItem("fincomp_refresh_token", refreshed.refreshToken)
+                localStorage.setItem("complyz_refresh_token", refreshed.refreshToken)
               return this.request<T>(endpoint, options)
             }
           } catch {
@@ -117,20 +90,21 @@ class ApiClient {
           }
         }
         this.clearToken()
-        localStorage.removeItem("fincomp_refresh_token")
-        // Login e MFA vivem no subdomínio de auth, fora desta app.
+        localStorage.removeItem("complyz_refresh_token")
+        // Redirect to the external authentication service after session expiry.
         if (env.NEXT_PUBLIC_AUTH_URL) {
           window.location.href = env.NEXT_PUBLIC_AUTH_URL
         }
       }
-      throw new Error("Session expired. Please sign in again.")
+      throw new Error("A sessão expirou. Inicie sessão novamente.")
     }
 
     if (!response.ok) {
-      let errorMsg = `Request failed: ${response.status} ${response.statusText}`
+      let errorMsg = `O pedido falhou: ${response.status} ${response.statusText}`
       try {
         const errorData = await response.json()
-        if (errorData.message) errorMsg = errorData.message
+        if (errorData.error?.message) errorMsg = errorData.error.message
+        else if (errorData.message) errorMsg = errorData.message
         else if (typeof errorData === "string") errorMsg = errorData
       } catch {
         // fallback to status text
@@ -140,7 +114,11 @@ class ApiClient {
 
     const contentType = response.headers.get("content-type")
     if (contentType && contentType.includes("application/json")) {
-      return response.json()
+      const body: unknown = await response.json()
+      if (typeof body === "object" && body !== null && "data" in body && "meta" in body) {
+        return body.data as T
+      }
+      return body as T
     }
     return response.text() as unknown as T
   }
@@ -156,7 +134,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("fincomp_refresh_token", res.refreshToken)
+      localStorage.setItem("complyz_refresh_token", res.refreshToken)
     return res
   }
 
@@ -175,7 +153,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("fincomp_refresh_token", res.refreshToken)
+      localStorage.setItem("complyz_refresh_token", res.refreshToken)
     return res
   }
 
@@ -196,7 +174,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("fincomp_refresh_token", res.refreshToken)
+      localStorage.setItem("complyz_refresh_token", res.refreshToken)
     return res
   }
 
@@ -211,7 +189,7 @@ class ApiClient {
       // Best-effort: always clear the local token
     } finally {
       this.clearToken()
-      if (typeof window !== "undefined") localStorage.removeItem("fincomp_refresh_token")
+      if (typeof window !== "undefined") localStorage.removeItem("complyz_refresh_token")
     }
   }
 
@@ -274,16 +252,12 @@ class ApiClient {
     )
   }
 
-  async reviewFlag(
-    id: string,
-    action: "DISMISS" | "RESOLVE",
-    notes: string
-  ): Promise<Flag> {
+  async reviewFlag(id: string, notes: string): Promise<Flag> {
     return this.request<GrcEngineFlag>(`/flags/${id}/review`, {
       method: "PATCH",
       body: JSON.stringify({
         note: notes,
-        status: action === "DISMISS" ? "DISMISSED" : "RESOLVED",
+        status: "RESOLVED",
       }),
     }).then(mapFlag)
   }

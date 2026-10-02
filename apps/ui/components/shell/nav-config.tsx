@@ -20,7 +20,7 @@ export interface NavItem {
   title: string
   url: string
   icon: LucideIcon
-  /** Chave de contagem vinda dos insights, mostrada como distintivo */
+  /** Insight count key displayed as a navigation badge. */
   badgeKey?: "pendingFlagsCount" | "sanctionsMatchCount" | "overdueSlaCount"
   items?: NavSubItem[]
 }
@@ -34,9 +34,9 @@ export interface NavModule {
   id: string
   label: string
   icon: LucideIcon
-  /** Primeira rota do módulo, usada ao clicar no rail */
+  /** Destination opened when the module rail item is selected. */
   href: string
-  /** Prefixos de rota que activam este módulo */
+  /** Route prefixes that activate this module. */
   matches: string[]
   title: string
   description?: string

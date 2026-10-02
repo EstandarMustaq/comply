@@ -127,7 +127,7 @@ export default function InsightsPage() {
       />
 
       <div className="space-y-6">
-        {/* Precisa de decisão */}
+        {/* Items requiring a decision */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {attention.map((item) => {
             const isActive = item.value > 0
@@ -141,12 +141,12 @@ export default function InsightsPage() {
                   if (e.key === "Enter") router.push(item.href)
                 }}
                 className={cn(
-                  "cursor-pointer shadow-sm transition-colors hover:border-primary/50",
+                  "hover:border-primary/50 cursor-pointer shadow-sm transition-colors",
                   isActive && item.urgent && "border-destructive/40"
                 )}
               >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 pb-2">
-                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                  <CardTitle className="text-muted-foreground text-xs font-medium">
                     {item.label}
                   </CardTitle>
                   <item.icon
@@ -171,7 +171,7 @@ export default function InsightsPage() {
                       {item.value}
                     </p>
                   )}
-                  <p className="text-[11px] text-muted-foreground">{item.description}</p>
+                  <p className="text-muted-foreground text-[11px]">{item.description}</p>
                 </CardContent>
               </Card>
             )
@@ -179,13 +179,13 @@ export default function InsightsPage() {
         </section>
 
         {nothingPending && !isLoading && (
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-            <CheckCircle2 className="size-4 text-primary" />
+          <div className="border-border bg-muted/40 text-muted-foreground flex items-center gap-2 rounded-lg border px-4 py-3 text-sm">
+            <CheckCircle2 className="text-primary size-4" />
             Nada por decidir neste momento.
           </div>
         )}
 
-        {/* Cobertura da carteira */}
+        {/* Portfolio coverage */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Cobertura da carteira</CardTitle>
@@ -197,27 +197,27 @@ export default function InsightsPage() {
             {coverage.map((row) => (
               <div key={row.label} className="space-y-1.5">
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-xs text-muted-foreground">{row.label}</span>
-                  <span className="text-sm font-semibold tabular-nums text-foreground">
+                  <span className="text-muted-foreground text-xs">{row.label}</span>
+                  <span className="text-foreground text-sm font-semibold tabular-nums">
                     {isLoading ? "—" : row.value}
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
+                    className="bg-primary h-full rounded-full transition-all duration-500"
                     style={{ width: `${isLoading ? 0 : row.percent}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-muted-foreground">{row.detail}</p>
+                <p className="text-muted-foreground text-[11px]">{row.detail}</p>
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Volume ao longo do tempo */}
+        {/* Volume over time */}
         <ChartAreaInteractive />
 
-        {/* Actividade acumulada */}
+        {/* Cumulative activity */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Acumulado</CardTitle>
@@ -241,11 +241,11 @@ export default function InsightsPage() {
               },
             ].map((stat) => (
               <div key={stat.label} className="space-y-0.5">
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className="text-muted-foreground text-xs">{stat.label}</p>
                 {isLoading ? (
                   <Skeleton className="h-7 w-20" />
                 ) : (
-                  <p className="text-2xl font-semibold tabular-nums text-foreground">
+                  <p className="text-foreground text-2xl font-semibold tabular-nums">
                     {stat.value}
                   </p>
                 )}
@@ -255,10 +255,10 @@ export default function InsightsPage() {
         </Card>
 
         {data?.complianceScorePercent !== undefined && (
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-3">
+          <div className="border-border flex items-center justify-between gap-3 rounded-lg border px-4 py-3">
             <div>
-              <p className="text-xs text-muted-foreground">Estado geral</p>
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-muted-foreground text-xs">Estado geral</p>
+              <p className="text-foreground text-sm font-medium">
                 {data.complianceScorePercent}% dos controlos em dia
               </p>
             </div>

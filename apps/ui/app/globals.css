@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Lausanne — fonte principal do Fincomp */
+/* Lausanne is the primary Complyz typeface. */
 @font-face {
   font-family: "Lausanne";
   src: url("./fonts/TWKLausanne/TWKLausanne-300.woff2") format("woff2");
@@ -85,7 +85,7 @@
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
 
-    /* sage */
+    /* Sage brand color. */
     --primary: 159 10.8% 36.5%;
     --primary-foreground: 150 15% 97%;
     --ring: 158.9 39.8% 36.5%;

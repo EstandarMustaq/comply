@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api-client"
 import { type ImportBatch } from "@/lib/types"
+import { getImportStatusLabel } from "@/lib/labels"
 
 export default function ImportPage() {
   const [batches, setBatches] = useState<ImportBatch[]>([])
@@ -69,7 +70,7 @@ export default function ImportPage() {
       default:
         return (
           <Badge variant="secondary" className="text-[10px]">
-            {status}
+            {getImportStatusLabel(status)}
           </Badge>
         )
     }
@@ -80,15 +81,15 @@ export default function ImportPage() {
       <SiteHeader title="Importar transacções" />
 
       <div className="space-y-6">
-        {/* Dropzone Container */}
+        {/* File upload area */}
         <UploadDropzone onSuccess={loadBatches} />
 
-        {/* History of Import Batches */}
+        {/* Recent imports */}
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileSpreadsheet className="h-4 w-4 text-primary" />
+                <FileSpreadsheet className="text-primary h-4 w-4" />
                 Histórico de Lotes Importados
               </CardTitle>
               <CardDescription className="text-xs">
@@ -108,7 +109,7 @@ export default function ImportPage() {
           </CardHeader>
           <CardContent>
             {batches.length === 0 ? (
-              <div className="py-8 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground py-8 text-center text-xs">
                 Nenhum lote importado ainda. Arraste uma folha de cálculo acima para
                 iniciar.
               </div>
@@ -142,7 +143,7 @@ export default function ImportPage() {
                       <TableCell className="text-center text-xs font-semibold text-red-600">
                         {b.errorRows}
                       </TableCell>
-                      <TableCell className="text-right text-xs text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-right text-xs">
                         {new Date(b.createdAt).toLocaleString("pt-MZ")}
                       </TableCell>
                     </TableRow>

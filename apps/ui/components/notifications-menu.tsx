@@ -84,7 +84,7 @@ export function NotificationsMenu() {
         <button
           type="button"
           aria-label="Notificações"
-          className="relative inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="text-muted-foreground hover:bg-background/60 hover:text-foreground focus-visible:ring-ring relative inline-flex size-8 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1"
         >
           <Bell className="size-4" />
           {entries.length > 0 && (
@@ -100,23 +100,23 @@ export function NotificationsMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" sideOffset={8} className="w-80 p-0">
-        <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
-          <span className="text-sm font-medium text-foreground">Notificações</span>
+        <div className="border-border flex items-center justify-between border-b px-3 py-2.5">
+          <span className="text-foreground text-sm font-medium">Notificações</span>
           {entries.length > 0 && (
-            <span className="text-xs text-muted-foreground">{entries.length}</span>
+            <span className="text-muted-foreground text-xs">{entries.length}</span>
           )}
         </div>
 
         <ScrollArea className="max-h-80">
           <div className="p-1.5">
             {!loaded && (
-              <p className="px-3 py-6 text-center text-xs text-muted-foreground">
+              <p className="text-muted-foreground px-3 py-6 text-center text-xs">
                 A carregar...
               </p>
             )}
 
             {loaded && entries.length === 0 && (
-              <p className="px-3 py-6 text-center text-xs text-muted-foreground">
+              <p className="text-muted-foreground px-3 py-6 text-center text-xs">
                 Nada por rever.
               </p>
             )}
@@ -125,7 +125,7 @@ export function NotificationsMenu() {
               <Link
                 key={entry.id}
                 href={entry.href}
-                className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted/60"
+                className="hover:bg-muted/60 flex items-start gap-2.5 rounded-lg px-3 py-2.5 transition-colors"
               >
                 <span
                   className={cn(
@@ -135,11 +135,11 @@ export function NotificationsMenu() {
                   aria-hidden="true"
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-xs font-medium text-foreground">
+                  <span className="text-foreground block truncate text-xs font-medium">
                     {entry.title}
                   </span>
                   {entry.description && (
-                    <span className="block truncate text-[11px] text-muted-foreground">
+                    <span className="text-muted-foreground block truncate text-[11px]">
                       {entry.description}
                     </span>
                   )}
@@ -149,10 +149,10 @@ export function NotificationsMenu() {
           </div>
         </ScrollArea>
 
-        <div className="border-t border-border p-1.5">
+        <div className="border-border border-t p-1.5">
           <Link
             href="/flags"
-            className="flex w-full items-center justify-center rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            className="text-muted-foreground hover:bg-muted/60 hover:text-foreground flex w-full items-center justify-center rounded-lg px-3 py-2 text-xs transition-colors"
           >
             Ver todos os alertas
           </Link>

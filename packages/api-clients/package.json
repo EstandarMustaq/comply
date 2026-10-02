@@ -1,0 +1,15 @@
+{
+  "name": "@complyz/api-clients",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenAPI-derived types and route contract for the Complyz API",
+  "license": "UNLICENSED",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "node ../../scripts/openapi.mjs"
+  },
+  "devDependencies": {
+    "@complyz/config-typescript": "workspace:*"
+  }
+}

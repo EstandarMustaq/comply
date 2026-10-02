@@ -50,7 +50,7 @@ export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-  // New Client Modal States
+  // New customer dialog state.
   const [isNewClientOpen, setIsNewClientOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newClientName, setNewClientName] = useState("")
@@ -102,7 +102,7 @@ export default function ClientsPage() {
         pepCategory: newClientIsPep ? newClientPepCategory : undefined,
       })
 
-      // Reset form
+      // Reset the customer form.
       setNewClientName("")
       setNewClientDoc("")
       setNewClientNuib("")
@@ -151,10 +151,10 @@ export default function ClientsPage() {
       />
 
       <div className="space-y-6">
-        {/* Search & Filters */}
+        {/* Customer search and filters */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute left-3 top-2.5 h-4 w-4" />
             <Input
               type="text"
               placeholder="Pesquisar por nome, documento ou NUIB..."
@@ -189,11 +189,11 @@ export default function ClientsPage() {
           </div>
         </div>
 
-        {/* Clients Table Card */}
+        {/* Customer records */}
         <Card className="border-border shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
-              <Users className="h-4 w-4 text-primary" />
+              <Users className="text-primary h-4 w-4" />
               Clientes ({filteredClients.length})
             </CardTitle>
             <CardDescription className="text-xs">
@@ -203,7 +203,7 @@ export default function ClientsPage() {
           </CardHeader>
           <CardContent>
             {filteredClients.length === 0 ? (
-              <div className="py-12 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground py-12 text-center text-xs">
                 Nenhum cliente corresponde aos filtros seleccionados.
               </div>
             ) : (
@@ -223,12 +223,12 @@ export default function ClientsPage() {
                   {filteredClients.map((client) => (
                     <TableRow
                       key={client.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="hover:bg-muted/50 cursor-pointer"
                       onClick={() => openClientDetail(client)}
                     >
                       <TableCell className="text-xs font-semibold">
                         {client.fullName}
-                        <div className="text-[10px] font-normal text-muted-foreground">
+                        <div className="text-muted-foreground text-[10px] font-normal">
                           {client.clientType === "INDIVIDUAL"
                             ? "Particular"
                             : "Pessoa colectiva"}
@@ -237,7 +237,7 @@ export default function ClientsPage() {
                       <TableCell className="font-mono text-xs">
                         {client.documentNumber}
                         {client.nuib && (
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-muted-foreground text-[10px]">
                             NUIB: {client.nuib}
                           </div>
                         )}
@@ -268,7 +268,7 @@ export default function ClientsPage() {
                             PEP ({client.pepCategory || "Nacional"})
                           </Badge>
                         ) : (
-                          <span className="text-[11px] text-muted-foreground">—</span>
+                          <span className="text-muted-foreground text-[11px]">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-xs font-semibold">
@@ -296,7 +296,7 @@ export default function ClientsPage() {
         </Card>
       </div>
 
-      {/* Slide-out Client Detail Sheet */}
+      {/* Customer details panel */}
       <ClientDetailSheet
         client={selectedClient}
         isOpen={isDetailOpen}
@@ -306,12 +306,12 @@ export default function ClientsPage() {
         }}
       />
 
-      {/* New Client KYC Dialog */}
+      {/* New customer profile dialog */}
       <Dialog open={isNewClientOpen} onOpenChange={setIsNewClientOpen}>
         <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-primary" />
+              <UserPlus className="text-primary h-5 w-5" />
               Adicionar cliente
             </DialogTitle>
             <DialogDescription className="text-xs">
@@ -405,16 +405,16 @@ export default function ClientsPage() {
               </div>
             </div>
 
-            {/* PEP Checkbox */}
-            <div className="space-y-2 rounded-lg border bg-muted/40 p-3">
+            {/* Politically exposed person indicator */}
+            <div className="bg-muted/40 space-y-2 rounded-lg border p-3">
               <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={newClientIsPep}
                   onChange={(e) => setNewClientIsPep(e.target.checked)}
-                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                  className="border-input text-primary focus:ring-primary h-4 w-4 rounded"
                 />
-                <span className="font-semibold text-foreground">
+                <span className="text-foreground font-semibold">
                   Pessoa com exposição política
                 </span>
               </label>

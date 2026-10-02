@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { api } from "@/lib/api-client"
 import { type Flag } from "@/lib/types"
+import { getFlagStatusLabel, getFlagTypeLabel } from "@/lib/labels"
 
 export default function FlagsPage() {
   const [flags, setFlags] = useState<Flag[]>([])
@@ -151,7 +152,7 @@ export default function FlagsPage() {
           </Tabs>
         </div>
 
-        {/* Flags List Card */}
+        {/* Alert list */}
         <Card className="border-border shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -164,7 +165,7 @@ export default function FlagsPage() {
           </CardHeader>
           <CardContent>
             {flags.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-12 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex flex-col items-center gap-2 py-12 text-center text-xs">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                 <span>Nenhum alerta nesta categoria.</span>
               </div>
@@ -187,7 +188,7 @@ export default function FlagsPage() {
                     return (
                       <TableRow
                         key={flag.id}
-                        className={`cursor-pointer hover:bg-muted/50 ${
+                        className={`hover:bg-muted/50 cursor-pointer ${
                           isSanction ? "bg-red-50/20" : ""
                         }`}
                         onClick={() => openReview(flag)}
@@ -197,37 +198,31 @@ export default function FlagsPage() {
                             variant={isSanction ? "urgent" : "secondary"}
                             className="text-[10px]"
                           >
-                            {flag.flagType.replace(/_/g, " ")}
+                            {getFlagTypeLabel(flag.flagType)}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-xs font-medium">
                           {flag.client?.fullName || "—"}
-                          <div className="font-mono text-[11px] text-muted-foreground">
+                          <div className="text-muted-foreground font-mono text-[11px]">
                             {flag.client?.documentNumber}
                           </div>
                         </TableCell>
                         <TableCell className="text-xs font-semibold">
                           {formatMt(flag.transaction?.amount)}
                         </TableCell>
-                        <TableCell className="max-w-sm truncate text-xs text-muted-foreground">
+                        <TableCell className="text-muted-foreground max-w-sm truncate text-xs">
                           {flag.ruleTriggered}
                         </TableCell>
                         <TableCell>
                           {isSanction ? (
                             getSlaBadge(flag.slaDeadline)
                           ) : (
-                            <span className="text-xs text-muted-foreground">Normal</span>
+                            <span className="text-muted-foreground text-xs">Normal</span>
                           )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-[10px]">
-                            {flag.status === "PENDING"
-                              ? "PENDENTE"
-                              : flag.status === "RESOLVED"
-                                ? "RESOLVIDO"
-                                : flag.status === "DISMISSED"
-                                  ? "DESCARTADO"
-                                  : flag.status}
+                            {getFlagStatusLabel(flag.status)}
                           </Badge>
                         </TableCell>
                         <TableCell
@@ -253,7 +248,7 @@ export default function FlagsPage() {
         </Card>
       </div>
 
-      {/* Slide-out Review Sheet */}
+      {/* Alert review panel */}
       <FlagReviewSheet
         flag={selectedFlag}
         isOpen={isReviewOpen}

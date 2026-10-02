@@ -110,15 +110,13 @@ export interface Transaction {
 }
 
 export type FlagType =
-  | "SANCTIONS_MATCH"
+  | "KYC_INCOMPLETE"
+  | "THRESHOLD_VALUE"
   | "STRUCTURING_SUSPECTED"
-  | "THRESHOLD_EXCEEDED"
-  | "PEP_TRANSACTION"
-  | "RAPID_MOVEMENT"
-  | "SIMPLIFIED_REGIME_BREACH"
+  | "SANCTIONS_MATCH"
+  | "PEP_REVIEW_DUE"
 
-export type FlagStatus =
-  "PENDING" | "UNDER_REVIEW" | "ESCALATED" | "DISMISSED" | "RESOLVED"
+export type FlagStatus = "PENDING" | "IN_REVIEW" | "ESCALATED_TO_STR" | "RESOLVED"
 
 export interface Flag {
   id: string
@@ -206,25 +204,19 @@ export interface CurrencyTransactionReport {
 
 export interface ThresholdRule {
   id: string
-  ruleCode: string
   name: string
-  ruleType: string
-  thresholdAmount: number
-  timeWindowDays: number
-  transactionType: string
-  regime: string
-  description: string
-  isActive: boolean
+  type: "SINGLE_TRANSACTION_VALUE" | "MONTHLY_AGGREGATE_VALUE" | "STRUCTURING"
+  valueThreshold: number | null
+  aggregationWindowDays: number | null
+  active: boolean
 }
 
 export interface AuditLog {
   id: string
-  userEmail: string
-  userRole: string
+  actor?: User | null
   action: string
-  resourceType: string
-  resourceId: string
-  details: string
-  ipAddress: string
+  entity: string
+  entityId?: string | null
+  details?: string | null
   createdAt: string
 }

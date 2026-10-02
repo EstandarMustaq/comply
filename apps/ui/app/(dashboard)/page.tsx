@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api-client"
 import { type Flag, type InsightsData } from "@/lib/types"
+import { getFlagTypeLabel } from "@/lib/labels"
 
 export default function DashboardOverviewPage() {
   const router = useRouter()
@@ -104,15 +105,15 @@ export default function DashboardOverviewPage() {
       />
 
       <div className="space-y-6">
-        {/* KPI Section Cards */}
+        {/* Operational summary */}
         <SectionCards data={insights} isLoading={isLoading} />
 
-        {/* Charts & Analytical Trends */}
+        {/* Activity trends */}
         <div className="grid gap-6">
           <ChartAreaInteractive />
         </div>
 
-        {/* Priority Alerts Table */}
+        {/* Priority alerts */}
         <Card className="border-border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
@@ -136,7 +137,7 @@ export default function DashboardOverviewPage() {
           </CardHeader>
           <CardContent>
             {pendingFlags.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center text-xs">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                 <span>Nenhum alerta pendente — tudo em conformidade.</span>
               </div>
@@ -157,19 +158,19 @@ export default function DashboardOverviewPage() {
                     return (
                       <TableRow
                         key={flag.id}
-                        className="cursor-pointer hover:bg-muted/50"
+                        className="hover:bg-muted/50 cursor-pointer"
                       >
                         <TableCell>
                           <Badge
                             variant={isSanction ? "urgent" : "secondary"}
                             className="text-[11px]"
                           >
-                            {flag.flagType.replace(/_/g, " ")}
+                            {getFlagTypeLabel(flag.flagType)}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium">
                           {flag.client?.fullName || "—"}
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="text-muted-foreground text-[11px]">
                             {flag.client?.documentNumber}
                           </div>
                         </TableCell>
@@ -180,7 +181,7 @@ export default function DashboardOverviewPage() {
                           {isSanction ? (
                             getSlaBadge(flag.slaDeadline)
                           ) : (
-                            <span className="text-xs text-muted-foreground">Normal</span>
+                            <span className="text-muted-foreground text-xs">Normal</span>
                           )}
                         </TableCell>
                         <TableCell className="text-right">
@@ -203,7 +204,7 @@ export default function DashboardOverviewPage() {
         </Card>
       </div>
 
-      {/* Lateral Flag Review Sheet */}
+      {/* Alert review panel */}
       <FlagReviewSheet
         flag={selectedFlag}
         isOpen={isReviewOpen}

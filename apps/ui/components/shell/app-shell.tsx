@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-/* ============================ CONTEXT ============================ */
-
 type AppShellContextProps = {
   sidebarOpen: boolean
   setSidebarOpen: (open: boolean) => void
@@ -36,8 +34,6 @@ export function useAppShell() {
   return context
 }
 
-/* ============================ SHELL ============================ */
-
 export function AppShell({
   defaultSidebarOpen = true,
   children,
@@ -56,7 +52,7 @@ export function AppShell({
     []
   )
 
-  // Cmd/Ctrl + \ alterna a sidebar, igual ao Comp AI
+  // Toggle the sidebar with Cmd/Ctrl + \.
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "\\" && (e.metaKey || e.ctrlKey)) {
@@ -102,7 +98,7 @@ export function AppShell({
         <div
           data-slot="app-shell"
           data-sidebar-open={sidebarOpen}
-          className="flex h-svh w-full flex-col overflow-hidden bg-muted"
+          className="bg-muted flex h-svh w-full flex-col overflow-hidden"
           {...props}
         >
           {children}
@@ -111,8 +107,6 @@ export function AppShell({
     </AppShellContext.Provider>
   )
 }
-
-/* ============================ NAVBAR ============================ */
 
 export function AppShellNavbar({
   startContent,
@@ -137,7 +131,7 @@ export function AppShellNavbar({
         <button
           type="button"
           onClick={toggleMobileDrawer}
-          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-background/60 hover:text-foreground md:hidden"
+          className="text-muted-foreground hover:bg-background/60 hover:text-foreground inline-flex size-8 items-center justify-center rounded-md md:hidden"
           aria-label="Abrir menu"
         >
           <PanelLeftOpen className="size-4" />
@@ -157,8 +151,6 @@ export function AppShellNavbar({
   )
 }
 
-/* ============================ BODY / MAIN ============================ */
-
 export function AppShellBody({
   children,
   ...props
@@ -172,7 +164,7 @@ export function AppShellBody({
       className="flex min-h-0 flex-1 overflow-hidden bg-transparent"
       {...props}
     >
-      {/* Gaveta móvel: rail e sidebar juntos */}
+      {/* Render the rail and sidebar together in the mobile drawer. */}
       <div className="md:hidden">
         {mobileDrawerOpen && (
           <div
@@ -188,11 +180,11 @@ export function AppShellBody({
           )}
         >
           {railContent && (
-            <div className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-border bg-muted py-3">
+            <div className="border-border bg-muted flex w-14 shrink-0 flex-col items-center gap-1 border-r py-3">
               {railContent}
             </div>
           )}
-          <div className="flex w-64 flex-col bg-background p-2">{sidebarContent}</div>
+          <div className="bg-background flex w-64 flex-col p-2">{sidebarContent}</div>
         </div>
       </div>
 
@@ -208,15 +200,13 @@ export function AppShellMain({
   return (
     <div
       data-slot="app-shell-main"
-      className="mb-2 ml-2 mr-2 flex min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background"
+      className="border-border bg-background mb-2 ml-2 mr-2 flex min-h-0 flex-1 overflow-hidden rounded-xl border"
       {...props}
     >
       {children}
     </div>
   )
 }
-
-/* ============================ RAIL ============================ */
 
 type RailIndicatorContextProps = {
   registerItem: (id: string, element: HTMLElement | null) => void
@@ -293,7 +283,7 @@ export function AppShellRail({
         >
           <span
             ref={indicatorRef}
-            className="pointer-events-none absolute right-0 -mr-2 h-6 w-1 rounded-full bg-primary transition-all duration-300 ease-out"
+            className="bg-primary pointer-events-none absolute right-0 -mr-2 h-6 w-1 rounded-full transition-all duration-300 ease-out"
             style={{ opacity: 0, top: 0 }}
             aria-hidden="true"
           />
@@ -304,7 +294,7 @@ export function AppShellRail({
           <button
             type="button"
             onClick={toggleSidebar}
-            className="flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background/60 hover:text-foreground"
+            className="text-muted-foreground hover:bg-background/60 hover:text-foreground flex size-10 items-center justify-center rounded-md transition-colors"
             aria-label={sidebarOpen ? "Colapsar sidebar" : "Expandir sidebar"}
           >
             {sidebarOpen ? (
@@ -352,7 +342,7 @@ export function AppShellRailItem({
         "flex size-10 cursor-pointer items-center justify-center rounded-lg transition-all duration-200",
         isActive
           ? "bg-primary text-primary-foreground shadow-md"
-          : "text-muted-foreground hover:bg-accent hover:text-foreground hover:shadow active:scale-95 dark:hover:bg-muted"
+          : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-muted hover:shadow active:scale-95"
       )}
       aria-label={label}
       {...props}
@@ -373,8 +363,6 @@ export function AppShellRailItem({
   )
 }
 
-/* ============================ SIDEBAR ============================ */
-
 export function AppShellSidebar({
   children,
   ...props
@@ -392,12 +380,12 @@ export function AppShellSidebar({
       data-slot="app-shell-sidebar"
       data-collapsed={isCollapsed}
       className={cn(
-        "hidden shrink-0 overflow-hidden bg-background transition-[width,padding] duration-200 ease-in-out md:flex md:flex-col",
+        "bg-background hidden shrink-0 overflow-hidden transition-[width,padding] duration-200 ease-in-out md:flex md:flex-col",
         isCollapsed ? "w-0 border-0 p-0" : "w-64 p-2"
       )}
       {...props}
     >
-      {/* Largura interna fixa evita que o texto se comprima durante a animação */}
+      {/* Keep the inner width fixed to prevent text compression during transitions. */}
       <div
         className={cn(
           "flex h-full w-60 flex-col transition-opacity duration-100",
@@ -428,27 +416,27 @@ export function AppShellSidebarHeader({
     <div
       data-slot="app-shell-sidebar-header"
       className={cn(
-        "mb-2 flex items-center border-b border-border px-2",
+        "border-border mb-2 flex items-center border-b px-2",
         isSimple ? "py-3" : "gap-3 py-2"
       )}
       {...props}
     >
       {icon && (
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground [&>svg]:size-4">
+        <span className="bg-muted text-foreground flex size-8 shrink-0 items-center justify-center rounded-lg [&>svg]:size-4">
           {icon}
         </span>
       )}
       <div className="min-w-0 flex-1">
         <div
           className={cn(
-            "truncate text-foreground",
+            "text-foreground truncate",
             isSimple ? "text-base" : "text-sm font-medium"
           )}
         >
           {title}
         </div>
         {description && (
-          <div className="truncate text-xs text-muted-foreground">{description}</div>
+          <div className="text-muted-foreground truncate text-xs">{description}</div>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -464,7 +452,7 @@ export function AppShellContent({
   return (
     <main
       data-slot="app-shell-content"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden border-l border-border bg-background"
+      className="border-border bg-background flex min-h-0 flex-1 flex-col overflow-hidden border-l"
       {...props}
     >
       <ScrollArea className="h-full w-full flex-1">
@@ -473,8 +461,6 @@ export function AppShellContent({
     </main>
   )
 }
-
-/* ============================ NAV ============================ */
 
 export function AppShellNav({
   children,
@@ -497,7 +483,7 @@ export function AppShellNavGroup({
   return (
     <div data-slot="app-shell-nav-group" {...props}>
       {label && (
-        <div className="px-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="text-muted-foreground px-2 pb-1 text-xs font-medium uppercase tracking-wider">
           {label}
         </div>
       )}
@@ -523,7 +509,7 @@ export function AppShellNavItem({
         "flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm",
         "transition-all duration-150 ease-out",
         isActive
-          ? "bg-muted font-medium text-foreground"
+          ? "bg-muted text-foreground font-medium"
           : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
       )}
       {...props}
@@ -549,8 +535,7 @@ export function AppShellNavItemCollapsible({
 }) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen ?? isActive ?? false)
 
-  // Expand when active without setState-in-effect: if isActive is true but isOpen is false,
-  // update synchronously before render commits (React batches this).
+  // Expand an active item before commit so its current route is immediately visible.
   if (isActive && !isOpen) {
     setIsOpen(true)
   }
@@ -565,7 +550,7 @@ export function AppShellNavItemCollapsible({
           "flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm",
           "transition-all duration-150 ease-out",
           isActive || isOpen
-            ? "font-semibold text-foreground"
+            ? "text-foreground font-semibold"
             : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         )}
       >
@@ -573,7 +558,7 @@ export function AppShellNavItemCollapsible({
         <span className="flex-1 text-left">{label}</span>
         <ChevronDown
           className={cn(
-            "size-4 text-muted-foreground transition-transform duration-200",
+            "text-muted-foreground size-4 transition-transform duration-200",
             isOpen && "rotate-180"
           )}
         />
@@ -585,7 +570,7 @@ export function AppShellNavItemCollapsible({
           isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="ml-2 mt-1 space-y-0.5 rounded-xl bg-muted/40 p-1.5 dark:bg-muted/20">
+        <div className="bg-muted/40 dark:bg-muted/20 ml-2 mt-1 space-y-0.5 rounded-xl p-1.5">
           {children}
         </div>
       </div>
@@ -606,7 +591,7 @@ export function AppShellNavSubItem({
         "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-sm",
         "transition-all duration-150 ease-out",
         isActive
-          ? "bg-background font-medium text-foreground shadow-sm"
+          ? "bg-background text-foreground font-medium shadow-sm"
           : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
       )}
       {...props}
@@ -623,7 +608,7 @@ export function AppShellNavFooter({
   return (
     <div
       data-slot="app-shell-nav-footer"
-      className="mt-auto space-y-1 border-t border-border pt-2"
+      className="border-border mt-auto space-y-1 border-t pt-2"
       {...props}
     >
       {children}

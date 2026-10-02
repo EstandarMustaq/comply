@@ -48,6 +48,7 @@ import {
   type SuspiciousActivityReport,
   type CurrencyTransactionReport,
 } from "@/lib/types"
+import { getReportStatusLabel } from "@/lib/labels"
 
 function ReportsContent() {
   const searchParams = useSearchParams()
@@ -58,7 +59,7 @@ function ReportsContent() {
   const [ctrs, setCtrs] = useState<CurrencyTransactionReport[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  // Submit Modal States
+  // Report submission dialog state.
   const [selectedStr, setSelectedStr] = useState<SuspiciousActivityReport | null>(null)
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
   const [suspicionGrounds, setSuspicionGrounds] = useState("")
@@ -134,7 +135,9 @@ function ReportsContent() {
       setSelectedStr(null)
       loadData()
     } catch (err: unknown) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to submit report.")
+      setSubmitError(
+        err instanceof Error ? err.message : "Não foi possível submeter a comunicação."
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -168,19 +171,19 @@ function ReportsContent() {
       />
 
       <div className="space-y-6">
-        {/* Retention Notice */}
-        <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-3.5 text-xs text-foreground">
-          <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        {/* Report retention details */}
+        <div className="border-border bg-muted/40 text-foreground flex items-start gap-3 rounded-lg border p-3.5 text-xs">
+          <Clock className="text-primary mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <span className="font-semibold">Conservação de documentos</span>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
+            <p className="text-muted-foreground mt-0.5 text-[11px]">
               Todas as comunicações submetidas, evidências e registos de diligência são
               conservados com bloqueio de eliminação por <strong>10 anos</strong>.
             </p>
           </div>
         </div>
 
-        {/* Tab Selection */}
+        {/* Report category tabs */}
         <div className="flex items-center justify-between">
           <Tabs
             value={activeTab}
@@ -199,11 +202,11 @@ function ReportsContent() {
         </div>
 
         {activeTab === "STR" ? (
-          /* STR Table Card */
+          /* Investigation reports */
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="h-4 w-4 text-primary" />
+                <FileText className="text-primary h-4 w-4" />
                 Comunicações de operações suspeitas ({strs.length})
               </CardTitle>
               <CardDescription className="text-xs">
@@ -213,7 +216,7 @@ function ReportsContent() {
             </CardHeader>
             <CardContent>
               {strs.length === 0 ? (
-                <div className="py-12 text-center text-xs text-muted-foreground">
+                <div className="text-muted-foreground py-12 text-center text-xs">
                   Nenhuma operação suspeita registada.
                 </div>
               ) : (
@@ -238,7 +241,7 @@ function ReportsContent() {
                           </TableCell>
                           <TableCell className="text-xs font-medium">
                             {report.client?.fullName || "—"}
-                            <div className="font-mono text-[10px] text-muted-foreground">
+                            <div className="text-muted-foreground font-mono text-[10px]">
                               {report.client?.documentNumber}
                             </div>
                           </TableCell>
@@ -248,14 +251,14 @@ function ReportsContent() {
                                 {report.gifimProtocolNumber}
                               </span>
                             ) : (
-                              <span className="italic text-muted-foreground">
+                              <span className="text-muted-foreground italic">
                                 Pendente
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-xs text-muted-foreground">
+                          <TableCell className="text-muted-foreground text-xs">
                             {report.retentionDeadline ? (
-                              <span className="font-medium text-foreground">
+                              <span className="text-foreground font-medium">
                                 {new Date(report.retentionDeadline).toLocaleDateString(
                                   "pt-MZ"
                                 )}
@@ -303,11 +306,11 @@ function ReportsContent() {
             </CardContent>
           </Card>
         ) : (
-          /* CTR Table Card */
+          /* Cash transaction reports */
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="h-4 w-4 text-primary" />
+                <FileText className="text-primary h-4 w-4" />
                 Comunicações de transacções em numerário ({ctrs.length})
               </CardTitle>
               <CardDescription className="text-xs">
@@ -317,7 +320,7 @@ function ReportsContent() {
             </CardHeader>
             <CardContent>
               {ctrs.length === 0 ? (
-                <div className="py-12 text-center text-xs text-muted-foreground">
+                <div className="text-muted-foreground py-12 text-center text-xs">
                   Nenhuma transacção em numerário pendente.
                 </div>
               ) : (
@@ -340,14 +343,14 @@ function ReportsContent() {
                         </TableCell>
                         <TableCell className="text-xs font-medium">
                           {ctr.client?.fullName}
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-muted-foreground text-[10px]">
                             {ctr.client?.documentNumber}
                           </div>
                         </TableCell>
                         <TableCell className="text-xs">
                           {ctr.reportingMonth}/{ctr.reportingYear}
                         </TableCell>
-                        <TableCell className="text-xs font-bold text-foreground">
+                        <TableCell className="text-foreground text-xs font-bold">
                           {formatMt(ctr.aggregateAmount)}
                         </TableCell>
                         <TableCell className="text-center text-xs">
@@ -355,7 +358,7 @@ function ReportsContent() {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-[10px]">
-                            {ctr.status}
+                            {getReportStatusLabel(ctr.status)}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -368,12 +371,12 @@ function ReportsContent() {
         )}
       </div>
 
-      {/* Submit / View STR Dialog */}
+      {/* Report submission and details dialog */}
       <Dialog open={isSubmitModalOpen} onOpenChange={setIsSubmitModalOpen}>
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
+              <Building2 className="text-primary h-5 w-5" />
               {selectedStr?.status === "SUBMITTED"
                 ? "Registo da comunicação"
                 : "Submeter comunicação de operação suspeita"}
@@ -417,7 +420,7 @@ function ReportsContent() {
                 value={suspicionGrounds}
                 onChange={(e) => setSuspicionGrounds(e.target.value)}
                 placeholder="Descreva os indicadores objectivos de suspeita, incongruências com o perfil financeiro do cliente ou correspondências em listas de sanções…"
-                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
               />
@@ -433,7 +436,7 @@ function ReportsContent() {
                 value={operationDetails}
                 onChange={(e) => setOperationDetails(e.target.value)}
                 placeholder="Contas, montantes, datas, canais e contrapartes envolvidas…"
-                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
               />
@@ -449,7 +452,7 @@ function ReportsContent() {
                 value={evidenceSummary}
                 onChange={(e) => setEvidenceSummary(e.target.value)}
                 placeholder="Extractos de conta, comprovativos de depósito, relatórios de triagem…"
-                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
               />
             </div>
@@ -516,7 +519,7 @@ export default function ReportsPage() {
     <Suspense
       fallback={
         <div className="flex flex-1 items-center justify-center p-6">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
         </div>
       }
     >
