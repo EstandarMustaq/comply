@@ -1,0 +1,57 @@
+---
+title: "Utilizar a API"
+description: "Autentique pedidos e interprete respostas da API Complyz."
+---
+
+A API permite ligar aplicações autorizadas ao Complyz. Envie pedidos para
+`https://api.trycomplyz.com` e inclua o caminho indicado em cada operação da
+referência.
+
+## Autenticação
+
+Inicie sessão com `POST /api/auth/login`. A resposta indica se deve concluir a
+configuração de autenticação multifactor ou confirmar um desafio. Envie o
+token de acesso como bearer token nos pedidos autenticados:
+
+```http
+Authorization: Bearer <token-de-acesso>
+```
+
+Use `POST /api/auth/refresh` para renovar uma sessão. O token de renovação é
+rotativo; guarde o token novo devolvido em cada renovação e deixe de usar o
+anterior. Não inclua tokens em URLs, registos ou mensagens de suporte.
+
+## Formato das respostas
+
+As respostas JSON bem-sucedidas incluem o resultado em `data` e informação do
+pedido em `meta`:
+
+```json
+{
+  "data": {
+    "id": "8b7a83f3-6030-4f84-b8e8-139e9dbf3a4a"
+  },
+  "meta": {
+    "timestamp": "2026-10-02T12:00:00Z",
+    "requestId": "4491e196-d873-4d84-9f79-8ab17250e500"
+  }
+}
+```
+
+Quando um pedido falha, a resposta usa `error` com um código estável, uma
+mensagem e detalhes estruturados. Use o código HTTP para decidir se deve
+corrigir o pedido, renovar a sessão ou tentar mais tarde. As operações de
+exportação devolvem ficheiros e não usam o envelope JSON de sucesso.
+
+## Paginação
+
+As listas paginadas incluem o resultado da página em `data`. Use os parâmetros
+de paginação apresentados em cada operação e considere os metadados devolvidos
+pela API ao percorrer páginas.
+
+## Segurança dos dados
+
+Utilize as operações apenas para os dados e as acções que a sua conta está
+autorizada a consultar ou executar. Não envie identificadores de organização
+para tentar alargar o acesso. Os exemplos nesta documentação usam
+identificadores fictícios.

@@ -2,24 +2,35 @@
 .env
 .env.local
 .env.*.local
-app/system-design/.env.local
+apps/ui/.env
+apps/ui/.env.local
+apps/ui/.env.*.local
 *.pem
 *.key
 
-# GRC engine
-package/grc-engine/target/
-package/grc-engine/.mvn/timing.properties
-package/grc-engine/.flattened-pom.xml
+# API
+apps/api/target/
+apps/api/build/
+apps/api/bin/
+apps/api/.gradle/
+.gradle/
+/build/
+.turbo/
+*.tsbuildinfo
 
 # System design
-app/system-design/node_modules/
-app/system-design/.pnp
-app/system-design/.pnp.js
-app/system-design/.next/
-app/system-design/out/
-app/system-design/build/
-app/system-design/*.tsbuildinfo
-app/system-design/next-env.d.ts
+apps/ui/node_modules/
+apps/ui/.pnp
+apps/ui/.pnp.js
+apps/ui/.next/
+apps/ui/out/
+apps/ui/build/
+apps/ui/*.tsbuildinfo
+apps/ui/next-env.d.ts
+apps/ui/playwright-report/
+apps/ui/.vercel/
+coverage/
+packages/api-clients/openapi.json
 
 # Logs & temp files
 *.log
@@ -29,10 +40,20 @@ yarn-error.log*
 pnpm-debug.log*
 __pycache__/
 *.py[cod]
-/tmp/fincomp_backups/
+/tmp/complyz_backups/
+node_modules/
+apps/ui/test-results/
+packages/ui/test-results/
+packages/ui/playwright-report/
+npm-packages-offline-cache/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+.vercel/
 
 # IDE & OS
 .DS_Store
 .idea/
 *.iml
 .vscode/
+.zed/state.json

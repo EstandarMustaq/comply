@@ -1,0 +1,14 @@
+---
+description: Complyz Next.js UI architecture, interaction, accessibility, and pt-MZ product voice
+globs: apps/ui/**/*.ts, apps/ui/**/*.tsx
+alwaysApply: false
+---
+
+# UI conventions
+
+- Read root `AGENTS.md` and consult installed Next.js documentation for framework changes.
+- Keep product copy direct and operational in Mozambican Portuguese (`pt-MZ`). Localize display labels without changing API enum values.
+- Put routes in App Router pages, domain components in `components/`, primitives in `components/ui/`, shell in `components/shell/`, and requests in `lib/api-client.ts`.
+- Prefer server components. Preserve accessible loading/empty/error states, dense full-width data presentation, neutral structural colors, and restrained brand/destructive colors.
+- Avoid exposing internal acronyms, implementation details, or legal citations in visible or accessible text.
+- Coordinate UI types and client changes with `packages/api-clients` and contract tests.

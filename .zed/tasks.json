@@ -1,0 +1,26 @@
+[
+  {
+    "label": "workspace: install git hooks",
+    "command": "pnpm",
+    "args": ["hooks:install"],
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "workspace: run full checks",
+    "command": "pnpm",
+    "args": ["check"],
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "workspace: run API tests",
+    "command": "pnpm",
+    "args": ["api:test"],
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "workspace: validate product language",
+    "command": "pnpm",
+    "args": ["product-language:check"],
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

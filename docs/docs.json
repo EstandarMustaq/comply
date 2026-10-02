@@ -1,0 +1,58 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Complyz",
+  "description": "Documentação para utilizar e integrar a plataforma Complyz.",
+  "colors": {
+    "primary": "#0B746B"
+  },
+  "api": {
+    "playground": {
+      "display": "simple"
+    },
+    "examples": {
+      "languages": ["curl", "javascript", "python"],
+      "defaults": "required"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guias",
+        "groups": [
+          {
+            "group": "Começar",
+            "pages": ["index", "guides/getting-started", "guides/organization-and-access"]
+          },
+          {
+            "group": "Utilizar Complyz",
+            "pages": [
+              "guides/clients",
+              "guides/importing-data",
+              "guides/reviewing-alerts",
+              "guides/reports"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrações",
+        "groups": [
+          {
+            "group": "Ligações",
+            "pages": [
+              "integrations/index",
+              "integrations/google-drive",
+              "integrations/google-workspace"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Referência da API",
+        "openapi": "https://api.trycomplyz.com/v3/api-docs",
+        "pages": ["api/index"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "packages/config/*"
+
+allowBuilds:
+  unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - "@types/node@26.5.1"
+  - "prettier@3.9.7"
+
+overrides:
+  "prettier@>=3.9.6 <4.0.0-0": "3.9.7"
+  "@types/node@>=26.5.1 <27.0.0-0": "26.5.1"

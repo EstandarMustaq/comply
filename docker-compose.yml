@@ -1,66 +1,76 @@
+name: complyz
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: fincomp-postgres
+    container_name: complyz-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-fincomp_db}
-      POSTGRES_USER: ${POSTGRES_USER:-fincomp_app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fincomp_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-complyz_db}
+      POSTGRES_USER: ${POSTGRES_USER:-complyz_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_BIND_ADDRESS:-127.0.0.1}:${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fincomp_app} -d ${POSTGRES_DB:-fincomp_db}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - fincomp-net
+    networks: [complyz]
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
+        max-size: 10m
         max-file: "3"
 
   redis:
     image: redis:7-alpine
-    container_name: fincomp-redis
+    container_name: complyz-redis
     restart: unless-stopped
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-redis_dev_password}"]
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${REDIS_PASSWORD:-redis_dev_password}",
+      ]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${REDIS_BIND_ADDRESS:-127.0.0.1}:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_dev_password}", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - fincomp-net
+    networks: [complyz]
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
+        max-size: 10m
         max-file: "3"
 
-  grc-engine:
+  api:
+    container_name: complyz-api
+    profiles: [app, production]
     build:
-      context: ./package/grc-engine
+      context: .
       dockerfile: Dockerfile
-    container_name: fincomp-grc-engine
+      target: api
+    image: ghcr.io/estandarmustaq/complyz-api:${COMPLYZ_IMAGE_TAG:-local}
     restart: unless-stopped
     ports:
-      - "${SERVER_PORT:-8080}:8080"
+      - "${API_BIND_ADDRESS:-127.0.0.1}:${SERVER_PORT:-8080}:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB:-fincomp_db}
-      DB_USER: ${POSTGRES_USER:-fincomp_app}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-fincomp_dev_password}
+      DB_NAME: ${POSTGRES_DB:-complyz_db}
+      DB_USER: ${POSTGRES_USER:-complyz_app}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_dev_password}
@@ -68,58 +78,140 @@ services:
       MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}
       MFA_AES_KEY: ${MFA_AES_KEY:-0123456789abcdef0123456789abcdef}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
-      FINCOMP_BOOTSTRAP_ENABLED: ${FINCOMP_BOOTSTRAP_ENABLED:-false}
-      FINCOMP_BOOTSTRAP_ADMIN_FULL_NAME: ${FINCOMP_BOOTSTRAP_ADMIN_FULL_NAME:-}
-      FINCOMP_BOOTSTRAP_ADMIN_EMAIL: ${FINCOMP_BOOTSTRAP_ADMIN_EMAIL:-}
-      FINCOMP_BOOTSTRAP_ADMIN_PASSWORD: ${FINCOMP_BOOTSTRAP_ADMIN_PASSWORD:-}
-      FINCOMP_BOOTSTRAP_OCOS_FULL_NAME: ${FINCOMP_BOOTSTRAP_OCOS_FULL_NAME:-}
-      FINCOMP_BOOTSTRAP_OCOS_EMAIL: ${FINCOMP_BOOTSTRAP_OCOS_EMAIL:-}
-      FINCOMP_BOOTSTRAP_OCOS_PASSWORD: ${FINCOMP_BOOTSTRAP_OCOS_PASSWORD:-}
+      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-false}
+      COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:-}
+      COMPLYZ_BOOTSTRAP_ADMIN_EMAIL: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:-}
+      COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:-}
+      COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:-}
+      COMPLYZ_BOOTSTRAP_OCOS_EMAIL: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:-}
+      COMPLYZ_BOOTSTRAP_OCOS_PASSWORD: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:-}
+      COMPLYZ_IMPORT_STORAGE_PATH: /var/lib/complyz/imports
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:-health,info,metrics,prometheus}
+    volumes:
+      - imports:/var/lib/complyz/imports
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    networks:
-      - fincomp-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:8080/actuator/health/readiness || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 45s
+      retries: 5
+    cpus: ${API_CPU_LIMIT:-1.00}
+    mem_limit: ${API_MEMORY_LIMIT:-1024m}
+    labels:
+      com.complyz.environment: ${COMPLYZ_ENVIRONMENT:-development}
+      com.complyz.service: api
+      com.complyz.cost-center: product
+    networks: [complyz]
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
+        max-size: 10m
         max-file: "3"
-    profiles: ["app", "full"]
 
-  design-system:
+  ui:
+    container_name: complyz-ui
+    profiles: [app, production]
     build:
-      context: ./app/design-system
+      context: .
       dockerfile: Dockerfile
+      target: web
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Fincomp}
-    container_name: fincomp-design-system
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Complyz}
+    image: ghcr.io/estandarmustaq/complyz-ui:${COMPLYZ_IMAGE_TAG:-local}
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${UI_BIND_ADDRESS:-127.0.0.1}:${UI_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
     depends_on:
-      - grc-engine
-    networks:
-      - fincomp-net
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    cpus: ${UI_CPU_LIMIT:-0.50}
+    mem_limit: ${UI_MEMORY_LIMIT:-512m}
+    labels:
+      com.complyz.environment: ${COMPLYZ_ENVIRONMENT:-development}
+      com.complyz.service: ui
+      com.complyz.cost-center: product
+    networks: [complyz]
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
-        max-size: "10m"
+        max-size: 10m
         max-file: "3"
-    profiles: ["app", "full"]
+
+  caddy:
+    container_name: complyz-caddy
+    profiles: [production]
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      API_DOMAIN: ${API_DOMAIN:-api.trycomplyz.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    cpus: ${CADDY_CPU_LIMIT:-0.25}
+    mem_limit: ${CADDY_MEMORY_LIMIT:-128m}
+    labels:
+      com.complyz.environment: production
+      com.complyz.service: edge
+      com.complyz.cost-center: platform
+    networks: [complyz]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
 
 volumes:
   postgres_data:
-    driver: local
+    name: ${POSTGRES_VOLUME_NAME:-complyz_postgres_data}
   redis_data:
-    driver: local
+    name: ${REDIS_VOLUME_NAME:-complyz_redis_data}
+  imports:
+    name: ${COMPLYZ_IMPORT_VOLUME_NAME:-complyz_complyz_imports}
+  caddy_data:
+    name: ${CADDY_DATA_VOLUME_NAME:-complyz_caddy_data}
+  caddy_config:
+    name: ${CADDY_CONFIG_VOLUME_NAME:-complyz_caddy_config}
 
 networks:
-  fincomp-net:
+  complyz:
+    name: complyz-net
     driver: bridge

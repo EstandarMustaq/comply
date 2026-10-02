@@ -1,0 +1,15 @@
+---
+description: Canonical Complyz repository architecture, tenant isolation, commands, and product-language boundaries
+alwaysApply: true
+---
+
+# Complyz repository
+
+- Read root `AGENTS.md`; it is the canonical guide. For UI changes, also follow `.github/instructions/ui.instructions.md`.
+- Use Node `26.5.0`, pnpm `12.8.1`, Java `21`, root pnpm scripts, and root `scripts/*.mjs`.
+- `apps/ui` and `packages/*` are managed by pnpm/Turborepo. `apps/api` is Gradle project `:api`.
+- Derive tenant scope from the authenticated `User` using `TenantAccessService`. Never trust a request organization ID for access control. Scope indirect reads, mutations, aggregates, exports, caches, and jobs; fail closed and test cross-organization access.
+- API contract changes require coordinated Spring/OpenAPI, `packages/api-clients`, UI types/client, and contract test updates.
+- Flyway history is append-only: add a new version; never modify, rename, or delete applied migration files.
+- Agent instructions and internal engineering docs use English. Product UI, user-facing API messages, and public Mintlify documentation use direct Mozambican Portuguese (`pt-MZ`); keep internal identifiers and legal citations out of product copy.
+- Preserve established accessibility, dense operational layouts, restrained colors, existing worktree changes, and generated Next.js instructions.

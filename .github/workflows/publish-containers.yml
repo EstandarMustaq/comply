@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish GRC engine and design system images
+    name: Publish API and UI images
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -29,15 +29,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-          submodules: false
-
-      - name: Initialize submodules over HTTPS
-        env:
-          SUBMODULES_TOKEN: ${{ secrets.SUBMODULES_TOKEN }}
-        run: |
-          test -n "$SUBMODULES_TOKEN" || { echo "::error::Configure the SUBMODULES_TOKEN repository secret with read access to both private submodules."; exit 1; }
-          git config --global url."https://x-access-token:${SUBMODULES_TOKEN}@github.com/".insteadOf "git@github.com:"
-          git submodule update --init --recursive
 
       - name: Normalize image namespace
         id: image-names
@@ -52,13 +43,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract image metadata
-        id: meta
+      - name: Extract API image metadata
+        id: api-meta
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ghcr.io/${{ steps.image-names.outputs.owner }}/grc-engine
-            ghcr.io/${{ steps.image-names.outputs.owner }}/design-system
+          images: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-api
+          tags: |
+            type=sha,prefix=
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Extract UI image metadata
+        id: ui-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui
           tags: |
             type=sha,prefix=
             type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
@@ -66,24 +64,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and publish GRC engine
+      - name: Build and publish API
         uses: docker/build-push-action@v6
         with:
-          context: package/grc-engine
-          file: package/grc-engine/Dockerfile
+          context: .
+          file: Dockerfile
+          target: api
           push: true
-          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/grc-engine:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=grc-engine
-          cache-to: type=gha,mode=max,scope=grc-engine
+          tags: ${{ steps.api-meta.outputs.tags }}
+          labels: ${{ steps.api-meta.outputs.labels }}
+          cache-from: type=gha,scope=complyz-api
+          cache-to: type=gha,mode=max,scope=complyz-api
 
-      - name: Build and publish design system
+      - name: Build and publish UI
         uses: docker/build-push-action@v6
         with:
-          context: app/design-system
-          file: app/design-system/Dockerfile
+          context: .
+          file: Dockerfile
+          target: web
           push: true
-          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/design-system:${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=design-system
-          cache-to: type=gha,mode=max,scope=design-system
+          tags: ${{ steps.ui-meta.outputs.tags }}
+          labels: ${{ steps.ui-meta.outputs.labels }}
+          cache-from: type=gha,scope=complyz-ui
+          cache-to: type=gha,mode=max,scope=complyz-ui

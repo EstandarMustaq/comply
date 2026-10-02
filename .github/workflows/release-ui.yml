@@ -1,0 +1,70 @@
+name: Release Complyz UI Container
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "ui-v*"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: release-ui-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish Complyz UI image
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.8.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install root workspace
+        run: pnpm install --frozen-lockfile
+      - name: Validate UI and shared packages
+        run: pnpm check && pnpm test:unit
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify browser interface
+        run: pnpm test:e2e
+      - name: Build UI
+        run: pnpm --filter @complyz/web build
+
+      - name: Normalize image namespace
+        id: image-names
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: echo "owner=${REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Publish Complyz UI image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          target: web
+          push: true
+          tags: |
+            ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ github.sha }}
+            ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
