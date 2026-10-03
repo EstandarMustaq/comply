@@ -3,8 +3,12 @@ import { relative, resolve, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
+// Preserve V1–V20 as immutable history; their legacy literals are not current product copy.
+const lastImmutableMigrationVersion = 20
+const migrationPath = "apps/api/src/main/resources/db/migration"
 const targets = [
   "apps/api/src/main/java",
+  migrationPath,
   "apps/ui/app",
   "apps/ui/components",
   "apps/ui/lib",
@@ -45,6 +49,12 @@ async function main() {
 
   const findings = []
   for (const file of files.sort()) {
+    const relativePath = relative(root, file).split(sep).join("/")
+    const migration = relativePath.match(
+      /^apps\/api\/src\/main\/resources\/db\/migration\/V(\d+)__/
+    )
+    if (migration && Number(migration[1]) <= lastImmutableMigrationVersion) continue
+
     const contents = await readFile(file, "utf8")
     for (const [index, line] of contents.split(/\r?\n/).entries()) {
       if (citationPattern.test(line)) {
@@ -55,9 +65,11 @@ async function main() {
 
   if (findings.length > 0) {
     console.error(findings.join("\n"))
-    throw new Error("An external citation was found in an application surface.")
+    throw new Error(
+      "An external citation was found in application source or a post-V20 migration."
+    )
   }
-  console.log("Application source citation check passed.")
+  console.log("Application and post-V20 migration citation check passed.")
 }
 
 main().catch((error) => {
