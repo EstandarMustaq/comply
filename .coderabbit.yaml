@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "apps/api/src/main/java/**"
+      instructions: |
+        Review Spring code against the repository's controller → service → repository layering. Treat Organization as the tenant boundary: derive it from the authenticated User via TenantAccessService, scope all customer data operations, and fail closed when tenant context is absent. Check authorization, validation, audit behavior, transaction boundaries, indirect relationships, and cross-organization denial coverage. Do not accept request-supplied organization IDs as authorization.
+    - path: "apps/api/src/main/resources/db/migration/**"
+      instructions: |
+        Flyway migrations are append-only. Check naming/version order, PostgreSQL correctness, alignment with JPA and repository behavior, tenant isolation, safe rollout/backfill implications, and migration test coverage. Never recommend editing or removing an already-applied migration. Keep user-facing seeded text in Mozambican Portuguese (pt-MZ).
+    - path: "apps/ui/**"
+      instructions: |
+        Follow AGENTS.md and .github/instructions/ui.instructions.md. Preserve the established design tokens, restrained brand color, compact operational density, shell composition, accessible interaction, and honest loading/empty/error states. User-facing UI copy must be direct operational pt-MZ; keep machine identifiers separate from display labels. Prefer server components and keep client boundaries focused on interaction.
+    - path: "packages/api-clients/**"
+      instructions: |
+        These files contain generated API-client contracts. Check consistency with Springdoc/API DTOs and nullability, but do not recommend hand-editing generated output when regeneration with pnpm api:openapi is appropriate. Contract changes should be reflected in the typed UI client and contract tests.
+    - path: "packages/ui/tests/**"
+      instructions: |
+        Prefer behavior-focused tests through public interfaces. Check API contract, tenant-isolation, accessible-state, and failure-path coverage where relevant. Keep test expectations independent from the implementation under test.
+    - path: "docs/**"
+      instructions: |
+        Public product documentation uses direct operational pt-MZ; internal engineering documentation uses English. Keep documented behavior consistent with implementation, avoid unsupported legal or operational promises, and refer to stable product terms rather than internal implementation details.
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - "AGENTS.md"
+      - ".github/copilot-instructions.md"
+      - ".github/instructions/**/*.md"
+      - "CLAUDE.md"

@@ -1,6 +1,6 @@
 ---
 name: add-flyway-migration
-description: Make an append-only Flyway schema or data change aligned with JPA, tenant isolation, and production rollout safety.
+description: Add an append-only Flyway schema or data migration for Complyz. Use when changing PostgreSQL schema or migration data; align JPA and tenant isolation, and preserve production rollout safety.
 ---
 
 # Add a Flyway migration

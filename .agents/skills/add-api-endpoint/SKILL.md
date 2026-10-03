@@ -1,6 +1,6 @@
 ---
 name: add-api-endpoint
-description: Implement or change a Spring API endpoint with Complyz module boundaries, Organization tenant isolation, authorization, audit, and contract coverage.
+description: Implement, add, or change Spring API endpoints in Complyz. Use when editing controllers, endpoint request/response behavior, validation, authorization, or audit; preserve module boundaries, Organization tenant isolation, and contract coverage.
 ---
 
 # Add or change an API endpoint

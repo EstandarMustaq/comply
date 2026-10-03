@@ -45,16 +45,33 @@ Run one API test class with `./gradlew :api:test --tests 'com.complyz.reporting.
 - UI copy, API messages shown to users, and public Mintlify documentation use direct, operational `pt-MZ`. Engineering instructions and internal code documentation use English.
 - Keep machine identifiers separate from display labels. Do not expose internal acronyms, implementation details, external citations, or legal deadlines in product-facing text. Follow `docs/standards/product-language.md` and run `pnpm product-language:check` after product-copy changes.
 - Complyz is an operational product: keep workflows clear, explainable, and traceable. Prioritize readable data density, accessible interactions, honest loading/empty/error states, restrained brand and destructive colors, and full-width analytical views.
-- For frontend work, follow this guide and `.github/instructions/ui.instructions.md`. Consult the installed Next.js guides under `apps/ui/node_modules/next/dist/docs/` before framework-specific changes. Next.js agent-file generation is disabled in `apps/ui/next.config.mjs`; do not add app-local agent instruction files.
+- For frontend work, follow `.github/instructions/ui.instructions.md`. It is the baseline for design tokens, brand color, compact density, and shell composition. Consult installed Next.js guides under `apps/ui/node_modules/next/dist/docs/` before framework-specific changes. Next.js agent-file generation is disabled in `apps/ui/next.config.mjs`; do not add app-local agent instruction files.
 - Keep route pages in the App Router, product components outside `components/ui/`, shared primitives in `components/ui/`, shell behavior in `components/shell/`, and API calls in `lib/api-client.ts`.
 - Preserve the established high-density operations layout, neutral structural palette, restrained sage and red usage, accessible loading/empty/error states, and full-width data views. Use server components by default; add client boundaries only for interaction/state.
 - Avoid synchronous state updates in `useEffect`; prefer event callbacks or asynchronous work. Any `useSearchParams()` usage must have a suitable Suspense boundary. Keep React Compiler exceptions narrowly scoped to the affected call.
+
+## Automatic skill routing
+
+Load the matching project skill before work without waiting for the user to name it. Load only applicable skills; combine them when a change crosses boundaries. Complyz instructions and the existing product design take precedence over generic external recommendations.
+
+- Any customer-facing product change—including UI, data, integrations, jobs, and customer workflows: `.agents/skills/product-quality/SKILL.md`.
+- Spring endpoint work: `.agents/skills/add-api-endpoint/SKILL.md`; contract or DTO changes also load `.agents/skills/sync-api-contract/SKILL.md`. Flyway changes: `.agents/skills/add-flyway-migration/SKILL.md`.
+- Product-facing wording: `.agents/skills/check-product-language/SKILL.md`.
+- UI routes, workflows, navigation, or components: `.agents/skills/ui-implementation/SKILL.md`. Visual design or UX work: also load `.agents/skills/impeccable/SKILL.md` and `.agents/skills/ui-ux-pro-max/SKILL.md`; UI/accessibility reviews: `.agents/skills/web-design-guidelines/SKILL.md`.
+- React component architecture: `.agents/skills/vercel-composition-patterns/SKILL.md`; React/Next.js implementation, refactoring, data fetching, or performance: `.agents/skills/vercel-react-best-practices/SKILL.md`; complex TypeScript type design: `.agents/skills/typescript-advanced-types/SKILL.md`.
+- Task briefs: `.agents/skills/write-task-brief/SKILL.md`. Production release requests: `.agents/skills/deploy-production/SKILL.md` before proposing or performing release steps; execution still requires explicit human authorization.
+- Domain terminology, glossary entries, or durable architecture decisions: `.agents/skills/domain-modeling/SKILL.md`. Module interface, seam, depth, or testability design: `.agents/skills/codebase-design/SKILL.md`.
+- Test-first work requested by the user, including red-green-refactor or integration-test design: `.agents/skills/tdd/SKILL.md`. Consult `codebase-design` when the public seam itself is uncertain.
+- Plan or decision stress-testing when the user asks to be grilled: `.agents/skills/grilling/SKILL.md`. A requested codebase architecture exploration/report: `.agents/skills/improve-codebase-architecture/SKILL.md`.
+- Explicit session handoff requests: `.agents/skills/handoff/SKILL.md`. Requests to prepare an async discovery questionnaire: `.agents/skills/to-questionnaire/SKILL.md`.
+- Explicit branch, diff, or pull-request review requests: `.agents/skills/code-review/SKILL.md`. For security reviews, also load the global `review-security` skill. Invoke CodeRabbit, Bugbot, or another hosted reviewer only when the user explicitly requests and authorizes it; follow `product-quality` for the data-sharing guardrail.
+- Creating or editing agent instructions or skills: `.agents/skills/writing-for-agents/SKILL.md`; use its `SKILL-MECHANICS.md` when changing skill invocation or routing.
+- When available, use the global `frontend-design` skill for greenfield visual direction and `tailwind-design-system` for token/theme system changes. Keep both subordinate to the established Complyz UI baseline.
 
 ## Agent entry points
 
 - GitHub Copilot: `.github/copilot-instructions.md` and `.github/instructions/`.
 - Claude: `CLAUDE.md`.
 - Cursor: `.cursor/rules/`.
-- Shared repeatable workflows: `.agents/skills/`.
+- Shared repeatable workflows and installed skills: `.agents/skills/`.
 - Git hooks: install with `pnpm hooks:install`; implementation is in `scripts/git-hooks.mjs`.
-- Apply `.agents/skills/product-quality/SKILL.md` automatically to product changes; scale its full-system review to the risk, especially for tenant data, customer workflows, and production operations.

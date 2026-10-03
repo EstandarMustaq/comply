@@ -1,6 +1,6 @@
 ---
 name: check-product-language
-description: Review and validate Complyz product-facing language in Mozambican Portuguese.
+description: Review and validate Complyz product-facing language in Mozambican Portuguese (`pt-MZ`). Use when writing or changing UI copy, user-facing API messages, exports, or public documentation.
 ---
 
 # Check product language

@@ -1,6 +1,6 @@
 ---
 name: write-task-brief
-description: Create a scoped, verifiable task brief for implementation work in this monorepo.
+description: Create a scoped, verifiable implementation task brief for the Complyz monorepo. Use when asked to define implementation scope, dependencies, acceptance criteria, verification, or operational concerns.
 ---
 
 # Write a task brief

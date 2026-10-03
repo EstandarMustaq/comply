@@ -1,7 +1,6 @@
 ---
 name: deploy-production
-description: Prepare and operate a Complyz production deployment through the protected release process and documented recovery controls.
-disable-model-invocation: true
+description: Prepare or operate a Complyz production deployment, release, or rollback through protected workflows and documented recovery controls. Load for production-release requests; require explicit human approval before any deployment, migration, or destructive action.
 ---
 
 # Production deployment

@@ -79,9 +79,22 @@ async function main() {
   )
   await cp(join(sourceRoot, ".githooks"), join(sandbox, ".githooks"), { recursive: true })
   await write("README.md", "Complyz hook sandbox\n")
+  await write(
+    "skills-lock.json",
+    JSON.stringify(
+      { version: 1, skills: { "vendored-test-skill": { sourceType: "github" } } },
+      null,
+      2
+    ) + "\n"
+  )
   await write("apps/api/src/main/resources/db/migration/V1__baseline.sql", "SELECT 1;\n")
   git("init", "--quiet")
-  git("add", "README.md", "apps/api/src/main/resources/db/migration/V1__baseline.sql")
+  git(
+    "add",
+    "README.md",
+    "skills-lock.json",
+    "apps/api/src/main/resources/db/migration/V1__baseline.sql"
+  )
   commit("chore: initialize hook test sandbox")
 
   const setup = command(process.execPath, ["scripts/setup-git-hooks.mjs"])
@@ -98,6 +111,36 @@ async function main() {
     command(process.execPath, ["scripts/setup-git-hooks.mjs", "--check"]).status === 0,
     "hook check failed"
   )
+
+  await write(
+    ".agents/skills/vendored-test-skill/SKILL.md",
+    "Upstream example with trailing whitespace   \n"
+  )
+  git("add", ".agents/skills/vendored-test-skill/SKILL.md")
+  expect(
+    runHook("pre-commit").status === 0,
+    "whitespace in a locked external skill was rejected"
+  )
+  git("reset", "--quiet", "--", ".agents/skills/vendored-test-skill/SKILL.md")
+  await rm(join(sandbox, ".agents/skills/vendored-test-skill"), {
+    recursive: true,
+    force: true,
+  })
+
+  await write(
+    ".agents/skills/local-skill/SKILL.md",
+    "Project-authored skill with trailing whitespace   \n"
+  )
+  git("add", ".agents/skills/local-skill/SKILL.md")
+  expect(
+    runHook("pre-commit").status !== 0,
+    "whitespace in a project-authored skill was accepted"
+  )
+  git("reset", "--quiet", "--", ".agents/skills/local-skill/SKILL.md")
+  await rm(join(sandbox, ".agents/skills/local-skill"), {
+    recursive: true,
+    force: true,
+  })
 
   const invalidMessage = await write("invalid-message.txt", "updated file\n")
   const invalidMessageResult = runHook("commit-msg", invalidMessage)

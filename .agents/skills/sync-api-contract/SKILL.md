@@ -1,6 +1,6 @@
 ---
 name: sync-api-contract
-description: Keep Spring endpoints, generated OpenAPI client types, the typed UI API client, and contract tests synchronized.
+description: Synchronize Complyz Spring endpoints and DTOs with generated OpenAPI types, the typed UI API client, and contract tests. Use whenever an API route, request, response, or nullability contract changes.
 ---
 
 # Synchronize the API contract

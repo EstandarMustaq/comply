@@ -39,6 +39,18 @@ function stagedPaths(filter = "ACMR") {
     .filter(Boolean)
 }
 
+function vendoredSkillPrefixes() {
+  const lockPath = `${root}skills-lock.json`
+  if (!existsSync(lockPath)) return []
+
+  const lock = JSON.parse(readFileSync(lockPath, "utf8"))
+  return Object.entries(lock.skills ?? {}).flatMap(([name, skill]) =>
+    skill.sourceType === "github"
+      ? [`.agents/skills/${name}/`, `.claude/skills/${name}/`]
+      : []
+  )
+}
+
 function checkStagedSecrets() {
   const files = stagedPaths()
   const forbiddenEnvironmentFiles = files.filter(
@@ -142,12 +154,23 @@ function checkProductLanguage(paths) {
 function preCommit() {
   const paths = stagedPaths()
   if (!paths.length) return
-  const diffCheck = spawnSync("git", ["diff", "--cached", "--check"], {
-    cwd: root,
-    stdio: "inherit",
-  })
-  if (diffCheck.error) throw diffCheck.error
-  if (diffCheck.status !== 0) fail("Staged changes contain whitespace errors.")
+
+  const externalSkillPrefixes = vendoredSkillPrefixes()
+  const pathsToCheck = paths.filter(
+    (path) => !externalSkillPrefixes.some((prefix) => path.startsWith(prefix))
+  )
+  if (pathsToCheck.length) {
+    const diffCheck = spawnSync(
+      "git",
+      ["diff", "--cached", "--check", "--", ...pathsToCheck],
+      {
+        cwd: root,
+        stdio: "inherit",
+      }
+    )
+    if (diffCheck.error) throw diffCheck.error
+    if (diffCheck.status !== 0) fail("Staged changes contain whitespace errors.")
+  }
   checkStagedSecrets()
   checkMigrationHistory()
   checkProductLanguage(paths)
