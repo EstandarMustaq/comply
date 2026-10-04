@@ -4,12 +4,26 @@ description: "Autentique pedidos e interprete respostas da API Complyz."
 ---
 
 A API permite ligar aplicações autorizadas ao Complyz. Envie pedidos para
-`https://api.trycomplyz.com` e inclua o caminho indicado em cada operação da
+`https://api.trycomplyz.com` e inclua o caminho versionado `/api/v1` indicado em cada operação da
 referência.
+
+## Versionamento
+
+Todas as operações desta referência pertencem à versão principal 1 e começam por `/api/v1`.
+Os caminhos antigos `/api/...` deixaram de ser expostos; actualize os clientes e
+as integrações para utilizar as rotas versionadas. A versão da URI identifica o
+contrato da API; não representa a revisão deste documento OpenAPI.
+
+A Complyz acrescentará operações e campos compatíveis à versão 1 sem alterar o
+significado das operações existentes. Uma alteração incompatível será publicada
+numa nova versão principal. Antes de retirar uma versão, a Complyz publicará a
+versão substituta, instruções de migração e o prazo de retirada. Quando aplicável,
+as respostas indicarão a descontinuação e a data de retirada nos cabeçalhos
+`Deprecation` e `Sunset`. Não há operações da versão 1 anunciadas para retirada.
 
 ## Autenticação
 
-Inicie sessão com `POST /api/auth/login`. A resposta indica se deve concluir a
+Inicie sessão com `POST /api/v1/auth/login`. A resposta indica se deve concluir a
 configuração de autenticação multifactor ou confirmar um desafio. Envie o
 token de acesso como bearer token nos pedidos autenticados:
 
@@ -17,7 +31,7 @@ token de acesso como bearer token nos pedidos autenticados:
 Authorization: Bearer <token-de-acesso>
 ```
 
-Use `POST /api/auth/refresh` para renovar uma sessão. O token de renovação é
+Use `POST /api/v1/auth/refresh` para renovar uma sessão. O token de renovação é
 rotativo; guarde o token novo devolvido em cada renovação e deixe de usar o
 anterior. Não inclua tokens em URLs, registos ou mensagens de suporte.
 

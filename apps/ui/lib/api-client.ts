@@ -12,7 +12,15 @@ import {
   type AuditLog,
 } from "./types"
 
-const API_BASE_URL = env.NEXT_PUBLIC_API_URL
+function resolveApiBaseUrl(value: string): string {
+  if (!value) return ""
+  const baseUrl = value.replace(/\/+$/, "")
+  if (baseUrl.endsWith("/api/v1")) return baseUrl
+  if (baseUrl.endsWith("/api")) return `${baseUrl}/v1`
+  return `${baseUrl}/api/v1`
+}
+
+const API_BASE_URL = resolveApiBaseUrl(env.NEXT_PUBLIC_API_URL)
 
 // The contract test validates these routes against the running API schema.
 export { apiContract } from "@complyz/api-clients"

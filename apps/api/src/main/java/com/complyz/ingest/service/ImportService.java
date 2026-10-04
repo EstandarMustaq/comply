@@ -130,6 +130,18 @@ public class ImportService {
             Map<String, String> suggestedMapping
     ) {}
 
+    @Transactional(readOnly = true)
+    public List<ImportBatch> listBatches(User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        return importBatchRepository.findAllByOrganizationId(organizationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ImportBatch> findBatch(UUID batchId, User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        return importBatchRepository.findByIdAndOrganizationId(batchId, organizationId);
+    }
+
     public UploadPreviewResponse createUploadBatch(MultipartFile file, User user) throws IOException {
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "extrato";
         ImportFormat format = originalFilename.toLowerCase().endsWith(".xlsx") ? ImportFormat.XLSX : ImportFormat.CSV;
@@ -177,15 +189,12 @@ public class ImportService {
     }
 
     private Map<String, Object> confirmAndProcessLocked(UUID batchId, Map<String, String> columnMapping, User user) throws Exception {
-        ImportBatch batch = importBatchRepository.findById(batchId)
+        UUID organizationId = tenantAccessService.organizationId(user);
+        ImportBatch batch = importBatchRepository.findByIdAndOrganizationId(batchId, organizationId)
                 .orElseThrow(() -> new IllegalArgumentException("Lote de importação não encontrado: " + batchId));
 
-        if (batch.getImportedBy() != null && user != null && !batch.getImportedBy().getId().equals(user.getId())) {
+        if (batch.getImportedBy() != null && !batch.getImportedBy().getId().equals(user.getId())) {
             throw new SecurityException("O lote de importação pertence a outro utilizador");
-        }
-        if (user != null && (batch.getOrganization() == null
-                || !batch.getOrganization().getId().equals(tenantAccessService.organizationId(user)))) {
-            throw new SecurityException("O lote de importação pertence a outra organização");
         }
         if (batch.getSourceFilePath() == null || batch.getSourceFilePath().isBlank()) {
             throw new IllegalStateException("Arquivo do lote não encontrado ou já processado");

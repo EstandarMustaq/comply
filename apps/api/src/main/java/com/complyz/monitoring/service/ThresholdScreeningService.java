@@ -48,6 +48,10 @@ public class ThresholdScreeningService {
         List<Flag> generatedFlags = new ArrayList<>();
         if (tx == null || tx.getClient() == null) return generatedFlags;
 
+        if (tx.getClient().getOrganization() == null || tx.getClient().getOrganization().getId() == null) {
+            throw new IllegalStateException("A organização do cliente é obrigatória para avaliar a operação");
+        }
+        var organizationId = tx.getClient().getOrganization().getId();
         List<ThresholdRule> activeRules = ruleRepository.findByActiveTrue();
         if (!CASH_TRANSACTION_TYPES.contains(tx.getType())) return generatedFlags;
 
@@ -58,7 +62,8 @@ public class ThresholdScreeningService {
                             "Operação em numerário que atinge ou ultrapassa o limiar configurado de %.2f MT (valor: %.2f MT).",
                             rule.getValueThreshold(), tx.getAmount()
                     );
-                    if (!flagRepository.existsByTransactionIdAndType(tx.getId(), FlagType.THRESHOLD_VALUE)) {
+                    if (flagRepository.countByTransactionIdAndOrganizationIdAndType(
+                            tx.getId(), organizationId, FlagType.THRESHOLD_VALUE) == 0) {
                         Flag flag = flagRepository.save(new Flag(tx.getClient(), tx, FlagType.THRESHOLD_VALUE, reason, null));
                         generatedFlags.add(flag);
                     }
@@ -67,9 +72,10 @@ public class ThresholdScreeningService {
                     CurrencyTransactionReport ctr = new CurrencyTransactionReport(
                             tx.getClient(), tx.getTransactionDate(), tx.getTransactionDate(), tx.getAmount(), rule
                     );
-                    if (rule.getId() != null && !ctrRepository
-                            .existsByClientIdAndAggregationPeriodStartAndAggregationPeriodEndAndThresholdRuleId(
-                                    tx.getClient().getId(), tx.getTransactionDate(), tx.getTransactionDate(), rule.getId())) {
+                    if (rule.getId() != null && ctrRepository
+                            .countByClientIdAndOrganizationIdAndAggregationPeriodStartAndAggregationPeriodEndAndThresholdRuleId(
+                                    tx.getClient().getId(), organizationId, tx.getTransactionDate(),
+                                    tx.getTransactionDate(), rule.getId()) == 0) {
                         ctrRepository.save(ctr);
                     }
                 }
@@ -78,14 +84,15 @@ public class ThresholdScreeningService {
                 LocalDate startDate = tx.getTransactionDate().minusDays(Math.max(windowDays - 1, 0));
                 LocalDate endDate = tx.getTransactionDate();
 
-                BigDecimal aggregate = transactionRepository.sumAmountByClientAndDateBetweenAndTypeIn(
-                        tx.getClient().getId(), startDate, endDate, CASH_TRANSACTION_TYPES);
+                BigDecimal aggregate = transactionRepository.sumAmountByClientAndOrganizationAndDateBetweenAndTypeIn(
+                        tx.getClient().getId(), organizationId, startDate, endDate, CASH_TRANSACTION_TYPES);
                 if (rule.getValueThreshold() != null && aggregate.compareTo(rule.getValueThreshold()) >= 0) {
                     String reason = String.format(
                             "Valor agregado de transações do mesmo cliente na janela de %d dias ultrapassa o limiar configurado de %.2f MT (total acumulado: %.2f MT).",
                             windowDays, rule.getValueThreshold(), aggregate
                     );
-                    if (!flagRepository.existsByTransactionIdAndType(tx.getId(), FlagType.THRESHOLD_VALUE)) {
+                    if (flagRepository.countByTransactionIdAndOrganizationIdAndType(
+                            tx.getId(), organizationId, FlagType.THRESHOLD_VALUE) == 0) {
                         Flag flag = flagRepository.save(new Flag(tx.getClient(), tx, FlagType.THRESHOLD_VALUE, reason, null));
                         generatedFlags.add(flag);
                     }
@@ -93,9 +100,9 @@ public class ThresholdScreeningService {
                     CurrencyTransactionReport ctr = new CurrencyTransactionReport(
                             tx.getClient(), startDate, endDate, aggregate, rule
                     );
-                    if (rule.getId() != null && !ctrRepository
-                            .existsByClientIdAndAggregationPeriodStartAndAggregationPeriodEndAndThresholdRuleId(
-                                    tx.getClient().getId(), startDate, endDate, rule.getId())) {
+                    if (rule.getId() != null && ctrRepository
+                            .countByClientIdAndOrganizationIdAndAggregationPeriodStartAndAggregationPeriodEndAndThresholdRuleId(
+                                    tx.getClient().getId(), organizationId, startDate, endDate, rule.getId()) == 0) {
                         ctrRepository.save(ctr);
                     }
                 }

@@ -7,12 +7,15 @@ import com.complyz.flags.entity.FlagType;
 import com.complyz.flags.repository.FlagRepository;
 import com.complyz.insights.dto.InsightsSummaryResponse;
 import com.complyz.monitoring.repository.TransactionRepository;
+import com.complyz.tenancy.service.TenantAccessService;
+import com.complyz.users.entity.User;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class InsightsService {
@@ -20,33 +23,45 @@ public class InsightsService {
     private final ClientRepository clientRepository;
     private final FlagRepository flagRepository;
     private final TransactionRepository transactionRepository;
+    private final TenantAccessService tenantAccessService;
 
     public InsightsService(
             ClientRepository clientRepository,
             FlagRepository flagRepository,
-            TransactionRepository transactionRepository
+            TransactionRepository transactionRepository,
+            TenantAccessService tenantAccessService
     ) {
         this.clientRepository = clientRepository;
         this.flagRepository = flagRepository;
         this.transactionRepository = transactionRepository;
+        this.tenantAccessService = tenantAccessService;
     }
 
-    @Cacheable(value = "insights_cache", key = "'summary'")
-    public InsightsSummaryResponse getSummary() {
-        long totalClients = clientRepository.count();
-        long kycComplete = clientRepository.countByKycCompleteTrue();
+    @Cacheable(value = "insights_cache", key = "'summary:' + #p0.organization.id")
+    public InsightsSummaryResponse getSummary(User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        if (organizationId == null) {
+            throw new IllegalStateException("Utilizador não associado a uma organização");
+        }
+
+        long totalClients = clientRepository.countByOrganizationId(organizationId);
+        long kycComplete = clientRepository.countByOrganizationIdAndKycCompleteTrue(organizationId);
         double kycPercentage = totalClients > 0 ? ((double) kycComplete / totalClients) * 100.0 : 0.0;
 
-        long simplifiedCount = clientRepository.countByDueDiligenceRegime(DueDiligenceRegime.SIMPLIFIED);
-        long normalCount = clientRepository.countByDueDiligenceRegime(DueDiligenceRegime.NORMAL);
+        long simplifiedCount = clientRepository.countByOrganizationIdAndDueDiligenceRegime(
+                organizationId, DueDiligenceRegime.SIMPLIFIED);
+        long normalCount = clientRepository.countByOrganizationIdAndDueDiligenceRegime(
+                organizationId, DueDiligenceRegime.NORMAL);
 
-        long pendingFlags = flagRepository.countByStatus(FlagStatus.PENDING);
-        long sanctionsCount = flagRepository.countByType(FlagType.SANCTIONS_MATCH);
-        long overdueSla = flagRepository.countOverdueSla(Instant.now());
-        long pepReviewDue = flagRepository.countByType(FlagType.PEP_REVIEW_DUE);
+        long pendingFlags = flagRepository.countByOrganizationIdAndStatus(organizationId, FlagStatus.PENDING);
+        long sanctionsCount = flagRepository.countByOrganizationIdAndType(organizationId, FlagType.SANCTIONS_MATCH);
+        long overdueSla = flagRepository.countOverdueSlaByOrganizationId(
+                organizationId, FlagStatus.PENDING, Instant.now());
+        long pepReviewDue = flagRepository.countByOrganizationIdAndType(organizationId, FlagType.PEP_REVIEW_DUE);
 
-        long totalTx = transactionRepository.count();
-        long retentionExpiring = transactionRepository.countByRetentionUntilBefore(LocalDate.now().plusMonths(3));
+        long totalTx = transactionRepository.countByOrganizationId(organizationId);
+        long retentionExpiring = transactionRepository.countByOrganizationIdAndRetentionUntilBefore(
+                organizationId, LocalDate.now().plusMonths(3));
 
         return new InsightsSummaryResponse(
                 totalClients,

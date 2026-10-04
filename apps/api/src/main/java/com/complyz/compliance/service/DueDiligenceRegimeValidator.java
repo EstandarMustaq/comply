@@ -56,10 +56,13 @@ public class DueDiligenceRegimeValidator {
         BigDecimal transactionAmount = newTransaction != null && newTransaction.getAmount() != null
                 ? newTransaction.getAmount()
                 : BigDecimal.ZERO;
-        BigDecimal monthlyTotal = transactionRepository
-                .sumAmountByClientAndDateBetween(client.getId(), startOfMonth, endOfMonth);
-        BigDecimal annualTotal = transactionRepository
-                .sumAmountByClientAndDateBetween(client.getId(), startOfYear, endOfYear);
+        if (client.getOrganization() == null || client.getOrganization().getId() == null) {
+            throw new IllegalStateException("A organização do cliente é obrigatória para validar o regime");
+        }
+        BigDecimal monthlyTotal = transactionRepository.sumAmountByClientAndOrganizationAndDateBetween(
+                client.getId(), client.getOrganization().getId(), startOfMonth, endOfMonth);
+        BigDecimal annualTotal = transactionRepository.sumAmountByClientAndOrganizationAndDateBetween(
+                client.getId(), client.getOrganization().getId(), startOfYear, endOfYear);
         if (newTransaction != null && newTransaction.getId() == null) {
             monthlyTotal = monthlyTotal.add(transactionAmount);
             annualTotal = annualTotal.add(transactionAmount);
@@ -82,9 +85,9 @@ public class DueDiligenceRegimeValidator {
                     exceededLimit
             );
 
-            if (!flagRepository.existsByClientIdAndTypeAndStatus(
-                    client.getId(), FlagType.KYC_INCOMPLETE, FlagStatus.PENDING
-            )) {
+            if (flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                    client.getId(), client.getOrganization().getId(), FlagType.KYC_INCOMPLETE,
+                    FlagStatus.PENDING) == 0) {
                 Flag flag = new Flag(client, newTransaction, FlagType.KYC_INCOMPLETE, reason, null);
                 return Optional.of(flagRepository.save(flag));
             }

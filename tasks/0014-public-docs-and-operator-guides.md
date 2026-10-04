@@ -34,19 +34,19 @@ depends_on:
 
 ## Context
 
-The current Mintlify API guide documents local `/api/auth/login` and `/api/auth/refresh`, and the Organization/access guide is minimal. Public text is `pt-MZ`; internal task/architecture docs are English. The target's navigation includes Account, Organizations, permissions, policy, SSO/MFA, CommercialClient, compliance and API, but documentation must not present proposed or untested functionality as available.
+The current Mintlify API guide documents the public `/api/v1` routes. The Organization/access guide is minimal. Public text is `pt-MZ`; internal task/architecture docs are English. Customer documentation covers Account, Organizations, permissions, policy, SSO/MFA, compliance and API; restricted operator documentation may describe CommercialClient as a back-office commercial reference, never as an Organization hierarchy or customer access context. Documentation must not present proposed or untested functionality as available.
 
 ## Objective
 
-Update customer-facing Mintlify documentation, API auth and integration guidance, and operator procedures to the release state proven by prior tasks. Identify implemented versus preview/deferred features and document access boundaries, recovery, quotas and support actions honestly.
+Update customer-facing Mintlify documentation, API auth/version/header and integration guidance, and operator procedures to the release state proven by prior tasks. Identify implemented versus preview/deferred features and document access boundaries, recovery, quotas, event-contract compatibility and support actions honestly.
 
 ## Acceptance criteria
 
-- [ ] Mintlify navigation covers only available workflows and follows the requested journey: Account/profile → Organizations → users/permissions → policy/settings → authentication/SSO/MFA → CommercialClient → compliance → API/compatibility.
-- [ ] API authentication examples exactly match the shipped OIDC/BFF/context-token flow, endpoint version, scopes, cookie/token handling, errors, PKCE and context selection; obsolete local login/refresh instructions are removed only after old clients are safely supported or migration is complete.
-- [ ] Organization, CommercialClient, KYC Client and OAuth client are distinctly named; docs state that same-CommercialClient membership is not compliance permission and do not instruct users to submit tenant IDs for authorization.
-- [ ] Public docs state only capabilities present and tested in the release, distinguish availability/preview/deferred items, and contain no internal implementation acronyms/citations or unapproved security promises.
-- [ ] Operator guides cover migration/backfill/recovery, IdP/JWKS rotation, revocation/logout, quota reconciliation/exemptions, policy propagation, outbox/DLQ, external client credentials and cross-tenant incident response as applicable to shipped features.
+- [ ] Mintlify navigation covers only available customer workflows and follows the journey: Account/profile → Organizations → users/permissions → policy/settings → authentication/SSO/MFA → compliance → API/compatibility. CommercialClient reference details belong only in restricted operator documentation.
+- [ ] API authentication examples exactly match the shipped OIDC/BFF/profile-and-Organization-context-token flow, `/api/v1` version policy, mandatory resource-server headers, scopes, cookie/token handling, errors, PKCE and context selection; obsolete local login/refresh instructions are removed only after the approved compatibility/migration window.
+- [ ] Customer documentation identifies Organization as the client institution and tenant, without using “Corporação” or presenting CommercialClient as a customer concept. Restricted operator documentation defines CommercialClient as the identifier/name/contract-reference/status record referenced by `organization.commercial_client_id`, with no Organization grouping/management or authorization semantics; no guide instructs users to submit tenant IDs for authorization.
+- [ ] Public docs state only capabilities present and tested in the release, distinguish availability/preview/deferred items, explain compatible API and event-contract evolution/deprecation when relevant, and contain no internal implementation acronyms/citations or unapproved security promises.
+- [ ] Operator guides cover migration/backfill/recovery, IdP/JWKS rotation, revocation/logout, quota reconciliation/exemptions, event-store backup/replay/schema evolution, outbox/DLQ, external client credentials and cross-tenant incident response as applicable to shipped features.
 - [ ] User-facing copy is direct, operational `pt-MZ`, with accessible terminology consistent with product-language standards. `pnpm product-language:check` and `pnpm exec prettier --check ROADMAP.md README.md docs` pass.
 
 ## Verification
@@ -66,3 +66,4 @@ Coordinate API deprecation/compatibility windows with customers before removing 
 ## Work log
 
 - 2026-10-03: Brief created; current documentation is not evidence that target OIDC or commercial workflows exist.
+- 2026-10-04: Aligned with ratified task 0001: Organization-only operational authorization, platform back-office commercial administration, versioned API/event contracts and approved context ownership.

@@ -35,12 +35,12 @@ Deliver a production-backed Account profile/security experience and explicit Org
 
 ## Acceptance criteria
 
-- [ ] Organization options come only from the authenticated Account's active memberships and display understandable role/status; the hard-coded default is removed. Use the approved `pt-MZ` business label “Corporação” for Organization where appropriate while keeping technical identifiers separate. Selection alone never grants access.
-- [ ] Switching Organization obtains a newly authorized context token, invalidates/clears tenant-specific query caches, persisted client state, selection-dependent form data and pending actions; failure returns to a safe prior or no-context state without showing stale tenant data.
+- [ ] Organization options come only from the authenticated Account's active memberships, including Organizations with different back-office CommercialClient references, and display Organization name and role/status only; the hard-coded default is removed. Use “Organização” in customer-facing `pt-MZ` and keep `Organization` as the stable domain identifier. Do not expose CommercialClient reference data in the customer workflow; neither selection nor the reference grants access.
+- [ ] Switching to any Organization obtains a newly authorized, five-minute Organization context token, invalidates/clears tenant-specific query caches, persisted client state, selection-dependent form data and pending actions; failure returns to a safe prior or no-context state without showing stale tenant data. No consolidated cross-Organization compliance view is offered in v1.
 - [ ] No IdP access/refresh token or long-lived operational token is exposed to or persisted by browser JavaScript; browser auth uses the approved HttpOnly BFF session and CSRF controls.
 - [ ] Account screens cover personal profile, language, time zone, notification preferences, factors and recovery status, linked external identities, active sessions and self-service sign-out/revocation; sensitive changes require the approved step-up and are auditable.
 - [ ] Account without Organization membership can access self-profile/security only, with an honest empty state for no memberships; it cannot access compliance routes.
-- [ ] Keyboard/screen-reader accessible selection and forms include loading, empty, error, denied and success states. Tests cover two Organizations, failed switch, cache clearing, session expiry and account with zero memberships.
+- [ ] Keyboard/screen-reader accessible selection and forms include loading, empty, error, denied and success states. Tests cover Organizations with different CommercialClient reference values and confirm those values are not shown to customers or used in authorization, plus failed switch, cache clearing, session expiry and an Account with zero memberships.
 - [ ] Product-facing copy is direct `pt-MZ`; Playwright/mobile and accessibility checks pass; `pnpm check` and `pnpm product-language:check` pass.
 
 ## Verification
@@ -59,3 +59,4 @@ A context switch is a security boundary, not only a visual selector update. Avoi
 ## Work log
 
 - 2026-10-03: Brief created; current selector is explicitly known to be a default placeholder, not a working membership selector.
+- 2026-10-04: Aligned with ratified task 0001: Accounts may hold memberships in Organizations with different commercial references, while every Organization context remains separately authorized and cross-Organization consolidation stays out of v1.

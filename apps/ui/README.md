@@ -15,7 +15,7 @@ pnpm --filter @complyz/web dev
 ```
 
 The app runs at `http://localhost:3000` and connects to the API at
-`http://localhost:8080/api`. Copy `.env.example` to `.env.local` in this
+`http://localhost:8080/api/v1`. Copy `.env.example` to `.env.local` in this
 directory to use different local service addresses or authentication settings.
 
 ## Verify changes

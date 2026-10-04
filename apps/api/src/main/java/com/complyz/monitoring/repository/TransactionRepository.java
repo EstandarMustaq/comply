@@ -15,48 +15,47 @@ import com.complyz.monitoring.entity.TransactionType;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    List<Transaction> findByClientId(UUID clientId);
-
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.client.id = :clientId AND t.transactionDate BETWEEN :startDate AND :endDate")
-    BigDecimal sumAmountByClientAndDateBetween(
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+            "WHERE t.client.id = :clientId AND t.client.organization.id = :organizationId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    BigDecimal sumAmountByClientAndOrganizationAndDateBetween(
             @Param("clientId") UUID clientId,
+            @Param("organizationId") UUID organizationId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
 
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.client.id = :clientId " +
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+            "WHERE t.client.id = :clientId AND t.client.organization.id = :organizationId " +
             "AND t.transactionDate BETWEEN :startDate AND :endDate AND t.type IN :types")
-    BigDecimal sumAmountByClientAndDateBetweenAndTypeIn(
+    BigDecimal sumAmountByClientAndOrganizationAndDateBetweenAndTypeIn(
             @Param("clientId") UUID clientId,
+            @Param("organizationId") UUID organizationId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("types") List<TransactionType> types
     );
 
-    @Query("SELECT t FROM Transaction t WHERE t.client.id = :clientId AND t.transactionDate BETWEEN :startDate AND :endDate ORDER BY t.transactionDate ASC")
-    List<Transaction> findByClientAndDateBetween(
-            @Param("clientId") UUID clientId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
-    );
-
-    @Query("SELECT t FROM Transaction t WHERE t.client.id = :clientId AND t.transactionDate BETWEEN :startDate AND :endDate " +
+    @Query("SELECT t FROM Transaction t WHERE t.client.id = :clientId " +
+            "AND t.client.organization.id = :organizationId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
             "AND t.type IN :types ORDER BY t.transactionDate ASC")
-    List<Transaction> findByClientAndDateBetweenAndTypeIn(
+    List<Transaction> findByClientAndOrganizationAndDateBetweenAndTypeIn(
             @Param("clientId") UUID clientId,
+            @Param("organizationId") UUID organizationId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("types") List<TransactionType> types
     );
 
-    long countByRetentionUntilBefore(LocalDate date);
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.client.organization.id = :organizationId")
+    long countByOrganizationId(@Param("organizationId") UUID organizationId);
 
-    long countByTransactionDateBetween(LocalDate startDate, LocalDate endDate);
-
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.transactionDate BETWEEN :startDate AND :endDate")
-    BigDecimal sumAmountByTransactionDateBetween(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.client.organization.id = :organizationId " +
+            "AND t.retentionUntil < :date")
+    long countByOrganizationIdAndRetentionUntilBefore(
+            @Param("organizationId") UUID organizationId,
+            @Param("date") LocalDate date
     );
 
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.client.organization.id = :organizationId " +

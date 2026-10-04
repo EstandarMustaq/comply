@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/clients")
+@RequestMapping("/clients")
 public class ClientController {
 
     private final ClientRepository clientRepository;

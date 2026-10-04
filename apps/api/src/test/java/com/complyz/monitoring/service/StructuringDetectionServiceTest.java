@@ -10,6 +10,7 @@ import com.complyz.monitoring.entity.Transaction;
 import com.complyz.monitoring.entity.TransactionType;
 import com.complyz.monitoring.repository.ThresholdRuleRepository;
 import com.complyz.monitoring.repository.TransactionRepository;
+import com.complyz.tenancy.entity.Organization;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -51,7 +52,7 @@ class StructuringDetectionServiceTest {
     void requiresAllTransactionsToBeBelowStructuringThreshold() {
         StructuringDetectionService service = new StructuringDetectionService(
                 transactionRepository, ruleRepository, flagRepository);
-        Client client = new Client("Cliente", "BI", "123");
+        Client client = client();
         ThresholdRule rule = new ThresholdRule("Structuring", ThresholdRuleType.STRUCTURING,
                 new BigDecimal("100000"), 30);
         Transaction current = new Transaction(client, new BigDecimal("50000"), "MZN",
@@ -60,8 +61,8 @@ class StructuringDetectionServiceTest {
                 LocalDate.of(2026, 9, 8), TransactionType.DEPOSIT);
 
         when(ruleRepository.findByTypeAndActiveTrue(ThresholdRuleType.STRUCTURING)).thenReturn(List.of(rule));
-        when(transactionRepository.findByClientAndDateBetweenAndTypeIn(
-                any(), any(), any(), any())).thenReturn(List.of(current, aboveThreshold, current));
+        when(transactionRepository.findByClientAndOrganizationAndDateBetweenAndTypeIn(
+                any(), any(), any(), any(), any())).thenReturn(List.of(current, aboveThreshold, current));
 
         assertThat(service.detectStructuring(current)).isEmpty();
         verify(flagRepository, never()).save(any());
@@ -71,7 +72,7 @@ class StructuringDetectionServiceTest {
     void doesNotCreateDuplicateStructuringFlagForSameTransaction() {
         StructuringDetectionService service = new StructuringDetectionService(
                 transactionRepository, ruleRepository, flagRepository);
-        Client client = new Client("Cliente", "BI", "123");
+        Client client = client();
         Transaction current = new Transaction(client, new BigDecimal("50000"), "MZN",
                 LocalDate.of(2026, 9, 9), TransactionType.DEPOSIT);
         current.setId(UUID.randomUUID());
@@ -79,12 +80,22 @@ class StructuringDetectionServiceTest {
                 new BigDecimal("100000"), 30);
 
         when(ruleRepository.findByTypeAndActiveTrue(ThresholdRuleType.STRUCTURING)).thenReturn(List.of(rule));
-        when(transactionRepository.findByClientAndDateBetweenAndTypeIn(
-                any(), any(), any(), any())).thenReturn(List.of(current, current, current));
-        when(flagRepository.existsByTransactionIdAndType(current.getId(), FlagType.STRUCTURING_SUSPECTED))
-                .thenReturn(true);
+        when(transactionRepository.findByClientAndOrganizationAndDateBetweenAndTypeIn(
+                any(), any(), any(), any(), any())).thenReturn(List.of(current, current, current));
+        when(flagRepository.countByTransactionIdAndOrganizationIdAndType(
+                current.getId(), client.getOrganization().getId(), FlagType.STRUCTURING_SUSPECTED))
+                .thenReturn(1L);
 
         assertThat(service.detectStructuring(current)).isEmpty();
         verify(flagRepository, never()).save(any());
+    }
+
+    private static Client client() {
+        Client client = new Client("Cliente", "BI", "123");
+        client.setId(UUID.randomUUID());
+        Organization organization = new Organization("test-org", "Test Organization");
+        organization.setId(UUID.randomUUID());
+        client.setOrganization(organization);
+        return client;
     }
 }

@@ -32,7 +32,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      NEXT_PUBLIC_API_URL: "/api",
+      NEXT_PUBLIC_API_URL: "/api/v1",
       NEXT_PUBLIC_APP_NAME: "Complyz",
     },
   },

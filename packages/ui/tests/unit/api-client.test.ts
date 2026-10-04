@@ -31,7 +31,7 @@ describe("api client", () => {
     vi.stubGlobal("fetch", fetchMock)
     await api.login("officer@complyz.test", "secret")
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://api:8080/api/auth/login",
+      "http://api:8080/api/v1/auth/login",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
@@ -57,11 +57,11 @@ describe("api client", () => {
     await expect(api.getClients()).resolves.toEqual([])
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "http://api:8080/api/auth/refresh",
+      "http://api:8080/api/v1/auth/refresh",
       expect.objectContaining({ method: "POST" })
     )
     expect(fetchMock).toHaveBeenLastCalledWith(
-      "http://api:8080/api/clients?page=0&size=50",
+      "http://api:8080/api/v1/clients?page=0&size=50",
       expect.objectContaining({
         headers: expect.objectContaining({ Authorization: "Bearer new-token" }),
       })

@@ -47,7 +47,7 @@ async function fulfillApi(route: Route) {
 }
 
 async function openDashboard(page: Page) {
-  await page.route("**/api/**", fulfillApi)
+  await page.route("**/api/v1/**", fulfillApi)
   await page.addInitScript(() => {
     localStorage.setItem("complyz_token", "e2e-token")
   })

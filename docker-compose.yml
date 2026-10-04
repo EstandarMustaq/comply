@@ -125,7 +125,7 @@ services:
       dockerfile: Dockerfile
       target: web
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Complyz}
     image: ghcr.io/estandarmustaq/complyz-ui:${COMPLYZ_IMAGE_TAG:-local}
     restart: unless-stopped

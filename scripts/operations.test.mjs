@@ -44,7 +44,7 @@ const productionEnvironment = {
   POSTGRES_VOLUME_NAME: "complyz_postgres_prod_data",
   REDIS_VOLUME_NAME: "complyz_redis_prod_data",
   CORS_ALLOWED_ORIGINS: "https://trycomplyz.com",
-  NEXT_PUBLIC_API_URL: "https://api.trycomplyz.com/api",
+  NEXT_PUBLIC_API_URL: "https://api.trycomplyz.com/api/v1",
   COMPLYZ_BOOTSTRAP_ENABLED: "false",
 }
 

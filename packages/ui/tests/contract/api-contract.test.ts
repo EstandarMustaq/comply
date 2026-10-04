@@ -3,7 +3,7 @@ import { apiContract } from "@/lib/api-client"
 
 type OpenApiDocument = {
   components?: {
-    schemas?: Record<string, unknown>
+    schemas?: Record<string, { properties?: Record<string, unknown> }>
     securitySchemes?: Record<string, unknown>
   }
   paths?: Record<
@@ -32,10 +32,23 @@ describe.skipIf(!openApiUrl)("GRC engine API contract", () => {
     const response = await fetch(openApiUrl as string)
     expect(response.ok).toBe(true)
     const document = (await response.json()) as OpenApiDocument
-    expect(document.servers).toContainEqual({ url: "https://api.trycomplyz.com" })
+    expect(
+      document.servers?.some((server) => server.url === "https://api.trycomplyz.com")
+    ).toBe(true)
     expect(document.components?.schemas?.ApiErrorEnvelope).toBeDefined()
-    expect(document.components?.schemas?.ApiResponseMeta).toBeDefined()
+    expect(document.components?.schemas?.ApiResponseMetadata).toBeDefined()
+    expect(document.components?.schemas?.ApiResponseMeta).toBeUndefined()
+    const systemConfigSchema = document.components?.schemas?.SystemConfigResponse
+    expect(systemConfigSchema?.properties).toHaveProperty("key")
+    expect(systemConfigSchema?.properties).toHaveProperty("value")
+    expect(systemConfigSchema?.properties).not.toHaveProperty("updatedBy")
+    expect(
+      Object.keys(document.paths ?? {}).every((path) => path.startsWith("/api/v1/"))
+    ).toBe(true)
     expect(document.components?.securitySchemes?.bearerAuth).toBeDefined()
+    expect(
+      document.paths?.["/api/v1/settings/users"]?.post?.responses?.["501"]
+    ).toBeDefined()
     for (const [method, path] of apiContract) {
       expect(document.paths?.[path]?.[method]).toBeDefined()
       const operation = document.paths?.[path]?.[method]

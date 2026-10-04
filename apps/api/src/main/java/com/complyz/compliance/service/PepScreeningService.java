@@ -41,9 +41,13 @@ public class PepScreeningService {
 
         int count = 0;
         for (Client client : overduePeps) {
-            boolean hasPendingFlag = flagRepository.existsByClientIdAndTypeAndStatus(
-                    client.getId(), FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING
-            );
+            if (client.getOrganization() == null || client.getOrganization().getId() == null) {
+                log.warn("Skipping PEP review flag for client without an organization");
+                continue;
+            }
+            boolean hasPendingFlag = flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                    client.getId(), client.getOrganization().getId(), FlagType.PEP_REVIEW_DUE,
+                    FlagStatus.PENDING) > 0;
 
             if (!hasPendingFlag) {
                 String reason = String.format(

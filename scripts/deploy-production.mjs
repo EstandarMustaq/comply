@@ -116,8 +116,8 @@ export function validateDeploymentEnvironment(env) {
   if (!origins.includes("https://trycomplyz.com")) {
     throw new Error("CORS_ALLOWED_ORIGINS must allow https://trycomplyz.com.")
   }
-  if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomplyz.com/api") {
-    throw new Error("NEXT_PUBLIC_API_URL must use https://api.trycomplyz.com/api.")
+  if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomplyz.com/api/v1") {
+    throw new Error("NEXT_PUBLIC_API_URL must use https://api.trycomplyz.com/api/v1.")
   }
 }
 

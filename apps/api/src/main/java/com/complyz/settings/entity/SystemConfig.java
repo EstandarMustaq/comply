@@ -1,6 +1,7 @@
 package com.complyz.settings.entity;
 
 import com.complyz.users.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -18,6 +19,7 @@ public class SystemConfig {
     @Column(name = "value", nullable = false, columnDefinition = "jsonb")
     private String value;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private User updatedBy;

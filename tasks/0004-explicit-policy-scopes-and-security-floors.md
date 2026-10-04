@@ -25,20 +25,21 @@ depends_on:
 
 ## Context
 
-The target separates personal Account preferences, explicit Organization policy and CommercialClient contract/templates/security floors. The baseline has threshold settings and system configuration but no persisted three-level policy model, provenance or effective-value semantics. Proposed floors and precedence rules require task 0001 approval.
+The approved model separates Account profile preferences from explicit Organization policy and platform-maintained security/regulatory floors. CommercialClient is a back-office reference only and has no policy, template, floor, entitlement default or authorization role. Organization entitlements are assigned independently. The baseline has threshold settings and system configuration but no persisted policy provenance or effective-value semantics.
 
 ## Objective
 
-Implement explicit, versioned policy values and their origins for Account, Organization and CommercialClient. Template application copies values into the Organization; it never creates silent inheritance. Implement the approved closed `PolicyFloor` allow-list with monotonic stricter-only evaluation, preview and audit.
+Implement versioned Account preferences and explicit Organization policy values, with platform defaults and a closed `PolicyFloor` catalog. CommercialClient policy/templates are not part of the model. Organizations may strengthen but never weaken applicable platform floors; implement effective-value evaluation, approved regulatory exemptions, preview and audit.
 
 ## Acceptance criteria
 
-- [ ] Policy storage distinguishes Account preferences, Organization compliance/authentication policy, CommercialClient settings/templates and security floors; each value records scope, version, origin and actor/change time as applicable.
-- [ ] Applying a template copies an immutable version into explicit Organization values and records `template:<id>@<version>` provenance; later template edits do not silently change existing Organizations.
-- [ ] Template propagation is a separate authorized command with before/after preview, impact count, audit and approved notifications; no background implicit propagation exists.
-- [ ] The approved closed floor-key set is validated; the proposed keys are `mfa.required`, `auth.min_acr`, `session.idle_timeout`, `session.max_duration`, `sso.allowed_idps`, `membership.external.allowed` and `membership.external.max_duration`. The Organization can strengthen but cannot weaken a floor; effective values expose `floor:commercial_client` provenance, and unknown keys fail closed.
-- [ ] Changing a floor requires approved step-up, a preview of affected Organizations, audit and notification to those Organizations' `OWNER`/`ADMIN` roles. Sensitive Organization policy changes require the approved role, validation, audit and authorization-version invalidation; regulatory thresholds remain Organization-local.
-- [ ] Tests cover precedence, monotonic comparison for every allowed key, rejected weakening/unknown key, copy semantics, preview/propagation and cross-Organization access denial.
+- [ ] Policy storage distinguishes Account preferences, explicit Organization policy and platform-owned floor/catalog values; each value records scope, version, origin, effective time and actor/change time as applicable. CommercialClient stores no policy or floor.
+- [ ] Organization defaults and regulatory floors are explicit, versioned and attributable to the platform. Do not add CommercialClient policy-template inheritance or silent propagation.
+- [ ] The closed security-floor set includes `auth.min_acr`, `session.idle_timeout`, `session.max_duration`, `sso.allowed_idps`, `membership.external.allowed` and `membership.external.max_duration`; regulatory floors cover the approved review intervals, retention minima, temporary-account duration and simplified-regime limits in task 0001. Unknown keys fail closed. The Organization may only strengthen a floor; effective values expose `floor:platform` provenance.
+- [ ] A valid simplified-regime exemption is explicit, keyed to eligible floors, referenced, time-bounded and auditable; without it the regulatory floor applies. Platform floor changes are versioned/effective-dated, preview affected Organizations and notify owners/admins and OCOS.
+- [ ] Sensitive Organization policy changes require `OWNER`, step-up, validation, impact preview, audit, owner/admin notification and an atomic authorization-version change effective on the next request within five minutes.
+- [ ] Legacy shared threshold/system-config writes remain denied to all Organization roles until a separately authenticated and audited platform authority is implemented; never expose platform-wide writes through Organization membership.
+- [ ] Tests cover every floor's monotonic comparison, defaults/effective values, exemption eligibility/expiry, rejected weakening/unknown keys, audit/notification and cross-Organization access denial.
 - [ ] Spring/OpenAPI types, generated `packages/api-clients`, typed UI types/client and contract tests remain synchronized; `pnpm api:test` passes.
 
 ## Verification
@@ -50,8 +51,9 @@ pnpm check
 
 ## Operational considerations
 
-Schema changes are append-only and must serialize with other migration work. Do not backfill global settings into all tenants until an explicit mapping and safe defaults have been reviewed. Policy change and authorization-version bump must be atomic before active sessions can rely on the new effective policy.
+Schema changes are append-only and must serialize with other migration work. Do not infer Organization policy or regulatory exemptions during backfill. Policy changes and authorization-version updates must be atomic; event-sourced aggregate ownership and event publication follow task 0009. Task 0002 closes the existing shared-settings write routes for Organization roles; do not re-enable them as a temporary workaround while this task is being implemented.
 
 ## Work log
 
-- 2026-10-03: Brief created; floor allow-list and policy decisions are blocked on task 0001.
+- 2026-10-03: Brief created from proposed policy rules.
+- 2026-10-04: Aligned with task 0001: Organization-owned policy and platform floors; CommercialClient is a non-authorizing reference with no policy, template or entitlement defaults.
