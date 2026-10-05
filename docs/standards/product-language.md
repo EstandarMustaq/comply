@@ -1,35 +1,69 @@
-# Product language and interface principles
+# Product voice and language
 
-## Product identity and purpose
+## Product identity
 
-Complyz helps financial teams turn customer and transaction information into clear, explainable, and traceable operational decisions.
+**Intelligent Financial Compliance.**
 
-The product should feel dependable, focused, and respectful of the operator's expertise. Every workflow should make the current state, available action, and resulting outcome easy to understand.
+Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
+
+Compliance should make finance safer, sharper and easier to operate—not slow it down.
+
+The longer-term design aims to support external-tool integrations, advanced precision mechanisms, compliance-analysis algorithms, transaction-fragmentation detection and native AI within compliance models. Treat these as planned capabilities, not current functionality, unless delivery is verified.
+
+Security alignment with ISO/IEC 27001:2022 and SOC 2 Type II criteria is a roadmap objective. Do not claim current alignment, ISO certification or a SOC 2 Type II report.
+
+## Voice
+
+Complyz speaks like software built for people who know what they are doing.
+
+- Write in English: youthful, professional, clear, direct, confident and bold.
+- Keep sentences short. Lead with the action or the state.
+- Use active verbs and concrete words. Name the boundary.
+- Be precise without sounding bureaucratic. Be technical without sounding academic. Be confident without sounding aggressive.
+- Say what something is and, when useful, what it is not.
+- Cut corporate filler, legalese and unnecessary abstraction.
+
+Prefer:
+
+- “Set the floor.”
+- “Access is blocked.”
+- “This policy applies here.”
+- “The membership expired.”
+- “You need step-up.”
+- “This action is audited.”
+- “No access across Organizations.”
+- “CommercialClient is back-office metadata.”
+
+Avoid:
+
+- “The aforementioned entity”
+- “Pursuant to the applicable provisions”
+- “Hierarchically superior entity”
+- “Administrative organizational structure”
+- “The system shall enforce…”
+- “In accordance with the aforementioned policy”
 
 ## Core vocabulary
 
-| Domain concept                   | Product wording            | Meaning                                                                |
-| -------------------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| Customer due diligence           | Customer profile           | Identity, risk, and relationship information for a customer.           |
-| Suspicious activity workflow     | Investigation case         | A review workflow created from an identified risk signal.              |
-| Sanctions screening              | Restricted-party screening | Controlled matching against configured screening data.                 |
-| Threshold/structuring monitoring | Transaction monitoring     | Rules that identify unusual value, frequency, or aggregation patterns. |
-| STR/CTR records                  | Compliance reports         | Structured reports prepared and submitted by authorized operators.     |
-| Audit log                        | Activity history           | Immutable record of important user and system actions.                 |
+| Term                 | Meaning                                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Account**          | A person's identity and security profile.                                                                                                                                                                     |
+| **Organization**     | The tenant and client institution in the product. Memberships, policies and compliance data belong to an Organization.                                                                                        |
+| **CommercialClient** | A back-office namespace for commercial control and reference. It stores an identifier, name, contract reference and status. It is not a tenant, does not manage Organizations and never drives authorization. |
+| **Membership**       | An Account's access relationship with an Organization.                                                                                                                                                        |
+| **Policy floor**     | The minimum security bar an Organization cannot weaken.                                                                                                                                                       |
+
+Keep stable API, event and storage identifiers separate from display labels. Do not rename wire values to improve copy. Keep security boundaries and domain distinctions explicit. Never imply that CommercialClient grants access or governs an Organization.
 
 ## Interface principles
 
-- Present the information needed for a decision without forcing operators through unnecessary steps.
-- Keep dense data readable with stable visual hierarchy, clear labels, and predictable actions.
-- Provide accessible loading, empty, success, and error states; never leave a blank operational area without context.
+- Put the information needed for a decision where the operator needs it.
+- Make the current state, next action and outcome obvious.
+- Keep dense data readable with clear labels, stable hierarchy and predictable actions.
+- Provide accessible loading, empty, success, error and denied states. Never leave an operational area blank without context.
 - Use neutral colors for structure, brand colors for emphasis, and destructive colors only for destructive or urgent states.
-- Keep data tables and analytical views wide enough to support real operational work.
+- Keep tables and analytical views wide enough for real work.
 
-## Product wording
+## Validation
 
-- Use short, direct explanations focused on the action the user can take.
-- Write product UI, user-facing API messages, and public documentation in direct Mozambican Portuguese (`pt-MZ`).
-- Keep technical documentation and engineering instructions in concise technical English.
-- Keep stable machine identifiers separate from display labels.
-- Do not expose internal implementation details, machine enums, or external citations in product-facing content.
-- Explain a blocked action through its current state and next step.
+Run `pnpm product-language:check` after changing UI copy, user-facing API messages, exports or public documentation. The check must reject Portuguese product copy while preserving stable wire values and immutable historical migrations.

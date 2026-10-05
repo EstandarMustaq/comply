@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "OpenAPI-derived types and route contract for the Complyz API",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "generate": "node ../../scripts/openapi.mjs"

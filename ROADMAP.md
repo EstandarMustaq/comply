@@ -8,6 +8,13 @@
 
 Move Complyz from a single-Organization `User` model to an enterprise, multi-tenant model with separate personal identity (`Account`) and operational tenant (`Organization`), which represents the client institution in the product. `CommercialClient` is a segregated commercial namespace reference used only for commercial control in the platform back office; it is not an Organization parent or grouping/management entity. Every compliance operation remains explicitly Organization-scoped. Commercial administration does not grant access to compliance records. Support must be evidenced by API authorization tests, migration rehearsal, browser flows and accurate customer/operator documentation before release.
 
+## Security alignment planning objective
+
+- **Objective:** develop a scoped plan for aligning Complyz security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria.
+- **Status:** planning only. No control assessment, gap analysis, implementation sequence, owner, timeline or certification evidence has been approved.
+- **Claim boundary:** this roadmap entry is not evidence that Complyz currently aligns with either framework. Complyz does not claim ISO certification or a SOC 2 Type II report.
+- **Next decision:** approve the scope and work required to create an alignment plan before adding delivery milestones. No implementation roadmap exists yet.
+
 ## Reviewed baseline
 
 The repository review confirmed these current-state facts:
@@ -129,7 +136,7 @@ Every target section and acceptance criterion is mapped below. The named brief i
 | Versioned Event Contracts and JSON Schema        | Business-named versioned event contracts; Context Map; shared versioned event envelope/catalog in `packages/contracts`; strict AJV and equivalent Java validation; separate API/event/OpenAPI version axes; no external-input schema compilation                                                | 0006, 0009, 0013, 0015                   |
 | Resource servers, headers and API compatibility  | Required bearer `Authorization` on protected resources and declared `Content-Type` for body requests; validated OpenAPI header contracts; additive-compatible `/api/v1`, separate event schema versions, safe major-version deprecation                                                         | 0006, 0009, 0014, 0015                   |
 | Camel and WSO2 Integrator boundary               | Camel internal event/outbox/ingest/sanctions/export jobs with idempotency, DLQ and backoff; WSO2 Integrator only for required external mediation; per-Organization/integration client credentials and least scopes; IdP remains separate                                                        | 0001, 0006, 0009, 0013, 0015             |
-| UI and product language                          | Real organization selector, context/cache clearing, profile/security, member/role/policy and commercial flows; accessible honest states, operational density, direct `pt-MZ`                                                                                                                    | 0010–0012, 0014, 0015                    |
+| UI and product language                          | Real organization selector, context/cache clearing, profile/security, member/role/policy and commercial flows; accessible, honest states, operational density, clear, direct English                                                                                                            | 0010–0012, 0014, 0015                    |
 | Documentation and release proof                  | Mintlify navigation; guide Account → Organizations → permissions → policies → authentication → platform commercial administration → compliance → API; distinguish ratified policy from implemented/tested behavior and retain release evidence                                                  | 0001, 0014, 0015                         |
 
 ## Release gates and validation

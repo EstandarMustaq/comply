@@ -1,9 +1,6 @@
-# Complyz web app
+# Intelligent Financial Compliance
 
-The Complyz web app gives compliance and risk teams one place to review customer
-profiles, transaction alerts, incoming data, investigations, reports, and team
-activity. Its screens are designed around the decisions operators make each
-day, with clear status, relevant context, and a record of what changed.
+Build the interface for regulated finance teams who know what they’re doing. The Complyz web app brings customer profiles, transaction activity, alerts, investigations and reports into one operational workspace, with the current state and next action up front.
 
 ## Run locally
 
@@ -30,6 +27,6 @@ pnpm test:e2e
 pnpm --filter @complyz/web build
 ```
 
-The root workspace owns dependency versions and shared settings. Reusable
-interface utilities and tests are maintained in `packages/ui`; API types are
-generated from the service contract in `packages/api-clients`.
+The root workspace owns dependency versions and shared settings. Reusable UI
+utilities and tests live in `packages/ui`. Generated API types live in
+`packages/api-clients` and follow the service contract.

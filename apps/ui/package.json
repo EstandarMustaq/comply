@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Complyz transactional monitoring and compliance interface",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
