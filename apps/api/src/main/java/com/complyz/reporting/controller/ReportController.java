@@ -96,7 +96,7 @@ public class ReportController {
         if (str == null) return ResponseEntity.status(404).body(ApiErrorBodies.notFound());
 
         if (str.getSubmittedAt() != null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Relatório já submetido não pode ser editado"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Filed reports can't be edited."));
         }
 
         if (request.accountNumber() != null) str.setAccountNumber(request.accountNumber());
@@ -174,7 +174,7 @@ public class ReportController {
                 || str.getBusinessRelationshipDescription().isBlank()
                 || str.getReportingInstitution() == null || str.getReportingInstitution().isBlank()
                 || str.getOcosName() == null || str.getOcosName().isBlank()) {
-            throw new IllegalArgumentException("STR incompleto: preencha instituição, titular, descrição da suspeita, relação de negócio e OCOS");
+            throw new IllegalArgumentException("Complete the report's institution, account holder, suspicion details, business relationship and responsible officer fields.");
         }
     }
 
@@ -213,7 +213,7 @@ public class ReportController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"relatorio-bm-" + year + ".xlsx\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"annual-report-" + year + ".xlsx\"")
                 .body(content);
     }
 }

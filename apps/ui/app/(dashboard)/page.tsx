@@ -52,7 +52,7 @@ export default function DashboardOverviewPage() {
       setInsights(insightsRes)
       setPendingFlags(flagsRes.slice(0, 10)) // Top 10 priority
     } catch (err) {
-      console.error("Erro ao carregar dashboard:", err)
+      console.error("Failed to load dashboard:", err)
     } finally {
       setIsLoading(false)
     }
@@ -91,7 +91,7 @@ export default function DashboardOverviewPage() {
   return (
     <div>
       <SiteHeader
-        title="Visão geral"
+        title="Overview"
         action={
           <Button
             size="sm"
@@ -99,7 +99,7 @@ export default function DashboardOverviewPage() {
             className="gap-1.5 text-xs shadow-sm"
           >
             <FileSpreadsheet className="h-3.5 w-3.5" />
-            <span>Importar dados</span>
+            <span>Import data</span>
           </Button>
         }
       />
@@ -119,10 +119,10 @@ export default function DashboardOverviewPage() {
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <ShieldAlert className="h-4 w-4 text-amber-500" />
-                Alertas em aberto
+                Open alerts
               </CardTitle>
               <CardDescription className="text-xs">
-                Priorizados por gravidade — clique para analisar e resolver
+                Prioritized by severity. Review each alert and choose what happens next.
               </CardDescription>
             </div>
             <Button
@@ -131,7 +131,7 @@ export default function DashboardOverviewPage() {
               onClick={() => router.push("/flags")}
               className="gap-1 text-xs"
             >
-              <span>Ver todos</span>
+              <span>View all</span>
               <ArrowRight className="h-3 w-3" />
             </Button>
           </CardHeader>
@@ -139,17 +139,17 @@ export default function DashboardOverviewPage() {
             {pendingFlags.length === 0 ? (
               <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center text-xs">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
-                <span>Nenhum alerta pendente — tudo em conformidade.</span>
+                <span>No pending alerts. Everything is up to date.</span>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[160px]">Tipo</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Regra activada</TableHead>
-                    <TableHead>Prazo</TableHead>
-                    <TableHead className="text-right">Acção</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Triggered rule</TableHead>
+                    <TableHead>Due</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -191,7 +191,7 @@ export default function DashboardOverviewPage() {
                             onClick={() => openFlagReview(flag)}
                             className="h-7 px-2.5 text-xs"
                           >
-                            Analisar
+                            Review
                           </Button>
                         </TableCell>
                       </TableRow>

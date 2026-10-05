@@ -123,7 +123,7 @@ public class ClientController {
         auditService.record(actor, AuditAction.PEP_REVIEWED, "clients", client.getId(),
                 "{\"pepLastReviewedAt\": \"" + LocalDate.now() + "\"}");
 
-        return ResponseEntity.ok(Map.of("message", "Revisão anual de PEP registrada com sucesso", "date", LocalDate.now()));
+        return ResponseEntity.ok(Map.of("message", "Annual politically exposed person review recorded.", "date", LocalDate.now()));
     }
 
     public record CreateClientRequest(

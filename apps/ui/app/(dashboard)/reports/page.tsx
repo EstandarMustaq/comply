@@ -75,7 +75,7 @@ function ReportsContent() {
     setSuspicionGrounds(report.suspicionGrounds || "")
     setOperationDetails(report.operationDetails || "")
     setEvidenceSummary(report.evidenceSummary || "")
-    setActionTaken(report.actionTaken || "Transacção retida para análise formal.")
+    setActionTaken(report.actionTaken || "Transaction held for formal review.")
     setGifimProtocol(
       report.gifimProtocolNumber ||
         `REF-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
@@ -97,7 +97,7 @@ function ReportsContent() {
         }
       }
     } catch (err) {
-      console.error("Erro ao carregar relatórios:", err)
+      console.error("Failed to load reports:", err)
     } finally {
       setIsLoading(false)
     }
@@ -114,9 +114,7 @@ function ReportsContent() {
     if (!selectedStr) return
 
     if (!suspicionGrounds || !operationDetails || !gifimProtocol) {
-      setSubmitError(
-        "Fundamentos, detalhes da transacção e número de protocolo são obrigatórios."
-      )
+      setSubmitError("Enter the reason, transaction details and protocol number.")
       return
     }
 
@@ -135,9 +133,7 @@ function ReportsContent() {
       setSelectedStr(null)
       loadData()
     } catch (err: unknown) {
-      setSubmitError(
-        err instanceof Error ? err.message : "Não foi possível submeter a comunicação."
-      )
+      setSubmitError(err instanceof Error ? err.message : "Could not submit the report.")
     } finally {
       setIsSubmitting(false)
     }
@@ -145,7 +141,7 @@ function ReportsContent() {
 
   const formatMt = (val?: number) => {
     if (val === undefined || val === null) return "0 MT"
-    return new Intl.NumberFormat("pt-MZ", {
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
       maximumFractionDigits: 0,
@@ -155,7 +151,7 @@ function ReportsContent() {
   return (
     <div>
       <SiteHeader
-        title="Relatórios"
+        title="Reports"
         action={
           <Button
             variant="outline"
@@ -165,7 +161,7 @@ function ReportsContent() {
             className="h-8 gap-1.5 text-xs"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
-            <span>Actualizar</span>
+            <span>Refresh</span>
           </Button>
         }
       />
@@ -175,10 +171,10 @@ function ReportsContent() {
         <div className="border-border bg-muted/40 text-foreground flex items-start gap-3 rounded-lg border p-3.5 text-xs">
           <Clock className="text-primary mt-0.5 h-4 w-4 shrink-0" />
           <div>
-            <span className="font-semibold">Conservação de documentos</span>
+            <span className="font-semibold">Record retention</span>
             <p className="text-muted-foreground mt-0.5 text-[11px]">
-              Todas as comunicações submetidas, evidências e registos de diligência são
-              conservados com bloqueio de eliminação por <strong>10 anos</strong>.
+              Submitted reports, evidence and due diligence records are locked against
+              deletion for <strong>10 years</strong>.
             </p>
           </div>
         </div>
@@ -192,10 +188,10 @@ function ReportsContent() {
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="STR" className="text-xs">
-                Operações suspeitas
+                Suspicious activity
               </TabsTrigger>
               <TabsTrigger value="CTR" className="text-xs">
-                Transacções em numerário
+                Cash transactions
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -207,28 +203,27 @@ function ReportsContent() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <FileText className="text-primary h-4 w-4" />
-                Comunicações de operações suspeitas ({strs.length})
+                Suspicious activity reports ({strs.length})
               </CardTitle>
               <CardDescription className="text-xs">
-                Comunicações formais submetidas às autoridades sobre operações com
-                indícios de suspeita.
+                Formal reports for transactions with indicators of suspicious activity.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {strs.length === 0 ? (
                 <div className="text-muted-foreground py-12 text-center text-xs">
-                  Nenhuma operação suspeita registada.
+                  No suspicious activity reports.
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Referência</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>N.º de protocolo</TableHead>
-                      <TableHead>Conservação até</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="text-right">Acção</TableHead>
+                      <TableHead>Reference</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Filing reference</TableHead>
+                      <TableHead>Retain until</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -252,7 +247,7 @@ function ReportsContent() {
                               </span>
                             ) : (
                               <span className="text-muted-foreground italic">
-                                Pendente
+                                Pending
                               </span>
                             )}
                           </TableCell>
@@ -260,11 +255,11 @@ function ReportsContent() {
                             {report.retentionDeadline ? (
                               <span className="text-foreground font-medium">
                                 {new Date(report.retentionDeadline).toLocaleDateString(
-                                  "pt-MZ"
+                                  "en-MZ"
                                 )}
                               </span>
                             ) : (
-                              "Após submissão"
+                              "Set after filing"
                             )}
                           </TableCell>
                           <TableCell>
@@ -272,7 +267,7 @@ function ReportsContent() {
                               variant={isSubmitted ? "success" : "warning"}
                               className="text-[10px]"
                             >
-                              {isSubmitted ? "SUBMETIDO" : "RASCUNHO"}
+                              {isSubmitted ? "FILED" : "DRAFT"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
@@ -293,7 +288,7 @@ function ReportsContent() {
                                 className="h-7 gap-1 px-2.5 text-xs"
                               >
                                 <Send className="h-3 w-3" />
-                                <span>Completar e submeter</span>
+                                <span>Complete and file</span>
                               </Button>
                             )}
                           </TableCell>
@@ -311,28 +306,27 @@ function ReportsContent() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <FileText className="text-primary h-4 w-4" />
-                Comunicações de transacções em numerário ({ctrs.length})
+                Cash transaction reports ({ctrs.length})
               </CardTitle>
               <CardDescription className="text-xs">
-                Comunicações periódicas de transacções em numerário que atingiram o limiar
-                de declaração.
+                Periodic reports for cash transactions that meet the reporting threshold.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {ctrs.length === 0 ? (
                 <div className="text-muted-foreground py-12 text-center text-xs">
-                  Nenhuma transacção em numerário pendente.
+                  No pending cash transaction reports.
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Referência</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Período</TableHead>
-                      <TableHead>Montante total</TableHead>
-                      <TableHead className="text-center">Transacções</TableHead>
-                      <TableHead>Estado</TableHead>
+                      <TableHead>Reference</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Period</TableHead>
+                      <TableHead>Total amount</TableHead>
+                      <TableHead className="text-center">Transactions</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -378,11 +372,11 @@ function ReportsContent() {
             <DialogTitle className="flex items-center gap-2">
               <Building2 className="text-primary h-5 w-5" />
               {selectedStr?.status === "SUBMITTED"
-                ? "Registo da comunicação"
-                : "Submeter comunicação de operação suspeita"}
+                ? "Filing record"
+                : "File suspicious activity report"}
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Ref: <strong>{selectedStr?.strReference}</strong> · Cliente:{" "}
+              Reference: <strong>{selectedStr?.strReference}</strong> · Customer:{" "}
               <strong>{selectedStr?.client?.fullName || "—"}</strong>
             </DialogDescription>
           </DialogHeader>
@@ -397,7 +391,7 @@ function ReportsContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="gifimProtocol" className="font-semibold">
-                Número de protocolo / referência <span className="text-red-500">*</span>
+                Filing reference <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="gifimProtocol"
@@ -412,14 +406,14 @@ function ReportsContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="suspicionGrounds" className="font-semibold">
-                Fundamentos da suspeita <span className="text-red-500">*</span>
+                Reason for suspicion <span className="text-red-500">*</span>
               </Label>
               <textarea
                 id="suspicionGrounds"
                 rows={3}
                 value={suspicionGrounds}
                 onChange={(e) => setSuspicionGrounds(e.target.value)}
-                placeholder="Descreva os indicadores objectivos de suspeita, incongruências com o perfil financeiro do cliente ou correspondências em listas de sanções…"
+                placeholder="Describe the indicators, how they differ from the customer's profile, or any sanctions matches…"
                 className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
@@ -428,14 +422,14 @@ function ReportsContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="operationDetails" className="font-semibold">
-                Detalhes da transacção <span className="text-red-500">*</span>
+                Transaction details <span className="text-red-500">*</span>
               </Label>
               <textarea
                 id="operationDetails"
                 rows={3}
                 value={operationDetails}
                 onChange={(e) => setOperationDetails(e.target.value)}
-                placeholder="Contas, montantes, datas, canais e contrapartes envolvidas…"
+                placeholder="Include accounts, amounts, dates, channels and counterparties…"
                 className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
@@ -444,14 +438,14 @@ function ReportsContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="evidenceSummary" className="font-semibold">
-                Resumo de evidências
+                Evidence summary
               </Label>
               <textarea
                 id="evidenceSummary"
                 rows={2}
                 value={evidenceSummary}
                 onChange={(e) => setEvidenceSummary(e.target.value)}
-                placeholder="Extractos de conta, comprovativos de depósito, relatórios de triagem…"
+                placeholder="Account statements, deposit receipts, screening results…"
                 className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
                 disabled={selectedStr?.status === "SUBMITTED"}
               />
@@ -459,7 +453,7 @@ function ReportsContent() {
 
             <div className="space-y-1.5">
               <Label htmlFor="actionTaken" className="font-semibold">
-                Acção tomada
+                Action taken
               </Label>
               <Input
                 id="actionTaken"
@@ -474,14 +468,14 @@ function ReportsContent() {
               <div className="space-y-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-900">
                 <div className="flex items-center gap-1.5 font-bold">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  Comunicação submetida — período de conservação activo
+                  Report filed — retention period is active
                 </div>
                 <p className="text-[11px]">
-                  Submetido em:{" "}
-                  {new Date(selectedStr.submissionDate || "").toLocaleString("pt-MZ")}
+                  Filed on:{" "}
+                  {new Date(selectedStr.submissionDate || "").toLocaleString("en-MZ")}
                 </p>
                 <p className="text-[11px]">
-                  Conservação até: <strong>{selectedStr.retentionDeadline}</strong>
+                  Retain until: <strong>{selectedStr.retentionDeadline}</strong>
                 </p>
               </div>
             )}
@@ -493,7 +487,7 @@ function ReportsContent() {
                 size="sm"
                 onClick={() => setIsSubmitModalOpen(false)}
               >
-                Fechar
+                Close
               </Button>
               {selectedStr?.status !== "SUBMITTED" && (
                 <Button
@@ -503,7 +497,7 @@ function ReportsContent() {
                   className="gap-1.5"
                 >
                   {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  Submeter comunicação
+                  File report
                 </Button>
               )}
             </DialogFooter>

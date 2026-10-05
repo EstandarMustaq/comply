@@ -10,7 +10,7 @@ import java.util.UUID;
 public class TenantAccessService {
     public Organization requireOrganization(User user) {
         if (user == null || user.getOrganization() == null) {
-            throw new IllegalStateException("Utilizador não associado a uma organização");
+            throw new IllegalStateException("The user is not assigned to an Organization.");
         }
         return user.getOrganization();
     }
@@ -19,7 +19,7 @@ public class TenantAccessService {
         if (requireOrganization(user).getId() == null
                 || organization == null
                 || !requireOrganization(user).getId().equals(organization.getId())) {
-            throw new SecurityException("Acesso recusado fora da organização do utilizador");
+            throw new SecurityException("Access denied outside the user's Organization.");
         }
     }
 

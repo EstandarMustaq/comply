@@ -69,12 +69,12 @@ public class UserManagementController {
     @PostMapping
     @ApiResponse(
             responseCode = "501",
-            description = "A criação directa de utilizadores não está disponível.",
+            description = "Direct user creation is not available.",
             content = @Content(schema = @Schema(implementation = ApiErrorEnvelope.class))
     )
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(Map.of("message", "A criação directa de utilizadores não está disponível."));
+                .body(Map.of("message", "Direct user creation is not available."));
     }
 
     @PatchMapping("/{id}/reset-mfa")
@@ -93,6 +93,6 @@ public class UserManagementController {
 
         auditService.record(actor, AuditAction.USER_UPDATED, "users", user.getId(), "{\"action\": \"RESET_MFA\"}");
 
-        return ResponseEntity.ok(Map.of("message", "MFA redefinido com sucesso para " + user.getEmail()));
+        return ResponseEntity.ok(Map.of("message", "MFA was reset for " + user.getEmail()));
     }
 }

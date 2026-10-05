@@ -48,7 +48,7 @@ public class BootstrapUserInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (!properties.isEnabled()) {
-            log.info("Bootstrap de utilizadores desativado; nenhuma credencial inicial será criada.");
+            log.info("User bootstrap is disabled; no initial credentials will be created.");
             return;
         }
 
@@ -58,7 +58,7 @@ public class BootstrapUserInitializer implements CommandLineRunner {
 
     private void createUserIfConfigured(BootstrapProperties.User configuredUser, Role role) {
         if (configuredUser == null) {
-            throw new IllegalStateException("Configuração de bootstrap ausente para o perfil " + role);
+            throw new IllegalStateException("Missing bootstrap configuration for role " + role);
         }
 
         requireValue(configuredUser.getFullName(), role, "fullName");
@@ -66,7 +66,7 @@ public class BootstrapUserInitializer implements CommandLineRunner {
         requireValue(configuredUser.getPassword(), role, "password");
 
         if (userRepository.existsByEmail(configuredUser.getEmail())) {
-            log.info("Utilizador de bootstrap para {} já existe; nenhum utilizador foi criado.", role);
+            log.info("Bootstrap user for {} already exists; no user was created.", role);
             return;
         }
 
@@ -78,10 +78,10 @@ public class BootstrapUserInitializer implements CommandLineRunner {
         );
         if (organizationRepository != null) {
             user.setOrganization(organizationRepository.findBySlug("default")
-                    .orElseThrow(() -> new IllegalStateException("Organização default não encontrada")));
+                    .orElseThrow(() -> new IllegalStateException("Default Organization not found.")));
         }
         userRepository.save(user);
-        log.info("Utilizador inicial para o perfil {} criado com o email configurado.", role);
+        log.info("Initial user for role {} was created with the configured email.", role);
     }
 
     private void requireValue(String value, Role role, String field) {

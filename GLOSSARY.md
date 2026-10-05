@@ -10,7 +10,7 @@ _Avoid_: User, customer account
 
 **Organization**:
 The client institution represented in the product and the tenant boundary for its policies, memberships and compliance work. A person's access to an Organization is explicit and never flows from a commercial reference.
-_Avoid_: Corporação; tenant ID as a user-facing label. Use “Organização” in customer-facing Portuguese and keep `Organization` as the stable domain identifier.
+_Avoid_: the former localized Organization label; tenant ID as a user-facing label. Use `Organization` in product copy and keep it as the stable domain identifier.
 
 **Organization membership**:
 An explicit relationship between an Account and one Organization, carrying the role and status that determine the Account's access in that Organization.

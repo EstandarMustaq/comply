@@ -1,6 +1,6 @@
 # Engineering workflow
 
-This guide documents the repository's supported checks for contributors. Product-facing UI and public docs remain in Mozambican Portuguese; engineering materials use English.
+This guide documents the repository's supported checks for contributors. Product UI and public documentation use Complyz's clear, direct, confident English voice. Engineering materials use concise technical English.
 
 ## Toolchain and workspace
 
@@ -54,4 +54,4 @@ AWS, Docker, or production services.
 - Keep customer data scoped to the authenticated `Organization`; test cross-organization access denial, including related records, aggregation and exports.
 - Add Flyway migrations as new versions only. Existing migration files are immutable after they may have been applied.
 - For API contract changes, regenerate OpenAPI-derived client types with `pnpm api:openapi`, update UI types/client and contract assertions, and run the relevant API and UI tests.
-- Keep product copy in direct Mozambican Portuguese and run `pnpm product-language:check` for product-facing text changes.
+- Keep product copy in clear, direct, confident English and run `pnpm product-language:check` for product-facing text changes.

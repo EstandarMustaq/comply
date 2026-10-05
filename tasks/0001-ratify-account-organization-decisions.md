@@ -104,4 +104,4 @@ This task closes decisions and updates planning artifacts only. It does not impl
 ## Work log
 
 - 2026-10-04: Owner approval closed D1–D7. D7's conflicting pending note was resolved as approved; the D6 no-event-sourcing proposal was superseded by the accepted event-sourced context architecture. Roadmap and dependent task briefs were aligned; the approval-only root artifact was removed.
-- 2026-10-04: Corrected `CommercialClient` to a segregated back-office namespace reference, not an Organization grouping or management entity; removed CommercialClient-derived plan defaults and replaced the former “Corporação” label with canonical `Organization` / pt-MZ “Organização”.
+- 2026-10-04: Corrected `CommercialClient` to a segregated back-office namespace reference, not an Organization grouping or management entity; removed CommercialClient-derived plan defaults and replaced the former localized Organization label with the canonical `Organization` product term.

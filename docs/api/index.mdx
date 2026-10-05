@@ -1,44 +1,29 @@
 ---
-title: "Utilizar a API"
-description: "Autentique pedidos e interprete respostas da API Complyz."
+title: "Use the API"
+description: "Authenticate requests and read Complyz API responses."
 ---
 
-A API permite ligar aplicações autorizadas ao Complyz. Envie pedidos para
-`https://api.trycomplyz.com` e inclua o caminho versionado `/api/v1` indicado em cada operação da
-referência.
+Connect authorized applications to Complyz through the API. Send requests to `https://api.trycomplyz.com` and use the `/api/v1` path shown for each operation.
 
-## Versionamento
+## Versioning
 
-Todas as operações desta referência pertencem à versão principal 1 e começam por `/api/v1`.
-Os caminhos antigos `/api/...` deixaram de ser expostos; actualize os clientes e
-as integrações para utilizar as rotas versionadas. A versão da URI identifica o
-contrato da API; não representa a revisão deste documento OpenAPI.
+Every operation in this reference belongs to major version 1 and starts with `/api/v1`. The old `/api/...` paths are no longer exposed. Update clients and integrations to use the versioned routes. The URI version identifies the API contract, not the OpenAPI document revision.
 
-A Complyz acrescentará operações e campos compatíveis à versão 1 sem alterar o
-significado das operações existentes. Uma alteração incompatível será publicada
-numa nova versão principal. Antes de retirar uma versão, a Complyz publicará a
-versão substituta, instruções de migração e o prazo de retirada. Quando aplicável,
-as respostas indicarão a descontinuação e a data de retirada nos cabeçalhos
-`Deprecation` e `Sunset`. Não há operações da versão 1 anunciadas para retirada.
+Complyz will add compatible operations and fields to version 1 without changing existing behavior. Breaking changes will ship in a new major version. Before a version is retired, Complyz will publish its replacement, migration steps and retirement date. Where supported, responses will announce deprecation and retirement through the `Deprecation` and `Sunset` headers. No version 1 operations are currently marked for retirement.
 
-## Autenticação
+## Authentication
 
-Inicie sessão com `POST /api/v1/auth/login`. A resposta indica se deve concluir a
-configuração de autenticação multifactor ou confirmar um desafio. Envie o
-token de acesso como bearer token nos pedidos autenticados:
+Sign in with `POST /api/v1/auth/login`. The response tells you whether to set up multi-factor authentication or verify a challenge. Send the access token as a bearer token on authenticated requests:
 
 ```http
-Authorization: Bearer <token-de-acesso>
+Authorization: Bearer <access-token>
 ```
 
-Use `POST /api/v1/auth/refresh` para renovar uma sessão. O token de renovação é
-rotativo; guarde o token novo devolvido em cada renovação e deixe de usar o
-anterior. Não inclua tokens em URLs, registos ou mensagens de suporte.
+Use `POST /api/v1/auth/refresh` to renew a session. Refresh tokens rotate. Store the new token returned by each refresh and stop using the previous one. Never put tokens in URLs, logs or support messages.
 
-## Formato das respostas
+## Response format
 
-As respostas JSON bem-sucedidas incluem o resultado em `data` e informação do
-pedido em `meta`:
+Successful JSON responses include the result in `data` and request details in `meta`:
 
 ```json
 {
@@ -52,20 +37,12 @@ pedido em `meta`:
 }
 ```
 
-Quando um pedido falha, a resposta usa `error` com um código estável, uma
-mensagem e detalhes estruturados. Use o código HTTP para decidir se deve
-corrigir o pedido, renovar a sessão ou tentar mais tarde. As operações de
-exportação devolvem ficheiros e não usam o envelope JSON de sucesso.
+Failed requests return `error` with a stable code, a message and structured details. Use the HTTP status to decide whether to fix the request, renew the session or try again later. Export operations return files instead of the JSON success envelope.
 
-## Paginação
+## Pagination
 
-As listas paginadas incluem o resultado da página em `data`. Use os parâmetros
-de paginação apresentados em cada operação e considere os metadados devolvidos
-pela API ao percorrer páginas.
+Paginated lists include the current page in `data`. Use the pagination parameters shown for each operation and follow the metadata returned by the API when moving between pages.
 
-## Segurança dos dados
+## Data security
 
-Utilize as operações apenas para os dados e as acções que a sua conta está
-autorizada a consultar ou executar. Não envie identificadores de organização
-para tentar alargar o acesso. Os exemplos nesta documentação usam
-identificadores fictícios.
+Use operations only for data you are authorized to view or change. Do not send Organization IDs to try to expand access. Examples in this documentation use fictional IDs.

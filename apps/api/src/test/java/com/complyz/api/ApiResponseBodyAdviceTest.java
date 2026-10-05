@@ -46,7 +46,7 @@ class ApiResponseBodyAdviceTest {
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         servletResponse.setStatus(401);
         Object result = advice.beforeBodyWrite(
-                Map.of("message", "Credenciais inválidas"),
+                Map.of("message", "Email or password is incorrect"),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
                 MappingJackson2HttpMessageConverter.class,
@@ -57,7 +57,7 @@ class ApiResponseBodyAdviceTest {
         assertInstanceOf(ApiErrorEnvelope.class, result);
         ApiErrorEnvelope envelope = (ApiErrorEnvelope) result;
         assertEquals("HTTP_401", envelope.error().code());
-        assertEquals("Credenciais inválidas", envelope.error().message());
+        assertEquals("Email or password is incorrect", envelope.error().message());
         assertEquals(Map.of(), envelope.error().details());
     }
 
@@ -67,7 +67,7 @@ class ApiResponseBodyAdviceTest {
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         servletResponse.setStatus(400);
         Object result = advice.beforeBodyWrite(
-                Map.of("message", "Ficheiro inválido", "fieldErrors", Map.of("amount", "obrigatório")),
+                Map.of("message", "File is invalid", "fieldErrors", Map.of("amount", "is required")),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
                 MappingJackson2HttpMessageConverter.class,
@@ -76,7 +76,7 @@ class ApiResponseBodyAdviceTest {
         );
 
         ApiErrorEnvelope envelope = (ApiErrorEnvelope) result;
-        assertEquals(Map.of("fieldErrors", Map.of("amount", "obrigatório")), envelope.error().details());
+        assertEquals(Map.of("fieldErrors", Map.of("amount", "is required")), envelope.error().details());
     }
 
     @Test

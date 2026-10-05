@@ -92,13 +92,13 @@ class ImportServiceValidationTest {
     void rejectsMissingInvalidAndFutureDates() {
         assertThatThrownBy(() -> service.parseDate(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ausente");
+                .hasMessageContaining("required");
         assertThatThrownBy(() -> service.parseDate("31/02/2026"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("inválida");
+                .hasMessageContaining("invalid");
         assertThatThrownBy(() -> service.parseDate("2099-01-01"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("futuro");
+                .hasMessageContaining("future");
     }
 
     @Test
@@ -111,13 +111,13 @@ class ImportServiceValidationTest {
     void rejectsMissingInvalidAndNonPositiveAmounts() {
         assertThatThrownBy(() -> service.parseAmount(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ausente");
+                .hasMessageContaining("required");
         assertThatThrownBy(() -> service.parseAmount("abc"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("inválido");
+                .hasMessageContaining("invalid");
         assertThatThrownBy(() -> service.parseAmount("-10"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("positivo");
+                .hasMessageContaining("positive");
     }
 
     @Test
@@ -126,6 +126,6 @@ class ImportServiceValidationTest {
         assertThat(service.parseTransactionType("SAQUE")).isEqualTo(com.complyz.monitoring.entity.TransactionType.WITHDRAWAL);
         assertThatThrownBy(() -> service.parseTransactionType("UNKNOWN"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("inválido");
+                .hasMessageContaining("invalid");
     }
 }

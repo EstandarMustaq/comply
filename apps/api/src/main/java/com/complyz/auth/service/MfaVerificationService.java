@@ -215,7 +215,7 @@ public class MfaVerificationService {
             int otp = binary % MODULUS;
             return String.format("%06d", otp);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao calcular código TOTP", e);
+            throw new RuntimeException("Could not calculate the verification code.", e);
         }
     }
 }

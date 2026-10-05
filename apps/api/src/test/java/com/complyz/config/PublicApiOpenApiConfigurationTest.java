@@ -55,7 +55,7 @@ class PublicApiOpenApiConfigurationTest {
         assertFalse(secured.getResponses().get("200").getContent().containsKey("*/*"));
         assertTrue(secured.getResponses().get("200").getContent().get("application/json")
                 .getSchema().getProperties().containsKey("data"));
-        assertEquals("Clientes", secured.getTags().getFirst());
+        assertEquals("Customers", secured.getTags().getFirst());
     }
 
     @Test

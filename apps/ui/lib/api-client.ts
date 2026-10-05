@@ -58,7 +58,7 @@ class ApiClient {
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     if (!API_BASE_URL) {
-      throw new Error("A variável NEXT_PUBLIC_API_URL não está configurada.")
+      throw new Error("NEXT_PUBLIC_API_URL is not set.")
     }
     const token = this.getToken()
     const headers: Record<string, string> = {
@@ -104,11 +104,11 @@ class ApiClient {
           window.location.href = env.NEXT_PUBLIC_AUTH_URL
         }
       }
-      throw new Error("A sessão expirou. Inicie sessão novamente.")
+      throw new Error("Your session expired. Sign in again.")
     }
 
     if (!response.ok) {
-      let errorMsg = `O pedido falhou: ${response.status} ${response.statusText}`
+      let errorMsg = `Request failed: ${response.status} ${response.statusText}`
       try {
         const errorData = await response.json()
         if (errorData.error?.message) errorMsg = errorData.error.message

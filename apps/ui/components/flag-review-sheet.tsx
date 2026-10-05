@@ -51,7 +51,7 @@ export function FlagReviewSheet({
   const calculateSlaRemaining = (deadline?: string) => {
     if (!deadline) return null
     const diff = new Date(deadline).getTime() - new Date().getTime()
-    if (diff <= 0) return "Prazo de revisão ultrapassado"
+    if (diff <= 0) return "Review deadline passed"
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
     return `${hours}h ${minutes}m restantes`
@@ -61,7 +61,7 @@ export function FlagReviewSheet({
 
   const handleReviewAction = async () => {
     if (!notes.trim()) {
-      setActionError("Registe as notas de análise antes de resolver o alerta.")
+      setActionError("Add review notes before resolving this alert.")
       return
     }
     try {
@@ -72,9 +72,7 @@ export function FlagReviewSheet({
       onFlagUpdated()
       onClose()
     } catch (err: unknown) {
-      setActionError(
-        err instanceof Error ? err.message : "Não foi possível atualizar o alerta."
-      )
+      setActionError(err instanceof Error ? err.message : "Could not update the alert.")
     } finally {
       setIsSubmitting(false)
     }
@@ -86,24 +84,22 @@ export function FlagReviewSheet({
       setActionError(null)
       const str = await api.escalateFlagToStr(
         flag.id,
-        notes || "Escalado para comunicação formal."
+        notes || "Escalated for formal reporting."
       )
       setNotes("")
       onFlagUpdated()
       onClose()
       router.push(`/reports?strId=${str.id}`)
     } catch (err: unknown) {
-      setActionError(
-        err instanceof Error ? err.message : "Não foi possível escalar o alerta."
-      )
+      setActionError(err instanceof Error ? err.message : "Could not escalate the alert.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const formatMt = (val?: number) => {
-    if (val === undefined || val === null) return "N/D"
-    return new Intl.NumberFormat("pt-MZ", {
+    if (val === undefined || val === null) return "—"
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
     }).format(val)
@@ -125,10 +121,10 @@ export function FlagReviewSheet({
             </Badge>
           </div>
           <SheetTitle className="text-foreground mt-2 text-base font-bold">
-            Análise do alerta
+            Alert review
           </SheetTitle>
           <SheetDescription className="text-xs">
-            Regra activada: <strong>{flag.ruleTriggered}</strong>
+            Triggered rule: <strong>{flag.ruleTriggered}</strong>
           </SheetDescription>
         </SheetHeader>
 
@@ -137,9 +133,9 @@ export function FlagReviewSheet({
           <div className="border-destructive/40 text-destructive my-4 flex items-start gap-2.5 rounded-lg border p-3 text-xs">
             <Clock className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
             <div>
-              <p className="font-bold">Correspondência de sanções — acção necessária</p>
+              <p className="font-bold">Sanctions match — action required</p>
               <p className="mt-0.5">
-                {slaText} — bloquear, rever e escalar dentro da janela de decisão.
+                {slaText} — block, review and escalate within the decision window.
               </p>
             </div>
           </div>
@@ -149,24 +145,24 @@ export function FlagReviewSheet({
           {/* Customer details */}
           <div className="space-y-2">
             <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-              <User className="text-primary h-3.5 w-3.5" /> Cliente
+              <User className="text-primary h-3.5 w-3.5" /> Customer
             </h4>
             <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Nome</span>
+                <span className="text-muted-foreground">Name</span>
                 <span className="text-foreground font-semibold">
                   {flag.client?.fullName || "—"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Documento</span>
+                <span className="text-muted-foreground">Document</span>
                 <span className="font-medium">
                   {flag.client?.documentNumber}{" "}
                   {flag.client?.nuib ? `· NUIB: ${flag.client.nuib}` : ""}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Diligência</span>
+                <span className="text-muted-foreground">Due diligence</span>
                 <Badge
                   variant={
                     flag.client?.regime === "SIMPLIFICADO" ? "outline" : "secondary"
@@ -176,7 +172,7 @@ export function FlagReviewSheet({
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Nível de risco</span>
+                <span className="text-muted-foreground">Risk rating</span>
                 <Badge
                   variant={
                     flag.client?.riskRating === "ALTO" ? "destructive" : "secondary"
@@ -188,7 +184,7 @@ export function FlagReviewSheet({
               {flag.client?.isPep && (
                 <div className="flex items-center justify-between rounded border border-amber-500/20 bg-amber-500/10 p-1.5">
                   <span className="font-bold text-amber-800">
-                    Pessoa com exposição política
+                    Politically exposed person
                   </span>
                   <Badge variant="warning">{flag.client.pepCategory || "Nacional"}</Badge>
                 </div>
@@ -200,34 +196,34 @@ export function FlagReviewSheet({
           {flag.transaction && (
             <div className="space-y-2">
               <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-                <CreditCard className="text-primary h-3.5 w-3.5" /> Transacção
+                <CreditCard className="text-primary h-3.5 w-3.5" /> Transaction
               </h4>
               <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Montante</span>
+                  <span className="text-muted-foreground">Amount</span>
                   <span className="text-foreground text-base font-bold">
                     {formatMt(flag.transaction.amount)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tipo</span>
+                  <span className="text-muted-foreground">Type</span>
                   <span className="font-medium">
                     {getTransactionTypeLabel(flag.transaction.transactionType)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Conta</span>
+                  <span className="text-muted-foreground">Account</span>
                   <span className="font-mono">{flag.transaction.accountNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Data</span>
+                  <span className="text-muted-foreground">Date</span>
                   <span>
-                    {new Date(flag.transaction.transactionDate).toLocaleString("pt-MZ")}
+                    {new Date(flag.transaction.transactionDate).toLocaleString("en-MZ")}
                   </span>
                 </div>
                 {flag.transaction.counterpartyName && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Contraparte</span>
+                    <span className="text-muted-foreground">Counterparty</span>
                     <span>
                       {flag.transaction.counterpartyName} (
                       {flag.transaction.counterpartyDocument || "—"})
@@ -241,28 +237,28 @@ export function FlagReviewSheet({
           {/* Match details */}
           <div className="space-y-2">
             <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-              <FileSpreadsheet className="text-primary h-3.5 w-3.5" /> Detalhes do alerta
+              <FileSpreadsheet className="text-primary h-3.5 w-3.5" /> Alert details
             </h4>
             <div className="bg-muted/20 break-all rounded-lg border p-3 font-mono text-[11px] leading-relaxed">
               {flag.details
                 ? typeof flag.details === "string"
                   ? flag.details
                   : JSON.stringify(flag.details, null, 2)
-                : "Sem detalhes adicionais."}
+                : "No additional details."}
             </div>
           </div>
 
           {/* Review notes */}
           <div className="space-y-2 pt-2">
             <Label htmlFor="reviewNotes" className="text-foreground font-semibold">
-              Notas de análise <span className="text-destructive">*</span>
+              Review notes <span className="text-destructive">*</span>
             </Label>
             <textarea
               id="reviewNotes"
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Descreva a sua análise e a fundamentação da decisão…"
+              placeholder="Explain your review and the reason for your decision…"
               className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
             />
             {actionError && (
@@ -283,7 +279,7 @@ export function FlagReviewSheet({
             className="text-xs"
           >
             <CheckCircle2 className="mr-1 h-3.5 w-3.5 text-emerald-600" />
-            Resolver
+            Resolve
           </Button>
 
           <Button
@@ -298,7 +294,7 @@ export function FlagReviewSheet({
             ) : (
               <FileWarning className="h-3.5 w-3.5" />
             )}
-            Escalar para comunicação
+            Escalate for reporting
           </Button>
         </SheetFooter>
       </SheetContent>

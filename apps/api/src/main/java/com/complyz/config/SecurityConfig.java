@@ -62,11 +62,11 @@ public class SecurityConfig {
                     writeApiError(
                             response,
                             HttpServletResponse.SC_UNAUTHORIZED,
-                            "Não autorizado: credenciais ausentes ou inválidas"
+                            "Authentication required. Provide valid credentials."
                     );
                 })
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                writeApiError(response, HttpServletResponse.SC_FORBIDDEN, "Acesso não permitido."))
+                                writeApiError(response, HttpServletResponse.SC_FORBIDDEN, "You don't have access to this resource."))
                 )
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

@@ -121,14 +121,14 @@ const chartData = [
 
 const chartConfig = {
   transactions: {
-    label: "Transações",
+    label: "Transactions",
   },
   desktop: {
     label: "Volume (MZN)",
     color: "hsl(var(--chart-1))",
   },
   mobile: {
-    label: "Alertas Gerados",
+    label: "Alerts generated",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig
@@ -155,13 +155,13 @@ export function ChartAreaInteractive() {
     <Card className="@container/card shadow-xs border-border">
       <CardHeader className="relative">
         <CardTitle className="text-base font-semibold">
-          Volume de Transações Monitoradas
+          Monitored transaction volume
         </CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Triagem algorítmica — últimos 3 meses
+            Automated screening — last 3 months
           </span>
-          <span className="@[540px]/card:hidden">Últimos 3 meses</span>
+          <span className="@[540px]/card:hidden">Last 3 months</span>
         </CardDescription>
         <div className="absolute right-4 top-4">
           <ToggleGroup
@@ -172,31 +172,31 @@ export function ChartAreaInteractive() {
             className="@[767px]/card:flex hidden"
           >
             <ToggleGroupItem value="90d" className="h-8 px-2.5 text-xs">
-              3 Meses
+              3 months
             </ToggleGroupItem>
             <ToggleGroupItem value="30d" className="h-8 px-2.5 text-xs">
-              30 Dias
+              30 days
             </ToggleGroupItem>
             <ToggleGroupItem value="7d" className="h-8 px-2.5 text-xs">
-              7 Dias
+              7 days
             </ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
               className="@[767px]/card:hidden flex w-40"
-              aria-label="Selecionar período"
+              aria-label="Select date range"
             >
-              <SelectValue placeholder="Últimos 3 meses" />
+              <SelectValue placeholder="Last 3 months" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="90d" className="rounded-lg">
-                Últimos 3 meses
+                Last 3 months
               </SelectItem>
               <SelectItem value="30d" className="rounded-lg">
-                Últimos 30 dias
+                Last 30 days
               </SelectItem>
               <SelectItem value="7d" className="rounded-lg">
-                Últimos 7 dias
+                Last 7 days
               </SelectItem>
             </SelectContent>
           </Select>
@@ -224,7 +224,7 @@ export function ChartAreaInteractive() {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleDateString("pt-MZ", {
+                return date.toLocaleDateString("en-MZ", {
                   month: "short",
                   day: "numeric",
                 })
@@ -235,7 +235,7 @@ export function ChartAreaInteractive() {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(String(value)).toLocaleDateString("pt-MZ", {
+                    return new Date(String(value)).toLocaleDateString("en-MZ", {
                       month: "short",
                       day: "numeric",
                     })

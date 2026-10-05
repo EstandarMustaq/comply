@@ -57,7 +57,7 @@ public class DueDiligenceRegimeValidator {
                 ? newTransaction.getAmount()
                 : BigDecimal.ZERO;
         if (client.getOrganization() == null || client.getOrganization().getId() == null) {
-            throw new IllegalStateException("A organização do cliente é obrigatória para validar o regime");
+            throw new IllegalStateException("The customer's Organization is required to validate this due diligence regime.");
         }
         BigDecimal monthlyTotal = transactionRepository.sumAmountByClientAndOrganizationAndDateBetween(
                 client.getId(), client.getOrganization().getId(), startOfMonth, endOfMonth);
@@ -76,12 +76,12 @@ public class DueDiligenceRegimeValidator {
             clientRepository.save(client);
 
             String exceededLimit = monthlyExceeded
-                    ? String.format("limiar mensal de %.2f MT (total movimentado no mês: %.2f MT)", monthlyLimit, monthlyTotal)
-                    : String.format("limiar anual de %.2f MT (total movimentado no ano: %.2f MT)", annualLimit, annualTotal);
+                    ? String.format("monthly limit of %.2f MT (month-to-date total: %.2f MT)", monthlyLimit, monthlyTotal)
+                    : String.format("annual limit of %.2f MT (year-to-date total: %.2f MT)", annualLimit, annualTotal);
             String reason = String.format(
-                    "Cliente em Regime Simplificado excedeu o %s. " +
-                    "Reclassificado automaticamente para Regime Normal; é obrigatória a recolha de diligência completa " +
-                    "Complete o perfil de risco e a diligência do cliente.",
+                    "The customer exceeded the simplified due diligence %s. " +
+                    "The system moved the customer to standard due diligence and marked the review incomplete. " +
+                    "Complete the risk profile and due diligence review.",
                     exceededLimit
             );
 

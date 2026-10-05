@@ -112,29 +112,29 @@ export const schema = z.object({
 })
 
 const sectionTypeLabels: Record<string, string> = {
-  "Table of Contents": "Índice",
-  "Executive Summary": "Resumo executivo",
-  "Technical Approach": "Abordagem técnica",
-  Design: "Desenho",
-  Capabilities: "Capacidades",
-  "Focus Documents": "Documentos principais",
-  Narrative: "Descrição",
-  "Cover Page": "Capa",
+  "Table of Contents": "Contents",
+  "Executive Summary": "Executive summary",
+  "Technical Approach": "Technical approach",
+  Design: "Design",
+  Capabilities: "Capabilities",
+  "Focus Documents": "Key documents",
+  Narrative: "Narrative",
+  "Cover Page": "Cover page",
 }
 
 const statusLabels: Record<string, string> = {
-  Done: "Concluído",
-  "In Progress": "Em curso",
-  "Not Started": "Não iniciado",
+  Done: "Done",
+  "In Progress": "In progress",
+  "Not Started": "Not started",
 }
 
 const columnLabels: Record<string, string> = {
-  header: "Título",
-  type: "Tipo",
-  status: "Estado",
-  target: "Objectivo",
-  limit: "Limite",
-  reviewer: "Responsável pela análise",
+  header: "Title",
+  type: "Type",
+  status: "Status",
+  target: "Target",
+  limit: "Limit",
+  reviewer: "Reviewer",
 }
 
 // Keep the drag handle isolated from the row content.
@@ -152,7 +152,7 @@ function DragHandle({ id }: { id: number }) {
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
       <GripVerticalIcon className="text-muted-foreground size-3" />
-      <span className="sr-only">Arrastar para reordenar</span>
+      <span className="sr-only">Drag to reorder</span>
     </Button>
   )
 }
@@ -173,7 +173,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Selecionar todas as linhas"
+          aria-label="Select all rows"
         />
       </div>
     ),
@@ -182,7 +182,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Selecionar linha"
+          aria-label="Select row"
         />
       </div>
     ),
@@ -191,7 +191,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "header",
-    header: "Título",
+    header: "Title",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />
     },
@@ -199,18 +199,18 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "type",
-    header: "Tipo de secção",
+    header: "Section type",
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {sectionTypeLabels[row.original.type] ?? "Outra secção"}
+          {sectionTypeLabels[row.original.type] ?? "Other section"}
         </Badge>
       </div>
     ),
   },
   {
     accessorKey: "status",
-    header: "Estado",
+    header: "Status",
     cell: ({ row }) => (
       <Badge
         variant="outline"
@@ -221,26 +221,26 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         ) : (
           <LoaderIcon />
         )}
-        {statusLabels[row.original.status] ?? "Estado não reconhecido"}
+        {statusLabels[row.original.status] ?? "Unknown status"}
       </Badge>
     ),
   },
   {
     accessorKey: "target",
-    header: () => <div className="w-full text-right">Objectivo</div>,
+    header: () => <div className="w-full text-right">Target</div>,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
           e.preventDefault()
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `A guardar ${row.original.header}`,
-            success: "Guardado",
-            error: "Erro",
+            loading: `Saving ${row.original.header}`,
+            success: "Saved",
+            error: "Could not save",
           })
         }}
       >
         <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Objectivo
+          Target
         </Label>
         <Input
           className="hover:bg-input/30 focus-visible:bg-background h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border"
@@ -252,20 +252,20 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limite</div>,
+    header: () => <div className="w-full text-right">Limit</div>,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
           e.preventDefault()
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `A guardar ${row.original.header}`,
-            success: "Guardado",
-            error: "Erro",
+            loading: `Saving ${row.original.header}`,
+            success: "Saved",
+            error: "Could not save",
           })
         }}
       >
         <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limite
+          Limit
         </Label>
         <Input
           className="hover:bg-input/30 focus-visible:bg-background h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border"
@@ -277,7 +277,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "reviewer",
-    header: "Responsável pela análise",
+    header: "Reviewer",
     cell: ({ row }) => {
       const isAssigned = row.original.reviewer !== "Assign reviewer"
 
@@ -288,11 +288,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       return (
         <>
           <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Responsável pela análise
+            Reviewer
           </Label>
           <Select>
             <SelectTrigger className="h-8 w-40" id={`${row.original.id}-reviewer`}>
-              <SelectValue placeholder="Atribuir responsável" />
+              <SelectValue placeholder="Assign a reviewer" />
             </SelectTrigger>
             <SelectContent align="end">
               <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
@@ -314,15 +314,15 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
             size="icon"
           >
             <MoreVerticalIcon />
-            <span className="sr-only">Abrir menu</span>
+            <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Editar</DropdownMenuItem>
-          <DropdownMenuItem>Duplicar</DropdownMenuItem>
-          <DropdownMenuItem>Adicionar aos favoritos</DropdownMenuItem>
+          <DropdownMenuItem>Edit</DropdownMenuItem>
+          <DropdownMenuItem>Duplicate</DropdownMenuItem>
+          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Eliminar</DropdownMenuItem>
+          <DropdownMenuItem>Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -417,23 +417,23 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
     <Tabs defaultValue="outline" className="flex w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
-          Vista
+          View
         </Label>
         <Select defaultValue="outline">
           <SelectTrigger className="@4xl/main:hidden flex w-fit" id="view-selector">
-            <SelectValue placeholder="Seleccionar vista" />
+            <SelectValue placeholder="Select a view" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="outline">Estrutura</SelectItem>
-            <SelectItem value="past-performance">Desempenho anterior</SelectItem>
-            <SelectItem value="key-personnel">Equipa responsável</SelectItem>
-            <SelectItem value="focus-documents">Documentos principais</SelectItem>
+            <SelectItem value="outline">Outline</SelectItem>
+            <SelectItem value="past-performance">Past performance</SelectItem>
+            <SelectItem value="key-personnel">Key personnel</SelectItem>
+            <SelectItem value="focus-documents">Key documents</SelectItem>
           </SelectContent>
         </Select>
         <TabsList className="@4xl/main:flex hidden">
-          <TabsTrigger value="outline">Estrutura</TabsTrigger>
+          <TabsTrigger value="outline">Outline</TabsTrigger>
           <TabsTrigger value="past-performance" className="gap-1">
-            Desempenho anterior{" "}
+            Past performance{" "}
             <Badge
               variant="secondary"
               className="bg-muted-foreground/30 flex h-5 w-5 items-center justify-center rounded-full"
@@ -442,7 +442,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="key-personnel" className="gap-1">
-            Equipa responsável{" "}
+            Key personnel{" "}
             <Badge
               variant="secondary"
               className="bg-muted-foreground/30 flex h-5 w-5 items-center justify-center rounded-full"
@@ -450,15 +450,15 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
               2
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="focus-documents">Documentos principais</TabsTrigger>
+          <TabsTrigger value="focus-documents">Key documents</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <ColumnsIcon />
-                <span className="hidden lg:inline">Personalizar colunas</span>
-                <span className="lg:hidden">Colunas</span>
+                <span className="hidden lg:inline">Customize columns</span>
+                <span className="lg:hidden">Columns</span>
                 <ChevronDownIcon />
               </Button>
             </DropdownMenuTrigger>
@@ -477,7 +477,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
-                      {columnLabels[column.id] ?? "Outra coluna"}
+                      {columnLabels[column.id] ?? "Other column"}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
@@ -485,7 +485,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
           </DropdownMenu>
           <Button variant="outline" size="sm">
             <PlusIcon />
-            <span className="hidden lg:inline">Adicionar secção</span>
+            <span className="hidden lg:inline">Add section</span>
           </Button>
         </div>
       </div>
@@ -530,7 +530,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Não foram encontrados resultados.
+                      No results found.
                     </TableCell>
                   </TableRow>
                 )}
@@ -540,13 +540,13 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
         </div>
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} de{" "}
-            {table.getFilteredRowModel().rows.length} linha(s) seleccionada(s).
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
               <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Linhas por página
+                Rows per page
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
@@ -567,7 +567,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
               </Select>
             </div>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
             </div>
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
               <Button
@@ -576,7 +576,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
-                <span className="sr-only">Ir para a primeira página</span>
+                <span className="sr-only">Go to first page</span>
                 <ChevronsLeftIcon />
               </Button>
               <Button
@@ -586,7 +586,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <span className="sr-only">Ir para a página anterior</span>
+                <span className="sr-only">Go to previous page</span>
                 <ChevronLeftIcon />
               </Button>
               <Button
@@ -596,7 +596,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                <span className="sr-only">Ir para a página seguinte</span>
+                <span className="sr-only">Go to next page</span>
                 <ChevronRightIcon />
               </Button>
               <Button
@@ -606,7 +606,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >
-                <span className="sr-only">Ir para a última página</span>
+                <span className="sr-only">Go to last page</span>
                 <ChevronsRightIcon />
               </Button>
             </div>
@@ -627,21 +627,21 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
 }
 
 const chartData = [
-  { month: "Janeiro", desktop: 186, mobile: 80 },
-  { month: "Fevereiro", desktop: 305, mobile: 200 },
-  { month: "Março", desktop: 237, mobile: 120 },
-  { month: "Abril", desktop: 73, mobile: 190 },
-  { month: "Maio", desktop: 209, mobile: 130 },
-  { month: "Junho", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 186, mobile: 80 },
+  { month: "February", desktop: 305, mobile: 200 },
+  { month: "March", desktop: 237, mobile: 120 },
+  { month: "April", desktop: 73, mobile: 190 },
+  { month: "May", desktop: 209, mobile: 130 },
+  { month: "June", desktop: 214, mobile: 140 },
 ]
 
 const chartConfig = {
   desktop: {
-    label: "Computador",
+    label: "Desktop",
     color: "var(--primary)",
   },
   mobile: {
-    label: "Telemóvel",
+    label: "Mobile",
     color: "var(--primary)",
   },
 } satisfies ChartConfig
@@ -659,7 +659,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
       <SheetContent side="right" className="flex flex-col">
         <SheetHeader className="gap-1">
           <SheetTitle>{item.header}</SheetTitle>
-          <SheetDescription>Total de visitantes nos últimos 6 meses</SheetDescription>
+          <SheetDescription>Total visitors over the last 6 months</SheetDescription>
         </SheetHeader>
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4 text-sm">
           {!isMobile && (
@@ -707,10 +707,10 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <Separator />
               <div className="grid gap-2">
                 <div className="flex gap-2 font-medium leading-none">
-                  Aumento de 5,2% este mês <TrendingUpIcon className="size-4" />
+                  Up 5.2% this month <TrendingUpIcon className="size-4" />
                 </div>
                 <div className="text-muted-foreground">
-                  Total de visitantes nos últimos 6 meses, apresentado por dispositivo.
+                  Total visitors over the last 6 months, by device.
                 </div>
               </div>
               <Separator />
@@ -718,7 +718,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           )}
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Título</Label>
+              <Label htmlFor="header">Title</Label>
               <Input id="header" defaultValue={item.header} />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -726,37 +726,37 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                 <Label htmlFor="type">Tipo</Label>
                 <Select defaultValue={item.type}>
                   <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Seleccionar tipo" />
+                    <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Table of Contents">Índice</SelectItem>
-                    <SelectItem value="Executive Summary">Resumo executivo</SelectItem>
-                    <SelectItem value="Technical Approach">Abordagem técnica</SelectItem>
-                    <SelectItem value="Design">Desenho</SelectItem>
-                    <SelectItem value="Capabilities">Capacidades</SelectItem>
-                    <SelectItem value="Focus Documents">Documentos principais</SelectItem>
-                    <SelectItem value="Narrative">Descrição</SelectItem>
-                    <SelectItem value="Cover Page">Capa</SelectItem>
+                    <SelectItem value="Table of Contents">Table of contents</SelectItem>
+                    <SelectItem value="Executive Summary">Executive summary</SelectItem>
+                    <SelectItem value="Technical Approach">Technical approach</SelectItem>
+                    <SelectItem value="Design">Design</SelectItem>
+                    <SelectItem value="Capabilities">Capabilities</SelectItem>
+                    <SelectItem value="Focus Documents">Key documents</SelectItem>
+                    <SelectItem value="Narrative">Narrative</SelectItem>
+                    <SelectItem value="Cover Page">Cover page</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="status">Estado</Label>
+                <Label htmlFor="status">Status</Label>
                 <Select defaultValue={item.status}>
                   <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Seleccionar estado" />
+                    <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Done">Concluído</SelectItem>
-                    <SelectItem value="In Progress">Em curso</SelectItem>
-                    <SelectItem value="Not Started">Não iniciado</SelectItem>
+                    <SelectItem value="Done">Done</SelectItem>
+                    <SelectItem value="In Progress">In progress</SelectItem>
+                    <SelectItem value="Not Started">Not started</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
-                <Label htmlFor="target">Objectivo</Label>
+                <Label htmlFor="target">Target</Label>
                 <Input id="target" defaultValue={item.target} />
               </div>
               <div className="flex flex-col gap-3">
@@ -765,10 +765,10 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Responsável pela análise</Label>
+              <Label htmlFor="reviewer">Reviewer</Label>
               <Select defaultValue={item.reviewer}>
                 <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Seleccionar responsável" />
+                  <SelectValue placeholder="Select a reviewer" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
@@ -780,10 +780,10 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           </form>
         </div>
         <SheetFooter className="mt-auto flex gap-2 sm:flex-col sm:space-x-0">
-          <Button className="w-full">Guardar</Button>
+          <Button className="w-full">Save</Button>
           <SheetClose asChild>
             <Button variant="outline" className="w-full">
-              Fechar
+              Close
             </Button>
           </SheetClose>
         </SheetFooter>

@@ -35,7 +35,7 @@ public class ImportController {
             return ResponseEntity.ok(preview);
         } catch (Exception e) {
             logger.warn("Could not prepare uploaded import file: {}", e.getClass().getSimpleName());
-            return ResponseEntity.badRequest().body(Map.of("message", "Não foi possível preparar o ficheiro. Verifique o formato e os dados."));
+            return ResponseEntity.badRequest().body(Map.of("message", "We couldn't prepare this file. Check its format and data."));
         }
     }
 
@@ -52,7 +52,7 @@ public class ImportController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.warn("Could not process confirmed import mapping: {}", e.getClass().getSimpleName());
-            return ResponseEntity.badRequest().body(Map.of("message", "Não foi possível processar a importação. Reveja os dados e tente novamente."));
+            return ResponseEntity.badRequest().body(Map.of("message", "We couldn't process this import. Review the data and try again."));
         }
     }
 

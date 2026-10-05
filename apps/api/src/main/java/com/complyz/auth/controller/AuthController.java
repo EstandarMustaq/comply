@@ -62,23 +62,23 @@ public class AuthController {
         String clientIp = httpRequest.getRemoteAddr();
 
         if (request.getEmail() == null || request.getEmail().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "O email é obrigatório"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
         }
         String password = request.getPassword();
         if (password == null || password.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "A password é obrigatória"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Password is required"));
         }
 
         if (tokenBlacklistService.isRateLimited(request.getEmail(), clientIp)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of("message", "Conta temporariamente bloqueada por excesso de tentativas falhadas. Tente em 15 minutos."));
+                    .body(Map.of("message", "Too many failed attempts. Try again in 15 minutes."));
         }
 
         User user = userRepository.findByEmail(request.getEmail()).orElse(null);
         if (user == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
             tokenBlacklistService.registerFailedLogin(request.getEmail(), clientIp);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Credenciais inválidas"));
+                    .body(Map.of("message", "Email or password is incorrect"));
         }
 
         if (!user.isMfaEnabled()) {
@@ -95,33 +95,33 @@ public class AuthController {
         String token = request.getChallengeToken();
         String code = request.getCode();
         if (token == null || token.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "O token de desafio é obrigatório"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Challenge token is required"));
         }
         if (code == null || code.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "O código de verificação é obrigatório"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Verification code is required"));
         }
 
         UUID userId = mfaVerificationService.getUserIdFromChallenge(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Desafio MFA expirado ou inválido. Reinicie o login."));
+                    .body(Map.of("message", "This sign-in challenge expired or is invalid. Sign in again."));
         }
 
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Utilizador não encontrado"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Account not found."));
         }
 
         if (mfaVerificationService.isAttemptRateLimited(token, userId, httpRequest.getRemoteAddr())) {
             mfaVerificationService.consumeChallenge(token);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of("message", "Desafio MFA bloqueado após tentativas inválidas. Reinicie o login."));
+                    .body(Map.of("message", "Too many failed verification attempts. Sign in again."));
         }
 
         boolean valid = mfaVerificationService.verifyTotpCode(user, code);
         if (!valid) {
             mfaVerificationService.registerFailedAttempt(token, userId, httpRequest.getRemoteAddr());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Código TOTP inválido ou já utilizado"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The verification code is invalid or has already been used."));
         }
 
         mfaVerificationService.consumeChallenge(token);
@@ -152,7 +152,7 @@ public class AuthController {
         String refreshToken = request.refreshToken();
         if (!jwtService.isRefreshTokenValid(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Refresh token inválido, expirado ou já utilizado"));
+                    .body(Map.of("message", "The refresh token is invalid, expired or already used."));
         }
 
         UUID userId;
@@ -162,13 +162,13 @@ public class AuthController {
             jti = jwtService.extractJti(refreshToken);
         } catch (RuntimeException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Refresh token inválido"));
+                    .body(Map.of("message", "The refresh token is invalid."));
         }
 
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Utilizador não encontrado"));
+                    .body(Map.of("message", "Account not found."));
         }
 
         tokenBlacklistService.blacklistToken(jti, jwtService.getRemainingMillis(refreshToken));
@@ -191,7 +191,7 @@ public class AuthController {
         }
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token de enrollment inválido ou expirado."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The enrollment token is invalid or expired."));
         }
 
         MfaEnrollResponse response = mfaEnrollmentService.startEnrollment(user);
@@ -211,17 +211,17 @@ public class AuthController {
         }
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token de enrollment inválido ou expirado."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The enrollment token is invalid or expired."));
         }
 
         String pendingSecret = mfaEnrollmentService.getPendingEnrollmentSecret(user);
         if (pendingSecret == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Sessão de enrollment expirada. Inicie novamente."));
+            return ResponseEntity.badRequest().body(Map.of("message", "The enrollment session expired. Start again."));
         }
 
         boolean valid = mfaVerificationService.verifyTotpWithSecret(user.getId(), pendingSecret, request.getCode());
         if (!valid) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Código TOTP incorreto. Verifique a hora do seu dispositivo."));
+            return ResponseEntity.badRequest().body(Map.of("message", "The verification code is incorrect. Check your device clock."));
         }
 
         // Encrypt the secret with AES-256-GCM before persistence.
@@ -244,7 +244,7 @@ public class AuthController {
         String refreshToken = jwtService.generateRefreshToken(user);
 
         return ResponseEntity.ok(new MfaConfirmResponse(
-                "MFA ativado com sucesso. Guarde os códigos de recuperação em local seguro.",
+                "MFA is on. Store your recovery codes somewhere safe.",
                 backupCodes,
                 accessToken,
                 refreshToken,
@@ -270,7 +270,7 @@ public class AuthController {
         if (authentication != null && authentication.getPrincipal() instanceof User user) {
             auditService.record(user, AuditAction.LOGOUT, "users", user.getId(), "{}");
         }
-        return ResponseEntity.ok(Map.of("message", "Sessão encerrada com sucesso"));
+        return ResponseEntity.ok(Map.of("message", "You are signed out."));
     }
 
     @GetMapping("/me")
@@ -292,6 +292,6 @@ public class AuthController {
         }
         String email = authentication != null ? authentication.getName() : null;
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilizador não encontrado no contexto de segurança"));
+                .orElseThrow(() -> new RuntimeException("Account not found in the security context."));
     }
 }

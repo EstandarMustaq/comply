@@ -39,7 +39,7 @@ Build a platform back-office experience for authorized platform operators to man
 - [ ] Organization entitlements are shown per Organization with source, status, term and 80%/100% warnings; they are not presented as inherited from CommercialClient. Contract-reference actions cannot exceed server-side permissions, and UI never implies regulatory operations are disabled by quota exhaustion.
 - [ ] Organization creation follows the approved lifecycle: platform back office creates the tenant and invites its first OWNER; the operator receives no compliance membership or access.
 - [ ] Every platform action produces an auditable outcome. Tests prove platform/compliance separation, deny direct aggregate writes from the back office, and prove Organization authorization and lifecycle are independent of CommercialClient reference values.
-- [ ] Accessible operational layout includes loading, empty, error, denied, limit-reached and success states, and direct `pt-MZ` wording. Tests prove commercial/operational separation and multi-Organization allocation; `pnpm check` and `pnpm product-language:check` pass.
+- [ ] The accessible operational layout includes loading, empty, error, denied, limit-reached and success states, with clear, direct English copy. Tests prove commercial/operational separation and multi-Organization allocation; `pnpm check` and `pnpm product-language:check` pass.
 
 ## Verification
 

@@ -45,7 +45,7 @@ public class StructuringDetectionService {
 
         Client client = currentTx.getClient();
         if (client.getOrganization() == null || client.getOrganization().getId() == null) {
-            throw new IllegalStateException("A organização do cliente é obrigatória para avaliar a operação");
+            throw new IllegalStateException("The customer's Organization is required to assess this transaction.");
         }
         var organizationId = client.getOrganization().getId();
         List<ThresholdRule> structuringRules = ruleRepository.findByTypeAndActiveTrue(ThresholdRuleType.STRUCTURING);
@@ -71,8 +71,8 @@ public class StructuringDetectionService {
 
             if (rule.getValueThreshold() != null && sum.compareTo(rule.getValueThreshold()) >= 0) {
                 String reason = String.format(
-                        "Suspeita de fraccionamento de operações (structuring): identificadas %d operações no período de %d dias " +
-                        "com montante cumulativo de %.2f MT (limiar de detecção: %.2f MT).",
+                        "Possible transaction structuring: %d transactions found over %d days " +
+                        "with a combined amount of %.2f MT (detection limit: %.2f MT).",
                         windowTransactions.size(), windowDays, sum, rule.getValueThreshold()
                 );
 

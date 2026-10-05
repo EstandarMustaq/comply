@@ -34,7 +34,7 @@ depends_on:
 
 ## Context
 
-The current Mintlify API guide documents the public `/api/v1` routes. The Organization/access guide is minimal. Public text is `pt-MZ`; internal task/architecture docs are English. Customer documentation covers Account, Organizations, permissions, policy, SSO/MFA, compliance and API; restricted operator documentation may describe CommercialClient as a back-office commercial reference, never as an Organization hierarchy or customer access context. Documentation must not present proposed or untested functionality as available.
+The current Mintlify API guide documents the public `/api/v1` routes. The Organization/access guide is minimal. Customer-facing product and public documentation use Complyz's clear, direct English voice; internal engineering docs use concise technical English. Customer documentation covers Account, Organizations, permissions, policy, SSO/MFA, compliance and API; restricted operator documentation may describe CommercialClient as a back-office commercial reference, never as an Organization hierarchy or customer access context. Documentation must not present proposed or untested functionality as available.
 
 ## Objective
 
@@ -44,10 +44,10 @@ Update customer-facing Mintlify documentation, API auth/version/header and integ
 
 - [ ] Mintlify navigation covers only available customer workflows and follows the journey: Account/profile → Organizations → users/permissions → policy/settings → authentication/SSO/MFA → compliance → API/compatibility. CommercialClient reference details belong only in restricted operator documentation.
 - [ ] API authentication examples exactly match the shipped OIDC/BFF/profile-and-Organization-context-token flow, `/api/v1` version policy, mandatory resource-server headers, scopes, cookie/token handling, errors, PKCE and context selection; obsolete local login/refresh instructions are removed only after the approved compatibility/migration window.
-- [ ] Customer documentation identifies Organization as the client institution and tenant, without using “Corporação” or presenting CommercialClient as a customer concept. Restricted operator documentation defines CommercialClient as the identifier/name/contract-reference/status record referenced by `organization.commercial_client_id`, with no Organization grouping/management or authorization semantics; no guide instructs users to submit tenant IDs for authorization.
+- [ ] Customer documentation identifies Organization as the client institution and tenant. It uses the canonical `Organization` term and never presents CommercialClient as a customer concept. Restricted operator documentation defines CommercialClient as the identifier/name/contract-reference/status record referenced by `organization.commercial_client_id`, with no Organization grouping/management or authorization semantics; no guide instructs users to submit tenant IDs for authorization.
 - [ ] Public docs state only capabilities present and tested in the release, distinguish availability/preview/deferred items, explain compatible API and event-contract evolution/deprecation when relevant, and contain no internal implementation acronyms/citations or unapproved security promises.
 - [ ] Operator guides cover migration/backfill/recovery, IdP/JWKS rotation, revocation/logout, quota reconciliation/exemptions, event-store backup/replay/schema evolution, outbox/DLQ, external client credentials and cross-tenant incident response as applicable to shipped features.
-- [ ] User-facing copy is direct, operational `pt-MZ`, with accessible terminology consistent with product-language standards. `pnpm product-language:check` and `pnpm exec prettier --check ROADMAP.md README.md docs` pass.
+- [ ] User-facing copy uses clear, direct, confident English, with accessible terminology consistent with product-language standards. `pnpm product-language:check` and `pnpm exec prettier --check ROADMAP.md README.md docs` pass.
 
 ## Verification
 

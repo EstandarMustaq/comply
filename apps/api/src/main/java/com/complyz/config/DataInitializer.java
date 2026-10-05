@@ -40,7 +40,7 @@ public class DataInitializer implements CommandLineRunner {
         if (sanctionsListRepository.count() == 0) {
             try (var is = getClass().getResourceAsStream(SEED_RESOURCE)) {
                 if (is == null) {
-                    throw new IllegalStateException("Seed obrigatório de sanções não encontrado");
+                    throw new IllegalStateException("Required sanctions seed was not found.");
                 }
 
                 byte[] seedContent = is.readAllBytes();
@@ -48,7 +48,7 @@ public class DataInitializer implements CommandLineRunner {
                         seedContent, new TypeReference<>() {}
                 );
                 if (entries.isEmpty()) {
-                    throw new IllegalStateException("Seed obrigatório de sanções está vazio");
+                    throw new IllegalStateException("Required sanctions seed is empty.");
                 }
 
                 List<SanctionsListEntry> parsedEntries = new java.util.ArrayList<>();
@@ -76,9 +76,9 @@ public class DataInitializer implements CommandLineRunner {
                         lifecycleService.activate(version);
                     }
                 }
-                log.info("Carga inicial de sanções concluída: {} registos carregados (Lista Nacional e ONU)", entries.size());
+                log.info("Sanctions seed loaded: {} entries (national list and UN list)", entries.size());
             } catch (Exception e) {
-                throw new IllegalStateException("Falha ao carregar seed obrigatório de sanções; aplicação bloqueada", e);
+                throw new IllegalStateException("Could not load the required sanctions seed. Application startup is blocked.", e);
             }
         }
     }
@@ -88,7 +88,7 @@ public class DataInitializer implements CommandLineRunner {
                 || isBlank(entry.fullName())
                 || isBlank(entry.entityType())
                 || isBlank(entry.sourceList())) {
-            throw new IllegalStateException("Entrada de sanções incompleta");
+            throw new IllegalStateException("Sanctions entry is incomplete.");
         }
     }
 

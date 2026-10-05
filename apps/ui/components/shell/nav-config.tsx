@@ -46,41 +46,41 @@ export interface NavModule {
 export const navModules: NavModule[] = [
   {
     id: "compliance",
-    label: "Conformidade",
+    label: "Compliance",
     icon: ShieldCheck,
     href: "/",
     matches: ["/", "/clients", "/flags", "/insights"],
-    title: "Conformidade",
-    description: "Monitorização e triagem",
+    title: "Compliance",
+    description: "Monitoring and screening",
     groups: [
       {
         items: [
-          { title: "Visão geral", url: "/", icon: LayoutDashboard },
-          { title: "Indicadores", url: "/insights", icon: BarChart3 },
+          { title: "Overview", url: "/", icon: LayoutDashboard },
+          { title: "Insights", url: "/insights", icon: BarChart3 },
         ],
       },
       {
-        label: "Monitorização",
+        label: "Monitoring",
         items: [
           {
-            title: "Clientes",
+            title: "Customers",
             url: "/clients",
             icon: Users,
             items: [
-              { title: "Todos os clientes", url: "/clients" },
-              { title: "Risco elevado", url: "/clients?risk=ALTO" },
-              { title: "Regime reforçado", url: "/clients?regime=NORMAL" },
+              { title: "All customers", url: "/clients" },
+              { title: "High risk", url: "/clients?risk=ALTO" },
+              { title: "Enhanced due diligence", url: "/clients?regime=NORMAL" },
             ],
           },
           {
-            title: "Alertas",
+            title: "Alerts",
             url: "/flags",
             icon: AlertTriangle,
             badgeKey: "pendingFlagsCount",
             items: [
-              { title: "Por rever", url: "/flags" },
-              { title: "Sanções", url: "/flags?type=sanctions" },
-              { title: "Fora de prazo", url: "/flags?sla=overdue" },
+              { title: "Needs review", url: "/flags" },
+              { title: "Sanctions", url: "/flags?type=sanctions" },
+              { title: "Overdue", url: "/flags?sla=overdue" },
             ],
           },
         ],
@@ -89,22 +89,22 @@ export const navModules: NavModule[] = [
   },
   {
     id: "data",
-    label: "Dados",
+    label: "Data",
     icon: Database,
     href: "/import",
     matches: ["/import"],
-    title: "Dados",
-    description: "Entrada de transacções",
+    title: "Data",
+    description: "Transaction imports",
     groups: [
       {
         items: [
           {
-            title: "Importar",
+            title: "Import",
             url: "/import",
             icon: UploadCloud,
             items: [
-              { title: "Novo ficheiro", url: "/import" },
-              { title: "Histórico", url: "/import?view=history" },
+              { title: "New file", url: "/import" },
+              { title: "History", url: "/import?view=history" },
             ],
           },
         ],
@@ -113,23 +113,23 @@ export const navModules: NavModule[] = [
   },
   {
     id: "reports",
-    label: "Relatórios",
+    label: "Reports",
     icon: FileText,
     href: "/reports",
     matches: ["/reports"],
-    title: "Relatórios",
-    description: "Comunicações e arquivo",
+    title: "Reports",
+    description: "Reports and records",
     groups: [
       {
         items: [
           {
-            title: "Relatórios",
+            title: "Reports",
             url: "/reports",
             icon: FileText,
             items: [
-              { title: "Todos", url: "/reports" },
-              { title: "Operações suspeitas", url: "/reports?type=STR" },
-              { title: "Transacções em numerário", url: "/reports?type=CTR" },
+              { title: "All reports", url: "/reports" },
+              { title: "Suspicious activity", url: "/reports?type=STR" },
+              { title: "Cash transactions", url: "/reports?type=CTR" },
             ],
           },
         ],
@@ -138,23 +138,23 @@ export const navModules: NavModule[] = [
   },
   {
     id: "settings",
-    label: "Definições",
+    label: "Settings",
     icon: Settings,
     href: "/settings",
     matches: ["/settings"],
-    title: "Definições",
-    description: "Parâmetros e registo",
+    title: "Settings",
+    description: "Rules and activity",
     groups: [
       {
         items: [
           {
-            title: "Definições",
+            title: "Settings",
             url: "/settings",
             icon: Settings,
             items: [
-              { title: "Limiares", url: "/settings" },
-              { title: "Registo de actividade", url: "/settings?tab=audit" },
-              { title: "Equipa", url: "/settings?tab=team" },
+              { title: "Thresholds", url: "/settings" },
+              { title: "Activity history", url: "/settings?tab=audit" },
+              { title: "Team", url: "/settings?tab=team" },
             ],
           },
         ],
@@ -173,7 +173,7 @@ export function resolveModule(pathname: string): NavModule {
 
   const fallback = navModules[0]
   if (!fallback) {
-    throw new Error("navModules não pode estar vazio")
+    throw new Error("navModules cannot be empty")
   }
   return fallback
 }

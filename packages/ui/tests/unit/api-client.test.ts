@@ -125,8 +125,12 @@ describe("api client", () => {
       "fetch",
       vi
         .fn()
-        .mockResolvedValue(jsonResponse(errorEnvelope("Acesso não permitido.", 403), 403))
+        .mockResolvedValue(
+          jsonResponse(errorEnvelope("You don't have access to this resource.", 403), 403)
+        )
     )
-    await expect(api.getClients()).rejects.toThrow("Acesso não permitido.")
+    await expect(api.getClients()).rejects.toThrow(
+      "You don't have access to this resource."
+    )
   })
 })

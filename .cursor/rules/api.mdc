@@ -12,4 +12,4 @@ alwaysApply: false
 - Use DTOs for external input/output and coordinate contract changes with generated OpenAPI client types and UI contract tests.
 - Add only new Flyway versions. Preserve checksums of existing versions; align JPA nullability and constraints with SQL.
 - Audit sensitive state transitions. Never log credentials, tokens, MFA secrets, or unnecessary personal data.
-- Keep messages shown to users in Mozambican Portuguese; keep implementation identifiers stable.
+- Write user-facing API messages in clear, direct, confident English. Keep implementation identifiers and wire values stable.

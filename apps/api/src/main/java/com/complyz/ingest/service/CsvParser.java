@@ -57,7 +57,7 @@ public class CsvParser {
 
             return new CsvParsedData(headers, rows);
         } catch (Exception e) {
-            throw new IOException("Falha ao analisar arquivo CSV: " + e.getMessage(), e);
+            throw new IOException("Could not parse CSV file: " + e.getMessage(), e);
         }
     }
 

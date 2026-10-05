@@ -31,7 +31,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
   const annualPercent = Math.min(100, Math.round((annualVolume / annualLimit) * 100))
 
   const formatMt = (val: number) => {
-    return new Intl.NumberFormat("pt-MZ", {
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
       maximumFractionDigits: 0,
@@ -47,7 +47,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               variant={client.riskRating === "ALTO" ? "destructive" : "secondary"}
               className="text-xs"
             >
-              Risco: {client.riskRating}
+              Risk: {client.riskRating}
             </Badge>
             <Badge variant="outline" className="font-mono text-xs">
               ID: {client.id.substring(0, 8)}
@@ -58,8 +58,8 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             {client.fullName}
           </SheetTitle>
           <SheetDescription className="text-xs">
-            {client.clientType === "INDIVIDUAL" ? "Pessoa Singular" : "Pessoa Colectiva"}{" "}
-            • Cadastrado em {new Date(client.createdAt).toLocaleDateString("pt-MZ")}
+            {client.clientType === "INDIVIDUAL" ? "Individual" : "Business"} • Created{" "}
+            {new Date(client.createdAt).toLocaleDateString("en-MZ")}
           </SheetDescription>
         </SheetHeader>
 
@@ -67,27 +67,23 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
           {/* Identity and documents */}
           <div className="space-y-2">
             <h4 className="text-muted-foreground font-semibold uppercase tracking-wider">
-              Identificação e Documentação
+              Identity and documents
             </h4>
             <div className="bg-muted/40 space-y-2 rounded-lg border p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  Documento (BI/DIRE/Passaporte/NUIT):
+                  Document (ID / residence permit / passport / NUIT):
                 </span>
                 <span className="font-semibold">{client.documentNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  NUIB (Identificação Bancária):
-                </span>
-                <span className="font-mono">{client.nuib || "Pendente de emissão"}</span>
+                <span className="text-muted-foreground">NUIB (bank identifier):</span>
+                <span className="font-mono">{client.nuib || "Not issued"}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  Regime de Diligência Aplicável:
-                </span>
+                <span className="text-muted-foreground">Due diligence:</span>
                 <Badge variant={isSimplified ? "default" : "secondary"}>
-                  {isSimplified ? "Simplificado" : "Normal / Reforçado"}
+                  {isSimplified ? "Simplified" : "Standard / enhanced"}
                 </Badge>
               </div>
             </div>
@@ -98,28 +94,25 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             <div className="space-y-1 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-amber-900">
               <div className="flex items-center gap-1.5 font-bold">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
-                Pessoa com exposição política
+                Politically exposed person
               </div>
               <p className="text-[11px] text-amber-800">
-                Categoria:{" "}
+                Category:{" "}
                 <strong>
-                  {client.pepCategory || "Nacional / Funções públicas relevantes"}
+                  {client.pepCategory || "National / relevant public office"}
                 </strong>
               </p>
               {client.lastPepReviewDate && (
                 <p className="text-[10px] text-amber-700">
-                  Última revisão anual de conformidade:{" "}
-                  {new Date(client.lastPepReviewDate).toLocaleDateString("pt-MZ")}
+                  Last annual review:{" "}
+                  {new Date(client.lastPepReviewDate).toLocaleDateString("en-MZ")}
                 </p>
               )}
             </div>
           ) : (
             <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-emerald-800">
               <ShieldCheck className="h-4 w-4 text-emerald-600" />
-              <span>
-                Cliente não identificado como pessoa com exposição política. Triagem
-                limpa.
-              </span>
+              <span>No politically exposed person match. Screening is clear.</span>
             </div>
           )}
 
@@ -129,13 +122,13 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               <div className="flex items-center justify-between">
                 <h4 className="text-foreground flex items-center gap-1.5 font-semibold">
                   <DollarSign className="text-primary h-4 w-4" />
-                  Monitorização de limiares
+                  Threshold monitoring
                 </h4>
                 <Badge
                   variant="outline"
                   className="border-border text-foreground text-[10px]"
                 >
-                  Regime simplificado
+                  Simplified due diligence
                 </Badge>
               </div>
 
@@ -143,7 +136,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
-                    Limite Mensal: {formatMt(monthlyVolume)} / {formatMt(monthlyLimit)}
+                    Monthly limit: {formatMt(monthlyVolume)} / {formatMt(monthlyLimit)}
                   </span>
                   <span
                     className={`font-bold ${monthlyPercent > 90 ? "text-destructive" : "text-primary"}`}
@@ -165,7 +158,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
-                    Limite Anual: {formatMt(annualVolume)} / {formatMt(annualLimit)}
+                    Annual limit: {formatMt(annualVolume)} / {formatMt(annualLimit)}
                   </span>
                   <span
                     className={`font-bold ${annualPercent > 90 ? "text-destructive" : "text-primary"}`}
@@ -183,8 +176,8 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 </div>
               </div>
               <p className="text-muted-foreground text-[10px]">
-                Ultrapassar o limite mensal (30.000 MT) ou anual (240.000 MT) exige
-                transição para diligência reforçada.
+                Exceeding the monthly (30,000 MZN) or annual (240,000 MZN) limit requires
+                enhanced due diligence.
               </p>
             </div>
           )}
@@ -193,7 +186,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
           <div className="space-y-2">
             <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
               <Layers className="text-primary h-3.5 w-3.5" />
-              Beneficiários efectivos
+              Beneficial owners
             </h4>
             {client.beneficialOwners && client.beneficialOwners.length > 0 ? (
               <div className="space-y-2">
@@ -205,12 +198,12 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                     <div className="flex justify-between font-semibold">
                       <span>{ubo.fullName}</span>
                       <span className="text-primary">
-                        {ubo.ownershipPercentage}% Participação
+                        {ubo.ownershipPercentage}% ownership
                       </span>
                     </div>
                     <div className="text-muted-foreground flex justify-between text-[11px]">
                       <span>
-                        Doc: {ubo.documentNumber} ({ubo.nationality})
+                        ID: {ubo.documentNumber} ({ubo.nationality})
                       </span>
                       {ubo.isPep && (
                         <Badge variant="warning" className="text-[10px]">
@@ -223,7 +216,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               </div>
             ) : (
               <div className="bg-muted/20 text-muted-foreground rounded-lg border p-3 text-center">
-                Sem beneficiários efectivos indiretos declarados (titular direto único).
+                No indirect beneficial owners declared (single direct owner).
               </div>
             )}
           </div>

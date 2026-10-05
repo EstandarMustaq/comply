@@ -21,7 +21,7 @@ import java.util.UUID;
 @ControllerAdvice
 public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    private static final String GENERIC_ERROR_MESSAGE = "O pedido não pôde ser concluído.";
+    private static final String GENERIC_ERROR_MESSAGE = "We couldn't complete the request.";
 
     @Override
     public boolean supports(

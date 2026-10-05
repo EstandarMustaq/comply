@@ -71,7 +71,7 @@ class DueDiligenceRegimeValidatorTest {
         assertThat(client.getDueDiligenceRegime()).isEqualTo(DueDiligenceRegime.NORMAL);
         assertThat(client.isKycComplete()).isFalse();
         verify(clientRepository).save(client);
-        assertThat(result.orElseThrow().getReason()).contains("limiar mensal");
+        assertThat(result.orElseThrow().getReason()).contains("monthly limit");
     }
 
     @Test
@@ -95,7 +95,7 @@ class DueDiligenceRegimeValidatorTest {
 
         assertThat(result).isPresent();
         assertThat(client.getDueDiligenceRegime()).isEqualTo(DueDiligenceRegime.NORMAL);
-        assertThat(result.orElseThrow().getReason()).contains("limiar anual");
+        assertThat(result.orElseThrow().getReason()).contains("annual limit");
     }
 
     @Test

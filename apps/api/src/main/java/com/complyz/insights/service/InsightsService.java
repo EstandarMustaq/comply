@@ -41,7 +41,7 @@ public class InsightsService {
     public InsightsSummaryResponse getSummary(User actor) {
         UUID organizationId = tenantAccessService.organizationId(actor);
         if (organizationId == null) {
-            throw new IllegalStateException("Utilizador não associado a uma organização");
+            throw new IllegalStateException("The user is not assigned to an Organization.");
         }
 
         long totalClients = clientRepository.countByOrganizationId(organizationId);

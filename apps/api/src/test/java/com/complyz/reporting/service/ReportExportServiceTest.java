@@ -44,7 +44,7 @@ class ReportExportServiceTest {
         assertThat(pdf).startsWith("%PDF-1.4".getBytes());
         String pdfContent = new String(pdf, java.nio.charset.StandardCharsets.US_ASCII);
         assertThat(pdfContent)
-                .contains("RELATORIO DE OPERACAO SUSPEITA")
+                .contains("Suspicious activity report")
                 .contains("\\347")
                 .contains("\\365")
                 .contains("/Encoding /WinAnsiEncoding");

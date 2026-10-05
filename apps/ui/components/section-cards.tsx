@@ -12,7 +12,7 @@ interface SectionCardsProps {
 
 export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
   const formatMt = (val?: number) =>
-    (val || 0).toLocaleString("pt-MZ", {
+    (val || 0).toLocaleString("en-MZ", {
       style: "currency",
       currency: "MZN",
       maximumFractionDigits: 0,
@@ -20,23 +20,23 @@ export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
 
   const cards = [
     {
-      title: "Clientes",
-      subtitle: `${data?.simplifiedRegimeClients ?? 0} simplificado · ${data?.normalRegimeClients ?? 0} reforçado`,
-      value: (data?.totalClients ?? 0).toLocaleString("pt-MZ"),
+      title: "Customers",
+      subtitle: `${data?.simplifiedRegimeClients ?? 0} simplified · ${data?.normalRegimeClients ?? 0} enhanced`,
+      value: (data?.totalClients ?? 0).toLocaleString("en-MZ"),
       icon: Users,
-      badge: "Activos",
+      badge: "Active",
       badgeVariant: "default",
       accentColor: "text-blue-500",
     },
     {
       title: "Alertas em aberto",
       subtitle: data?.urgentSanctionsFlagsCount
-        ? `${data.urgentSanctionsFlagsCount} exigem decisão imediata`
-        : "Tudo normal",
+        ? `${data.urgentSanctionsFlagsCount} need a decision now`
+        : "All clear",
       value: (data?.pendingFlagsCount ?? 0).toString(),
       icon: AlertTriangle,
       badge: data?.urgentSanctionsFlagsCount
-        ? `${data.urgentSanctionsFlagsCount} urgentes`
+        ? `${data.urgentSanctionsFlagsCount} urgent`
         : "Normal",
       badgeVariant: data?.urgentSanctionsFlagsCount ? "destructive" : "secondary",
       accentColor: data?.urgentSanctionsFlagsCount
@@ -45,19 +45,19 @@ export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
     },
     {
       title: "Volume monitorizado",
-      subtitle: `${data?.totalTransactions ?? 0} transacções analisadas`,
+      subtitle: `${data?.totalTransactions ?? 0} transactions reviewed`,
       value: formatMt(data?.totalVolumeMt),
       icon: TrendingUp,
-      badge: "Acumulado",
+      badge: "All time",
       badgeVariant: "secondary",
       accentColor: "text-emerald-500",
     },
     {
-      title: "Índice de conformidade",
-      subtitle: `${data?.reportedStrsCount ?? 0} comunicações submetidas`,
+      title: "Compliance score",
+      subtitle: `${data?.reportedStrsCount ?? 0} reports submitted`,
       value: `${data?.complianceScorePercent ?? 100}%`,
       icon: ShieldCheck,
-      badge: "Geral",
+      badge: "Overall",
       badgeVariant: "default",
       accentColor: "text-teal-500",
     },

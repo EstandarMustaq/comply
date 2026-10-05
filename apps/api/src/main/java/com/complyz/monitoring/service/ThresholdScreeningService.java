@@ -49,7 +49,7 @@ public class ThresholdScreeningService {
         if (tx == null || tx.getClient() == null) return generatedFlags;
 
         if (tx.getClient().getOrganization() == null || tx.getClient().getOrganization().getId() == null) {
-            throw new IllegalStateException("A organização do cliente é obrigatória para avaliar a operação");
+            throw new IllegalStateException("The customer's Organization is required to screen this transaction.");
         }
         var organizationId = tx.getClient().getOrganization().getId();
         List<ThresholdRule> activeRules = ruleRepository.findByActiveTrue();
@@ -59,7 +59,7 @@ public class ThresholdScreeningService {
             if (rule.getType() == ThresholdRuleType.SINGLE_TRANSACTION_VALUE) {
                 if (rule.getValueThreshold() != null && tx.getAmount().compareTo(rule.getValueThreshold()) >= 0) {
                     String reason = String.format(
-                            "Operação em numerário que atinge ou ultrapassa o limiar configurado de %.2f MT (valor: %.2f MT).",
+                            "Cash transaction meets or exceeds the configured limit of %.2f MT (amount: %.2f MT).",
                             rule.getValueThreshold(), tx.getAmount()
                     );
                     if (flagRepository.countByTransactionIdAndOrganizationIdAndType(
@@ -88,7 +88,7 @@ public class ThresholdScreeningService {
                         tx.getClient().getId(), organizationId, startDate, endDate, CASH_TRANSACTION_TYPES);
                 if (rule.getValueThreshold() != null && aggregate.compareTo(rule.getValueThreshold()) >= 0) {
                     String reason = String.format(
-                            "Valor agregado de transações do mesmo cliente na janela de %d dias ultrapassa o limiar configurado de %.2f MT (total acumulado: %.2f MT).",
+                            "The customer's total transactions over %d days exceed the configured limit of %.2f MT (total: %.2f MT).",
                             windowDays, rule.getValueThreshold(), aggregate
                     );
                     if (flagRepository.countByTransactionIdAndOrganizationIdAndType(

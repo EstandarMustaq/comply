@@ -1,5 +1,5 @@
 ---
-description: Complyz Next.js UI architecture, design tokens, compact operational density, shell composition, accessibility, and pt-MZ product voice
+description: Complyz Next.js UI architecture, design tokens, compact operational density, shell composition, accessibility and product voice
 globs: apps/ui/**/*.ts, apps/ui/**/*.tsx
 alwaysApply: false
 ---
@@ -11,6 +11,6 @@ alwaysApply: false
 - Preserve compact, full-width operational views without shrinking interactive targets, weakening focus visibility, or relying on color alone for state.
 - Reuse `components/shell/app-shell-client.tsx` and `components/shell/nav-config.tsx`; do not create another shell or duplicate global navigation.
 - Keep routes in App Router pages, product components in `components/`, primitives in `components/ui/`, and requests in `lib/api-client.ts`. Prefer server components and isolate client state to interactions.
-- Keep product copy direct and operational in Mozambican Portuguese (`pt-MZ`). Localize labels without changing stable API values; avoid internal acronyms, implementation details, and legal citations in product copy.
+- Keep product copy clear, direct and confident in English. Write display labels without changing stable API values; avoid internal acronyms, implementation details and unsupported claims.
 - Load the matching UI, UX, React, composition, and review skills listed in root `AGENTS.md` automatically. They inform the work but do not override the Complyz baseline or user brief.
 - Coordinate UI contract changes with `packages/api-clients`, `lib/types.ts`, `lib/api-client.ts`, and contract tests.

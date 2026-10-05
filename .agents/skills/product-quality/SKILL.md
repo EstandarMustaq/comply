@@ -38,9 +38,9 @@ reporting a task complete.
    output handling, secrets and personal data, logs, object/file handling,
    dependency/process invocation, and abuse or resource-exhaustion paths.
 5. Check customer experience against `docs/standards/product-language.md`:
-   clear operational `pt-MZ`, accessible interaction, honest loading/empty/
-   error/success states, readable data density, and no internal identifiers or
-   implementation leakage in product copy.
+   clear, direct, confident English, accessible interaction, honest
+   loading/empty/error/success states, readable data density, and no internal
+   identifiers or implementation leakage in product copy.
 6. Check persistence and release safety. Flyway migrations are append-only;
    schema, entity, and repository behavior must agree. Explain rollout,
    backfill, recovery, and compatibility implications for operational changes.

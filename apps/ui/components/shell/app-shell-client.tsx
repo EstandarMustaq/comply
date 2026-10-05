@@ -72,45 +72,45 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
     () => [
       {
         id: "navigate",
-        label: "Navegar",
+        label: "Navigate",
         items: [
           {
             id: "overview",
-            label: "Visão geral",
+            label: "Overview",
             icon: <LayoutDashboard />,
-            keywords: ["dashboard", "inicio"],
+            keywords: ["dashboard", "home"],
             onSelect: () => router.push("/"),
           },
           {
             id: "insights",
-            label: "Indicadores",
+            label: "Insights",
             icon: <BarChart3 />,
-            keywords: ["metricas", "indicadores", "cobertura"],
+            keywords: ["metrics", "insights", "coverage"],
             onSelect: () => router.push("/insights"),
           },
           {
             id: "clients",
-            label: "Clientes",
+            label: "Customers",
             icon: <Users />,
-            keywords: ["titulares", "contas"],
+            keywords: ["customers", "accounts"],
             onSelect: () => router.push("/clients"),
           },
           {
             id: "flags",
             label: "Alertas",
             icon: <AlertTriangle />,
-            keywords: ["sinalizacoes", "triagem"],
+            keywords: ["alerts", "screening"],
             onSelect: () => router.push("/flags"),
           },
           {
             id: "reports",
-            label: "Relatórios",
+            label: "Reports",
             icon: <FileText />,
             onSelect: () => router.push("/reports"),
           },
           {
             id: "settings",
-            label: "Definições",
+            label: "Settings",
             icon: <Settings />,
             onSelect: () => router.push("/settings"),
           },
@@ -118,19 +118,19 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
       },
       {
         id: "actions",
-        label: "Acções",
+        label: "Actions",
         items: [
           {
             id: "import",
-            label: "Importar transacções",
+            label: "Import transactions",
             icon: <UploadCloud />,
             shortcut: "⌘I",
-            keywords: ["carregar", "ficheiro", "csv"],
+            keywords: ["upload", "file", "csv"],
             onSelect: () => router.push("/import"),
           },
           {
             id: "sanctions",
-            label: "Rever correspondências de sanções",
+            label: "Review sanctions matches",
             icon: <AlertTriangle />,
             onSelect: () => router.push("/flags?type=sanctions"),
           },
@@ -157,7 +157,7 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
               className="bg-muted-foreground/75 h-4 w-[1px]"
             />
             <OrganizationSelector
-              organizations={[{ id: "default", name: "Instituição", short: "IN" }]}
+              organizations={[{ id: "default", name: "Organization", short: "ORG" }]}
             />
           </div>
         }
@@ -262,7 +262,7 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
                 icon={<Settings />}
                 isActive={pathname.startsWith("/settings")}
               >
-                Definições
+                Settings
               </AppShellNavItem>
             </AppShellNavFooter>
           </AppShellSidebar>

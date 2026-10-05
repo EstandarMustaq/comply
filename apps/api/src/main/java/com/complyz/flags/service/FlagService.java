@@ -48,7 +48,7 @@ public class FlagService {
     public Flag reviewFlag(UUID flagId, User reviewer, String note, FlagStatus nextStatus) {
         UUID organizationId = requireOrganizationId(reviewer);
         Flag flag = flagRepository.findByIdAndOrganizationId(flagId, organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Flag não encontrada: " + flagId));
+                .orElseThrow(() -> new IllegalArgumentException("Alert not found: " + flagId));
 
         flag.setReviewedBy(reviewer);
         flag.setReviewedAt(Instant.now());
@@ -67,7 +67,7 @@ public class FlagService {
     public SuspiciousActivityReport escalateToStr(UUID flagId, User ocos, String institutionName) {
         UUID organizationId = requireOrganizationId(ocos);
         Flag flag = flagRepository.findByIdAndOrganizationId(flagId, organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Flag não encontrada: " + flagId));
+                .orElseThrow(() -> new IllegalArgumentException("Alert not found: " + flagId));
 
         flag.setStatus(FlagStatus.ESCALATED_TO_STR);
         flag.setReviewedBy(ocos);
@@ -76,13 +76,13 @@ public class FlagService {
 
         SuspiciousActivityReport str = new SuspiciousActivityReport();
         str.setFlag(flag);
-        str.setReportingInstitution(institutionName != null ? institutionName : "Instituição de Microfinanças");
-        str.setAccountHolder(flag.getClient() != null ? flag.getClient().getFullName() : "Não identificado");
+        str.setReportingInstitution(institutionName != null ? institutionName : "Microfinance institution");
+        str.setAccountHolder(flag.getClient() != null ? flag.getClient().getFullName() : "Unidentified");
         if (flag.getTransaction() != null) {
             str.setMonetaryValue(flag.getTransaction().getAmount());
         }
-        str.setSuspicionDescription("Escalado a partir da flag: " + flag.getReason());
-        str.setBusinessRelationshipDescription("Cliente cadastrado no sistema Complyz");
+        str.setSuspicionDescription("Escalated from alert: " + flag.getReason());
+        str.setBusinessRelationshipDescription("Customer is registered in Complyz.");
         str.setOcosName(ocos.getFullName());
 
         SuspiciousActivityReport savedStr = strRepository.save(str);
@@ -96,7 +96,7 @@ public class FlagService {
     private UUID requireOrganizationId(User actor) {
         UUID organizationId = tenantAccessService.organizationId(actor);
         if (organizationId == null) {
-            throw new IllegalStateException("A organização do utilizador é obrigatória");
+            throw new IllegalStateException("The user's Organization is required.");
         }
         return organizationId;
     }

@@ -50,8 +50,8 @@ function matches(item: CommandSearchItem, query: string) {
 }
 
 export function CommandSearch({
-  placeholder = "Pesquisar...",
-  emptyText = "Sem resultados.",
+  placeholder = "Search...",
+  emptyText = "No results.",
   groups = [],
   onSelect,
   triggerWidth = "md",
@@ -155,9 +155,9 @@ export function CommandSearch({
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="top-[20%] max-w-xl translate-y-0 gap-0 overflow-hidden p-0 [&>button]:hidden">
-          <DialogTitle className="sr-only">Pesquisar</DialogTitle>
+          <DialogTitle className="sr-only">Search</DialogTitle>
           <DialogDescription className="sr-only">
-            Pesquisar e navegar pelo Complyz
+            Search Complyz and jump to a workspace
           </DialogDescription>
 
           <div className="p-3 pb-2">

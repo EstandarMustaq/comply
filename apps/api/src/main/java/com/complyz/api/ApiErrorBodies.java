@@ -7,14 +7,14 @@ public final class ApiErrorBodies {
     private ApiErrorBodies() {}
 
     public static Map<String, String> notFound() {
-        return Map.of("message", "O registo pedido não foi encontrado.");
+        return Map.of("message", "The requested record was not found.");
     }
 
     public static Map<String, String> invalidExportState() {
-        return Map.of("message", "O relatório tem de estar submetido antes de ser exportado.");
+        return Map.of("message", "File the report before exporting it.");
     }
 
     public static Map<String, String> invalidExportPeriod() {
-        return Map.of("message", "O ano indicado não é válido para esta exportação.");
+        return Map.of("message", "Enter a valid year for this export.");
     }
 }

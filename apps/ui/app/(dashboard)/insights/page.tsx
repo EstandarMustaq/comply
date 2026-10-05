@@ -52,54 +52,54 @@ export default function InsightsPage() {
 
   const coverage = [
     {
-      label: "Identificação completa",
+      label: "Complete identity",
       value: `${kycPercent}%`,
-      detail: `${data?.kycCompleteCount ?? 0} de ${totalClients} clientes`,
+      detail: `${data?.kycCompleteCount ?? 0} of ${totalClients} customers`,
       percent: kycPercent,
     },
     {
-      label: "Regime reforçado",
-      value: (data?.normalRegimeCount ?? 0).toLocaleString("pt-MZ"),
-      detail: `${percent(data?.normalRegimeCount ?? 0, totalClients)}% da carteira`,
+      label: "Enhanced due diligence",
+      value: (data?.normalRegimeCount ?? 0).toLocaleString("en-MZ"),
+      detail: `${percent(data?.normalRegimeCount ?? 0, totalClients)}% of customers`,
       percent: percent(data?.normalRegimeCount ?? 0, totalClients),
     },
     {
-      label: "Regime simplificado",
-      value: (data?.simplifiedRegimeCount ?? 0).toLocaleString("pt-MZ"),
-      detail: `${percent(data?.simplifiedRegimeCount ?? 0, totalClients)}% da carteira`,
+      label: "Simplified due diligence",
+      value: (data?.simplifiedRegimeCount ?? 0).toLocaleString("en-MZ"),
+      detail: `${percent(data?.simplifiedRegimeCount ?? 0, totalClients)}% of customers`,
       percent: percent(data?.simplifiedRegimeCount ?? 0, totalClients),
     },
   ]
 
   const attention = [
     {
-      label: "Correspondências de sanções",
+      label: "Sanctions matches",
       value: data?.sanctionsMatchCount ?? 0,
-      description: "Decisão dentro de 24 horas",
+      description: "Decision due within 24 hours",
       icon: ShieldAlert,
       urgent: true,
       href: "/flags?type=sanctions",
     },
     {
-      label: "Casos fora de prazo",
+      label: "Overdue cases",
       value: data?.overdueSlaCount ?? 0,
-      description: "Decisão em atraso",
+      description: "Decision is overdue",
       icon: Clock,
       urgent: true,
       href: "/flags?sla=overdue",
     },
     {
-      label: "Revisões periódicas vencidas",
+      label: "Customer reviews due",
       value: data?.pepReviewDueCount ?? 0,
-      description: "Clientes por reavaliar",
+      description: "Customers to reassess",
       icon: Users,
       urgent: false,
       href: "/clients",
     },
     {
-      label: "Registos a expirar",
+      label: "Records expiring",
       value: data?.retentionExpiringCount ?? 0,
-      description: "Prazo de conservação a terminar",
+      description: "Retention period ending",
       icon: Clock,
       urgent: false,
       href: "/reports",
@@ -111,8 +111,8 @@ export default function InsightsPage() {
   return (
     <div>
       <SiteHeader
-        title="Indicadores"
-        description="Onde está a carteira e o que precisa de decisão agora"
+        title="Insights"
+        description="See your workload and what needs a decision now."
         action={
           <Button
             size="sm"
@@ -120,7 +120,7 @@ export default function InsightsPage() {
             className="gap-1.5 text-xs"
             onClick={() => router.push("/reports")}
           >
-            Ver relatórios
+            View reports
             <ArrowUpRight className="size-3.5" />
           </Button>
         }
@@ -181,16 +181,16 @@ export default function InsightsPage() {
         {nothingPending && !isLoading && (
           <div className="border-border bg-muted/40 text-muted-foreground flex items-center gap-2 rounded-lg border px-4 py-3 text-sm">
             <CheckCircle2 className="text-primary size-4" />
-            Nada por decidir neste momento.
+            Nothing needs a decision right now.
           </div>
         )}
 
         {/* Portfolio coverage */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Cobertura da carteira</CardTitle>
+            <CardTitle className="text-sm font-semibold">Customer coverage</CardTitle>
             <CardDescription className="text-xs">
-              Como estão distribuídos os {totalClients.toLocaleString("pt-MZ")} clientes
+              Breakdown of {totalClients.toLocaleString("en-MZ")} customers
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -220,24 +220,22 @@ export default function InsightsPage() {
         {/* Cumulative activity */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Acumulado</CardTitle>
-            <CardDescription className="text-xs">
-              Desde o início do acompanhamento
-            </CardDescription>
+            <CardTitle className="text-sm font-semibold">All-time activity</CardTitle>
+            <CardDescription className="text-xs">Since monitoring began</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             {[
               {
-                label: "Transacções analisadas",
-                value: (data?.totalTransactionsCount ?? 0).toLocaleString("pt-MZ"),
+                label: "Transactions reviewed",
+                value: (data?.totalTransactionsCount ?? 0).toLocaleString("en-MZ"),
               },
               {
-                label: "Alertas por rever",
-                value: (data?.pendingFlagsCount ?? 0).toLocaleString("pt-MZ"),
+                label: "Alerts to review",
+                value: (data?.pendingFlagsCount ?? 0).toLocaleString("en-MZ"),
               },
               {
-                label: "Comunicações submetidas",
-                value: (data?.reportedStrsCount ?? 0).toLocaleString("pt-MZ"),
+                label: "Reports submitted",
+                value: (data?.reportedStrsCount ?? 0).toLocaleString("en-MZ"),
               },
             ].map((stat) => (
               <div key={stat.label} className="space-y-0.5">
@@ -257,13 +255,13 @@ export default function InsightsPage() {
         {data?.complianceScorePercent !== undefined && (
           <div className="border-border flex items-center justify-between gap-3 rounded-lg border px-4 py-3">
             <div>
-              <p className="text-muted-foreground text-xs">Estado geral</p>
+              <p className="text-muted-foreground text-xs">Overall status</p>
               <p className="text-foreground text-sm font-medium">
-                {data.complianceScorePercent}% dos controlos em dia
+                {data.complianceScorePercent}% of controls are current
               </p>
             </div>
             <Badge variant={data.complianceScorePercent >= 80 ? "default" : "urgent"}>
-              {data.complianceScorePercent >= 80 ? "Estável" : "Requer atenção"}
+              {data.complianceScorePercent >= 80 ? "On track" : "Needs attention"}
             </Badge>
           </div>
         )}

@@ -960,7 +960,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -998,7 +998,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1032,7 +1032,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1070,7 +1070,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1104,7 +1104,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1128,7 +1128,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description A criação directa de utilizadores não está disponível. */
+      /** @description Direct user creation is not available. */
       501: {
         headers: {
           [name: string]: unknown
@@ -1138,7 +1138,7 @@ export interface operations {
           "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1176,7 +1176,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1210,7 +1210,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1242,7 +1242,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1281,7 +1281,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1321,7 +1321,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1355,7 +1355,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1393,7 +1393,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1429,7 +1429,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1463,7 +1463,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1497,7 +1497,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1535,7 +1535,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1569,7 +1569,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1605,7 +1605,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1641,7 +1641,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1679,7 +1679,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1715,7 +1715,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1747,7 +1747,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1783,7 +1783,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1817,7 +1817,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1855,7 +1855,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1893,7 +1893,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1927,7 +1927,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1959,7 +1959,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -1991,7 +1991,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2025,7 +2025,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2059,7 +2059,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2093,7 +2093,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2125,7 +2125,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2157,7 +2157,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2191,7 +2191,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2231,7 +2231,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2265,7 +2265,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2297,7 +2297,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown
@@ -2346,7 +2346,7 @@ export interface operations {
           }
         }
       }
-      /** @description Erro devolvido pelo serviço. */
+      /** @description The service returned an error. */
       default: {
         headers: {
           [name: string]: unknown

@@ -65,7 +65,7 @@ public class FlagController {
         User ocos = (User) authentication.getPrincipal();
         SuspiciousActivityReport report = flagService.escalateToStr(id, ocos, institutionName);
         return ResponseEntity.ok(Map.of(
-                "message", "Sinal escalado com sucesso para investigação",
+                "message", "Alert escalated for investigation.",
                 "strId", report.getId()
         ));
     }

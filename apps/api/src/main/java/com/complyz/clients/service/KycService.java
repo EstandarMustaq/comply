@@ -73,7 +73,7 @@ public class KycService {
         if (!complete && flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
                 clientId, client.getOrganization().getId(), FlagType.KYC_INCOMPLETE, FlagStatus.PENDING) == 0) {
             flagRepository.save(new Flag(client, null, FlagType.KYC_INCOMPLETE,
-                    "KYC incompleto: identificação obrigatória ou beneficiários efetivos pendentes.",
+                    "Customer review is incomplete: identification or beneficial owner details are missing.",
                     null));
         }
         return saved;
@@ -98,7 +98,7 @@ public class KycService {
     public BeneficialOwner verifyOwner(UUID ownerId, User actor) {
         UUID organizationId = requireOrganizationId(actor);
         BeneficialOwner owner = beneficialOwnerRepository.findByIdAndClientOrganizationId(ownerId, organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Beneficiário efetivo não encontrado: " + ownerId));
+                .orElseThrow(() -> new IllegalArgumentException("Beneficial owner not found: " + ownerId));
         owner.setVerifiedAt(LocalDate.now());
         BeneficialOwner saved = beneficialOwnerRepository.save(owner);
         recalculateAndPersist(owner.getClient().getId(), actor);
@@ -108,16 +108,16 @@ public class KycService {
     private Client findClient(UUID clientId, User actor) {
         var organization = tenantAccessService.requireOrganization(actor);
         if (organization.getId() == null) {
-            throw new IllegalStateException("A organização do utilizador é obrigatória");
+            throw new IllegalStateException("The user's Organization is required.");
         }
         return clientRepository.findByIdAndOrganization(clientId, organization)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clientId));
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + clientId));
     }
 
     private UUID requireOrganizationId(User actor) {
         UUID organizationId = tenantAccessService.organizationId(actor);
         if (organizationId == null) {
-            throw new IllegalStateException("A organização do utilizador é obrigatória");
+            throw new IllegalStateException("The user's Organization is required.");
         }
         return organizationId;
     }
@@ -137,11 +137,11 @@ public class KycService {
 
     private void validateOwner(String fullName, BeneficialOwnerRole role, BigDecimal percentage) {
         if (isBlank(fullName) || role == null) {
-            throw new IllegalArgumentException("Nome e função do beneficiário efetivo são obrigatórios");
+            throw new IllegalArgumentException("Beneficial owner name and role are required.");
         }
         if (percentage != null && (percentage.compareTo(BigDecimal.ZERO) < 0
                 || percentage.compareTo(new BigDecimal("100")) > 0)) {
-            throw new IllegalArgumentException("Percentagem de participação deve estar entre 0 e 100");
+            throw new IllegalArgumentException("Ownership percentage must be between 0 and 100.");
         }
     }
 

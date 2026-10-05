@@ -27,27 +27,27 @@ public class PublicApiOpenApiConfiguration {
     private static final String ERROR_ENVELOPE_SCHEMA = "ApiErrorEnvelope";
     private static final String API_BASE_PATH = ApiVersioningConfiguration.API_BASE_PATH;
     private static final Map<String, String> RESOURCE_TAGS = Map.of(
-            "/auth", "Autenticação",
-            "/clients", "Clientes",
-            "/flags", "Alertas",
-            "/import-batches", "Importações",
-            "/insights", "Indicadores",
-            "/reports", "Relatórios",
-            "/settings/users", "Utilizadores",
-            "/settings", "Definições",
-            "/audit-log", "Histórico de actividade"
+            "/auth", "Authentication",
+            "/clients", "Customers",
+            "/flags", "Alerts",
+            "/import-batches", "Imports",
+            "/insights", "Insights",
+            "/reports", "Reports",
+            "/settings/users", "Users",
+            "/settings", "Settings",
+            "/audit-log", "Activity history"
     );
 
     @Bean
     public OpenAPI complyzOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API Complyz")
+                        .title("Complyz API")
                         .version("1.0")
-                        .description("API para integração com a plataforma Complyz."))
+                        .description("API for Complyz's financial compliance workspace."))
                 .servers(List.of(new Server()
                         .url("https://api.trycomplyz.com")
-                        .description("Produção")))
+                        .description("Production")))
                 .components(new Components()
                         .addSecuritySchemes(API_KEY, new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
@@ -140,7 +140,7 @@ public class PublicApiOpenApiConfiguration {
         responses.addApiResponse(
                 "default",
                 new ApiResponse()
-                        .description("Erro devolvido pelo serviço.")
+                        .description("The service returned an error.")
                         .content(new io.swagger.v3.oas.models.media.Content().addMediaType(
                                 "application/json",
                                 new io.swagger.v3.oas.models.media.MediaType()
