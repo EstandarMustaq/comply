@@ -52,3 +52,6 @@ package-lock.json
 .claude/skills/improve-codebase-architecture
 .claude/skills/tdd
 .claude/skills/to-questionnaire
+
+# Nested worktrees are separate checkouts; do not format their contents.
+.worktrees/
