@@ -132,7 +132,7 @@ export function AppShellNavbar({
           type="button"
           onClick={toggleMobileDrawer}
           className="text-muted-foreground hover:bg-background/60 hover:text-foreground inline-flex size-8 items-center justify-center rounded-md md:hidden"
-          aria-label="Abrir menu"
+          aria-label="Open menu"
         >
           <PanelLeftOpen className="size-4" />
         </button>
@@ -295,7 +295,7 @@ export function AppShellRail({
             type="button"
             onClick={toggleSidebar}
             className="text-muted-foreground hover:bg-background/60 hover:text-foreground flex size-10 items-center justify-center rounded-md transition-colors"
-            aria-label={sidebarOpen ? "Colapsar sidebar" : "Expandir sidebar"}
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {sidebarOpen ? (
               <PanelLeftClose className="size-5" />
