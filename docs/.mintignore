@@ -1,4 +1,6 @@
 archive/**
+adr/**
+architecture/**
 openapi-internal.json
 README.md
 brand/**

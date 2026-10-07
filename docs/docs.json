@@ -10,6 +10,7 @@
     "playground": {
       "display": "simple"
     },
+    "url": "full",
     "examples": {
       "languages": ["curl", "javascript", "python"],
       "defaults": "required"
@@ -39,19 +40,27 @@
         "tab": "Integrations",
         "groups": [
           {
-            "group": "Connections",
-            "pages": [
-              "integrations/index",
-              "integrations/google-drive",
-              "integrations/google-workspace"
-            ]
+            "group": "Overview",
+            "pages": ["integrations/index"]
+          },
+          {
+            "group": "Planned integrations",
+            "pages": ["integrations/google-drive", "integrations/google-workspace"]
           }
         ]
       },
       {
         "tab": "API reference",
-        "openapi": "https://api.trycomplyz.com/v3/api-docs",
-        "pages": ["api/index"]
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["api/index"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "https://api.trycomplyz.com/v3/api-docs"
+          }
+        ]
       }
     ]
   }

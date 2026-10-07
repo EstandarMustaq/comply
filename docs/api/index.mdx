@@ -1,48 +1,112 @@
 ---
-title: "Use the API"
-description: "Authenticate requests and read Complyz API responses."
+title: "Make your first API request"
+description: "Connect an authorized client to Complyz using the production API."
 ---
 
-Connect authorized applications to Complyz through the API. Send requests to `https://api.trycomplyz.com` and use the `/api/v1` path shown for each operation.
+Use the Complyz API to connect authorized applications to your Organization's workspace. The API reference lists every operation, its request fields, and its responses.
 
-## Versioning
+<Note>
+  The production API base URL is `https://api.trycomplyz.com`. Complyz API version 1
+  operations use the `/api/v1` path. The API reference displays the full request URL.
+</Note>
 
-Every operation in this reference belongs to major version 1 and starts with `/api/v1`. The old `/api/...` paths are no longer exposed. Update clients and integrations to use the versioned routes. The URI version identifies the API contract, not the OpenAPI document revision.
+## Sign in
 
-Complyz will add compatible operations and fields to version 1 without changing existing behavior. Breaking changes will ship in a new major version. Before a version is retired, Complyz will publish its replacement, migration steps and retirement date. Where supported, responses will announce deprecation and retirement through the `Deprecation` and `Sunset` headers. No version 1 operations are currently marked for retirement.
+### Start authentication
 
-## Authentication
-
-Sign in with `POST /api/v1/auth/login`. The response tells you whether to set up multi-factor authentication or verify a challenge. Send the access token as a bearer token on authenticated requests:
+Send your account email and password to the full login URL:
 
 ```http
-Authorization: Bearer <access-token>
+POST https://api.trycomplyz.com/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "you@example.com",
+  "password": "<your-password>"
+}
 ```
 
-Use `POST /api/v1/auth/refresh` to renew a session. Refresh tokens rotate. Store the new token returned by each refresh and stop using the previous one. Never put tokens in URLs, logs or support messages.
+The response tells you which multi-factor authentication step to complete:
 
-## Response format
+- `MFA_ENROLLMENT_REQUIRED`: set up multi-factor authentication for the account.
+- `MFA_REQUIRED`: verify the sign-in challenge.
 
-Successful JSON responses include the result in `data` and request details in `meta`:
+For first-time setup, start enrollment and confirm the verification code. For an
+existing setup, verify the sign-in challenge. Successful verification or enrollment
+confirmation returns an access token and a refresh token. See the matching operations
+in the [API reference](/api).
+
+<Warning>
+  Replace the example credentials with your own. Do not commit credentials or tokens.
+</Warning>
+
+### Send an authenticated request
+
+Send the access token in the `Authorization` header. For example, this request returns
+the summary available to the signed-in user's Organization:
+
+```bash
+curl --request GET \
+  --url https://api.trycomplyz.com/api/v1/insights/summary \
+  --header "Authorization: Bearer ${COMPLYZ_ACCESS_TOKEN}"
+```
+
+Replace `COMPLYZ_ACCESS_TOKEN` with the access token returned after authentication.
+Keep access and refresh tokens in a secure secret store. Never put them in URLs, logs,
+source control, or support messages.
+
+### Refresh an access token
+
+When the access token expires, send the current refresh token to:
+
+```http
+POST https://api.trycomplyz.com/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "<your-refresh-token>"
+}
+```
+
+The response contains a new access token and refresh token. Store both securely and
+replace the previous refresh token; it cannot be reused.
+
+## Read API responses
+
+Successful JSON responses place the result in `data` and request details in `meta`.
+This complete example shows an insights summary:
 
 ```json
 {
   "data": {
-    "id": "8b7a83f3-6030-4f84-b8e8-139e9dbf3a4a"
+    "totalClients": 0,
+    "kycCompleteCount": 0,
+    "kycCompletenessPercentage": 0,
+    "simplifiedRegimeCount": 0,
+    "normalRegimeCount": 0,
+    "pendingFlagsCount": 0,
+    "sanctionsMatchCount": 0,
+    "overdueSlaCount": 0,
+    "pepReviewDueCount": 0,
+    "totalTransactionsCount": 0,
+    "retentionExpiringCount": 0
   },
   "meta": {
-    "timestamp": "2026-10-02T12:00:00Z",
-    "requestId": "4491e196-d873-4d84-9f79-8ab17250e500"
+    "timestamp": "<timestamp>",
+    "requestId": "<request-id>"
   }
 }
 ```
 
-Failed requests return `error` with a stable code, a message and structured details. Use the HTTP status to decide whether to fix the request, renew the session or try again later. Export operations return files instead of the JSON success envelope.
+Errors include an error code, message, and details. Use the HTTP status and error
+response to correct the request, renew the session, or decide whether to retry.
+Some operations return files instead of a JSON response.
 
-## Pagination
+## Versioning and access
 
-Paginated lists include the current page in `data`. Use the pagination parameters shown for each operation and follow the metadata returned by the API when moving between pages.
+Use the versioned request URL shown in the API reference. Current operations use
+`https://api.trycomplyz.com/api/v1`; do not omit the version path or add it twice.
 
-## Data security
-
-Use operations only for data you are authorized to view or change. Do not send Organization IDs to try to expand access. Examples in this documentation use fictional IDs.
+The API authorizes access using the signed-in account and its Organization. Use
+operations only for information you are authorized to view or change. An Organization
+ID does not grant access to another Organization's data.
