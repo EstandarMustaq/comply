@@ -143,7 +143,7 @@ export function CommandSearch({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "border-border bg-background/60 text-muted-foreground hover:bg-background focus-visible:ring-ring flex h-8 items-center gap-2 rounded-md border px-2.5 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-1",
+            "flex h-8 items-center gap-2 rounded-md border border-border bg-background/60 px-2.5 text-left text-xs text-muted-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             triggerWidths[triggerWidth]
           )}
         >
@@ -161,8 +161,8 @@ export function CommandSearch({
           </DialogDescription>
 
           <div className="p-3 pb-2">
-            <div className="border-border/80 bg-muted/60 flex items-center gap-2.5 rounded-lg border px-3 transition-colors">
-              <Search className="text-muted-foreground size-4 shrink-0" />
+            <div className="flex items-center gap-2.5 rounded-lg border border-border/80 bg-muted/60 px-3 transition-colors">
+              <Search className="size-4 shrink-0 text-muted-foreground" />
               <input
                 autoFocus
                 value={query}
@@ -172,7 +172,7 @@ export function CommandSearch({
                 }}
                 onKeyDown={handleListKeyDown}
                 placeholder={placeholder}
-                className="text-foreground placeholder:text-muted-foreground h-8 flex-1 bg-transparent text-sm outline-none"
+                className="h-8 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
               <Kbd>Esc</Kbd>
             </div>
@@ -181,14 +181,14 @@ export function CommandSearch({
           <ScrollArea className="max-h-80">
             <div className="p-2 pt-0">
               {flatItems.length === 0 && (
-                <p className="text-muted-foreground px-3 py-6 text-center text-sm">
+                <p className="px-3 py-6 text-center text-sm text-muted-foreground">
                   {emptyText}
                 </p>
               )}
 
               {filteredGroups.map((group) => (
                 <div key={group.id} className="mb-1 last:mb-0">
-                  <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium uppercase tracking-wider">
+                  <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {group.label}
                   </div>
                   <div className="space-y-0.5">

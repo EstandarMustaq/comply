@@ -150,7 +150,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
             className="hidden"
             onChange={handleFileInput}
           />
-          <div className="bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-full">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
             {isUploading ? (
               <Loader2 className="h-7 w-7 animate-spin" />
             ) : (
@@ -164,7 +164,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                 ? "Uploading and reading headers..."
                 : "Choose or drop a spreadsheet here"}
             </h3>
-            <p className="text-muted-foreground max-w-md text-xs">
+            <p className="max-w-md text-xs text-muted-foreground">
               Upload operational statements as CSV or XLSX. Complyz detects delimiters,
               encoding and header rows.
             </p>
@@ -183,7 +183,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
 
       {/* Error alert */}
       {error && (
-        <div className="border-destructive/40 text-destructive flex items-center gap-2 rounded-md border p-3 text-xs">
+        <div className="flex items-center gap-2 rounded-md border border-destructive/40 p-3 text-xs text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -202,7 +202,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="text-primary h-5 w-5" />
+              <FileSpreadsheet className="h-5 w-5 text-primary" />
               Confirm column mapping
             </DialogTitle>
             <DialogDescription className="text-xs">
@@ -212,7 +212,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
           </DialogHeader>
 
           <div className="space-y-4 py-3">
-            <div className="text-muted-foreground grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase">
+            <div className="grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase text-muted-foreground">
               <div>Complyz field</div>
               <div>Detected column</div>
             </div>
@@ -225,8 +225,8 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                   className="grid grid-cols-2 items-center gap-3 py-1 text-sm"
                 >
                   <div>
-                    <span className="text-foreground font-medium">{target.label}</span>
-                    {target.required && <span className="text-destructive ml-1">*</span>}
+                    <span className="font-medium text-foreground">{target.label}</span>
+                    {target.required && <span className="ml-1 text-destructive">*</span>}
                   </div>
                   <div>
                     <Select

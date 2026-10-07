@@ -168,11 +168,11 @@ function ReportsContent() {
 
       <div className="space-y-6">
         {/* Report retention details */}
-        <div className="border-border bg-muted/40 text-foreground flex items-start gap-3 rounded-lg border p-3.5 text-xs">
-          <Clock className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+        <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-3.5 text-xs text-foreground">
+          <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <div>
             <span className="font-semibold">Record retention</span>
-            <p className="text-muted-foreground mt-0.5 text-[11px]">
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
               Submitted reports, evidence and due diligence records are locked against
               deletion for <strong>10 years</strong>.
             </p>
@@ -202,7 +202,7 @@ function ReportsContent() {
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="text-primary h-4 w-4" />
+                <FileText className="h-4 w-4 text-primary" />
                 Suspicious activity reports ({strs.length})
               </CardTitle>
               <CardDescription className="text-xs">
@@ -211,7 +211,7 @@ function ReportsContent() {
             </CardHeader>
             <CardContent>
               {strs.length === 0 ? (
-                <div className="text-muted-foreground py-12 text-center text-xs">
+                <div className="py-12 text-center text-xs text-muted-foreground">
                   No suspicious activity reports.
                 </div>
               ) : (
@@ -236,7 +236,7 @@ function ReportsContent() {
                           </TableCell>
                           <TableCell className="text-xs font-medium">
                             {report.client?.fullName || "—"}
-                            <div className="text-muted-foreground font-mono text-[10px]">
+                            <div className="font-mono text-[10px] text-muted-foreground">
                               {report.client?.documentNumber}
                             </div>
                           </TableCell>
@@ -246,14 +246,14 @@ function ReportsContent() {
                                 {report.gifimProtocolNumber}
                               </span>
                             ) : (
-                              <span className="text-muted-foreground italic">
+                              <span className="italic text-muted-foreground">
                                 Pending
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-muted-foreground text-xs">
+                          <TableCell className="text-xs text-muted-foreground">
                             {report.retentionDeadline ? (
-                              <span className="text-foreground font-medium">
+                              <span className="font-medium text-foreground">
                                 {new Date(report.retentionDeadline).toLocaleDateString(
                                   "en-MZ"
                                 )}
@@ -305,7 +305,7 @@ function ReportsContent() {
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="text-primary h-4 w-4" />
+                <FileText className="h-4 w-4 text-primary" />
                 Cash transaction reports ({ctrs.length})
               </CardTitle>
               <CardDescription className="text-xs">
@@ -314,7 +314,7 @@ function ReportsContent() {
             </CardHeader>
             <CardContent>
               {ctrs.length === 0 ? (
-                <div className="text-muted-foreground py-12 text-center text-xs">
+                <div className="py-12 text-center text-xs text-muted-foreground">
                   No pending cash transaction reports.
                 </div>
               ) : (
@@ -337,14 +337,14 @@ function ReportsContent() {
                         </TableCell>
                         <TableCell className="text-xs font-medium">
                           {ctr.client?.fullName}
-                          <div className="text-muted-foreground text-[10px]">
+                          <div className="text-[10px] text-muted-foreground">
                             {ctr.client?.documentNumber}
                           </div>
                         </TableCell>
                         <TableCell className="text-xs">
                           {ctr.reportingMonth}/{ctr.reportingYear}
                         </TableCell>
-                        <TableCell className="text-foreground text-xs font-bold">
+                        <TableCell className="text-xs font-bold text-foreground">
                           {formatMt(ctr.aggregateAmount)}
                         </TableCell>
                         <TableCell className="text-center text-xs">
@@ -370,7 +370,7 @@ function ReportsContent() {
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Building2 className="text-primary h-5 w-5" />
+              <Building2 className="h-5 w-5 text-primary" />
               {selectedStr?.status === "SUBMITTED"
                 ? "Filing record"
                 : "File suspicious activity report"}
@@ -414,7 +414,7 @@ function ReportsContent() {
                 value={suspicionGrounds}
                 onChange={(e) => setSuspicionGrounds(e.target.value)}
                 placeholder="Describe the indicators, how they differ from the customer's profile, or any sanctions matches…"
-                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
+                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
               />
@@ -430,7 +430,7 @@ function ReportsContent() {
                 value={operationDetails}
                 onChange={(e) => setOperationDetails(e.target.value)}
                 placeholder="Include accounts, amounts, dates, channels and counterparties…"
-                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
+                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 disabled={selectedStr?.status === "SUBMITTED"}
                 required
               />
@@ -446,7 +446,7 @@ function ReportsContent() {
                 value={evidenceSummary}
                 onChange={(e) => setEvidenceSummary(e.target.value)}
                 placeholder="Account statements, deposit receipts, screening results…"
-                className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
+                className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 disabled={selectedStr?.status === "SUBMITTED"}
               />
             </div>
@@ -513,7 +513,7 @@ export default function ReportsPage() {
     <Suspense
       fallback={
         <div className="flex flex-1 items-center justify-center p-6">
-          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       }
     >

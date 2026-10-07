@@ -165,7 +165,7 @@ export default function FlagsPage() {
           </CardHeader>
           <CardContent>
             {flags.length === 0 ? (
-              <div className="text-muted-foreground flex flex-col items-center gap-2 py-12 text-center text-xs">
+              <div className="flex flex-col items-center gap-2 py-12 text-center text-xs text-muted-foreground">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                 <span>No alerts in this category.</span>
               </div>
@@ -188,7 +188,7 @@ export default function FlagsPage() {
                     return (
                       <TableRow
                         key={flag.id}
-                        className={`hover:bg-muted/50 cursor-pointer ${
+                        className={`cursor-pointer hover:bg-muted/50 ${
                           isSanction ? "bg-red-50/20" : ""
                         }`}
                         onClick={() => openReview(flag)}
@@ -203,21 +203,21 @@ export default function FlagsPage() {
                         </TableCell>
                         <TableCell className="text-xs font-medium">
                           {flag.client?.fullName || "—"}
-                          <div className="text-muted-foreground font-mono text-[11px]">
+                          <div className="font-mono text-[11px] text-muted-foreground">
                             {flag.client?.documentNumber}
                           </div>
                         </TableCell>
                         <TableCell className="text-xs font-semibold">
                           {formatMt(flag.transaction?.amount)}
                         </TableCell>
-                        <TableCell className="text-muted-foreground max-w-sm truncate text-xs">
+                        <TableCell className="max-w-sm truncate text-xs text-muted-foreground">
                           {flag.ruleTriggered}
                         </TableCell>
                         <TableCell>
                           {isSanction ? (
                             getSlaBadge(flag.slaDeadline)
                           ) : (
-                            <span className="text-muted-foreground text-xs">Normal</span>
+                            <span className="text-xs text-muted-foreground">Normal</span>
                           )}
                         </TableCell>
                         <TableCell>

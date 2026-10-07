@@ -53,8 +53,8 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
               ID: {client.id.substring(0, 8)}
             </Badge>
           </div>
-          <SheetTitle className="text-foreground mt-2 flex items-center gap-2 text-base font-bold">
-            <User className="text-primary h-5 w-5" />
+          <SheetTitle className="mt-2 flex items-center gap-2 text-base font-bold text-foreground">
+            <User className="h-5 w-5 text-primary" />
             {client.fullName}
           </SheetTitle>
           <SheetDescription className="text-xs">
@@ -66,10 +66,10 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
         <div className="space-y-6 py-4 text-xs">
           {/* Identity and documents */}
           <div className="space-y-2">
-            <h4 className="text-muted-foreground font-semibold uppercase tracking-wider">
+            <h4 className="font-semibold uppercase tracking-wider text-muted-foreground">
               Identity and documents
             </h4>
-            <div className="bg-muted/40 space-y-2 rounded-lg border p-3">
+            <div className="space-y-2 rounded-lg border bg-muted/40 p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   Document (ID / residence permit / passport / NUIT):
@@ -118,15 +118,15 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
 
           {/* Simplified regime limits */}
           {isSimplified && (
-            <div className="border-border bg-muted/40 space-y-3 rounded-lg border p-3">
+            <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-foreground flex items-center gap-1.5 font-semibold">
-                  <DollarSign className="text-primary h-4 w-4" />
+                <h4 className="flex items-center gap-1.5 font-semibold text-foreground">
+                  <DollarSign className="h-4 w-4 text-primary" />
                   Threshold monitoring
                 </h4>
                 <Badge
                   variant="outline"
-                  className="border-border text-foreground text-[10px]"
+                  className="border-border text-[10px] text-foreground"
                 >
                   Simplified due diligence
                 </Badge>
@@ -144,7 +144,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                     {monthlyPercent}%
                   </span>
                 </div>
-                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full transition-all ${
                       monthlyPercent > 90 ? "bg-destructive" : "bg-primary"
@@ -166,7 +166,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                     {annualPercent}%
                   </span>
                 </div>
-                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full transition-all ${
                       annualPercent > 90 ? "bg-destructive" : "bg-primary"
@@ -175,7 +175,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                   />
                 </div>
               </div>
-              <p className="text-muted-foreground text-[10px]">
+              <p className="text-[10px] text-muted-foreground">
                 Exceeding the monthly (30,000 MZN) or annual (240,000 MZN) limit requires
                 enhanced due diligence.
               </p>
@@ -184,8 +184,8 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
 
           {/* Beneficial owners */}
           <div className="space-y-2">
-            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-              <Layers className="text-primary h-3.5 w-3.5" />
+            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
+              <Layers className="h-3.5 w-3.5 text-primary" />
               Beneficial owners
             </h4>
             {client.beneficialOwners && client.beneficialOwners.length > 0 ? (
@@ -193,7 +193,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 {client.beneficialOwners.map((ubo) => (
                   <div
                     key={ubo.id}
-                    className="bg-muted/40 space-y-1 rounded-lg border p-2.5"
+                    className="space-y-1 rounded-lg border bg-muted/40 p-2.5"
                   >
                     <div className="flex justify-between font-semibold">
                       <span>{ubo.fullName}</span>
@@ -201,7 +201,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                         {ubo.ownershipPercentage}% ownership
                       </span>
                     </div>
-                    <div className="text-muted-foreground flex justify-between text-[11px]">
+                    <div className="flex justify-between text-[11px] text-muted-foreground">
                       <span>
                         ID: {ubo.documentNumber} ({ubo.nationality})
                       </span>
@@ -215,7 +215,7 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 ))}
               </div>
             ) : (
-              <div className="bg-muted/20 text-muted-foreground rounded-lg border p-3 text-center">
+              <div className="rounded-lg border bg-muted/20 p-3 text-center text-muted-foreground">
                 No indirect beneficial owners declared (single direct owner).
               </div>
             )}
