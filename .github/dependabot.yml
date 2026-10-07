@@ -6,6 +6,14 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    # These majors need coordinated plugin/CSS migrations before automated updates.
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor-and-patch:
         patterns:

@@ -28,6 +28,12 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
+/**
+ * Load the current user and show account actions; failed user lookup leaves
+ * the loading placeholder visible. Sign-out clears local tokens and redirects
+ * to the configured auth URL or reloads the page. Logout request failures are
+ * ignored by the API client; local storage errors can still reject sign-out.
+ */
 export function HeaderUserMenu() {
   const router = useRouter()
   const [user, setUser] = useState<CurrentUser | null>(null)
@@ -55,18 +61,18 @@ export function HeaderUserMenu() {
   }
 
   if (!user) {
-    return <Skeleton className="bg-muted-foreground/25 h-7 w-7 rounded-full" />
+    return <Skeleton className="h-7 w-7 rounded-full bg-muted-foreground/25" />
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="focus-visible:ring-ring rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-1"
+          className="rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           aria-label="Account menu"
         >
-          <Avatar className="border-border h-7 w-7 rounded-full border">
-            <AvatarFallback className="bg-nav-teal-bg text-nav-teal-text rounded-full text-[11px] font-semibold">
+          <Avatar className="h-7 w-7 rounded-full border border-border">
+            <AvatarFallback className="rounded-full bg-nav-teal-bg text-[11px] font-semibold text-nav-teal-text">
               {getInitials(user.fullName)}
             </AvatarFallback>
           </Avatar>
@@ -74,14 +80,14 @@ export function HeaderUserMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="border-border w-56 rounded-lg p-1.5 shadow-md"
+        className="w-56 rounded-lg border-border p-1.5 shadow-md"
         align="end"
         sideOffset={8}
       >
         <DropdownMenuLabel className="px-2 py-1.5 font-normal">
           <div className="flex flex-col gap-0.5">
-            <span className="text-foreground text-xs font-semibold">{user.fullName}</span>
-            <span className="text-muted-foreground text-[11px]">{user.email}</span>
+            <span className="text-xs font-semibold text-foreground">{user.fullName}</span>
+            <span className="text-[11px] text-muted-foreground">{user.email}</span>
           </div>
         </DropdownMenuLabel>
 
@@ -92,7 +98,7 @@ export function HeaderUserMenu() {
             className="cursor-pointer gap-2 py-1.5 text-xs"
             onClick={() => router.push("/settings")}
           >
-            <Settings className="text-muted-foreground h-3.5 w-3.5" />
+            <Settings className="h-3.5 w-3.5 text-muted-foreground" />
             Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
@@ -100,7 +106,7 @@ export function HeaderUserMenu() {
         <DropdownMenuSeparator className="my-1" />
 
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive cursor-pointer gap-2 py-1.5 text-xs"
+          className="cursor-pointer gap-2 py-1.5 text-xs text-destructive focus:text-destructive"
           onClick={handleLogout}
         >
           <LogOut className="h-3.5 w-3.5" />

@@ -25,6 +25,10 @@ function percent(part: number, total: number) {
   return Math.round((part / total) * 100)
 }
 
+/**
+ * Load workload and customer coverage metrics with links to related workspaces.
+ * A failed insights request ends loading and leaves the default zero counts.
+ */
 export default function InsightsPage() {
   const router = useRouter()
   const [data, setData] = useState<InsightsData | null>(null)
@@ -141,12 +145,12 @@ export default function InsightsPage() {
                   if (e.key === "Enter") router.push(item.href)
                 }}
                 className={cn(
-                  "hover:border-primary/50 cursor-pointer shadow-sm transition-colors",
+                  "cursor-pointer shadow-sm transition-colors hover:border-primary/50",
                   isActive && item.urgent && "border-destructive/40"
                 )}
               >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 pb-2">
-                  <CardTitle className="text-muted-foreground text-xs font-medium">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
                     {item.label}
                   </CardTitle>
                   <item.icon
@@ -171,7 +175,7 @@ export default function InsightsPage() {
                       {item.value}
                     </p>
                   )}
-                  <p className="text-muted-foreground text-[11px]">{item.description}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.description}</p>
                 </CardContent>
               </Card>
             )
@@ -179,8 +183,8 @@ export default function InsightsPage() {
         </section>
 
         {nothingPending && !isLoading && (
-          <div className="border-border bg-muted/40 text-muted-foreground flex items-center gap-2 rounded-lg border px-4 py-3 text-sm">
-            <CheckCircle2 className="text-primary size-4" />
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+            <CheckCircle2 className="size-4 text-primary" />
             Nothing needs a decision right now.
           </div>
         )}
@@ -197,18 +201,18 @@ export default function InsightsPage() {
             {coverage.map((row) => (
               <div key={row.label} className="space-y-1.5">
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-muted-foreground text-xs">{row.label}</span>
-                  <span className="text-foreground text-sm font-semibold tabular-nums">
+                  <span className="text-xs text-muted-foreground">{row.label}</span>
+                  <span className="text-sm font-semibold tabular-nums text-foreground">
                     {isLoading ? "—" : row.value}
                   </span>
                 </div>
-                <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className="bg-primary h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full bg-primary transition-all duration-500"
                     style={{ width: `${isLoading ? 0 : row.percent}%` }}
                   />
                 </div>
-                <p className="text-muted-foreground text-[11px]">{row.detail}</p>
+                <p className="text-[11px] text-muted-foreground">{row.detail}</p>
               </div>
             ))}
           </CardContent>
@@ -239,11 +243,11 @@ export default function InsightsPage() {
               },
             ].map((stat) => (
               <div key={stat.label} className="space-y-0.5">
-                <p className="text-muted-foreground text-xs">{stat.label}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
                 {isLoading ? (
                   <Skeleton className="h-7 w-20" />
                 ) : (
-                  <p className="text-foreground text-2xl font-semibold tabular-nums">
+                  <p className="text-2xl font-semibold tabular-nums text-foreground">
                     {stat.value}
                   </p>
                 )}
@@ -253,10 +257,10 @@ export default function InsightsPage() {
         </Card>
 
         {data?.complianceScorePercent !== undefined && (
-          <div className="border-border flex items-center justify-between gap-3 rounded-lg border px-4 py-3">
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-3">
             <div>
-              <p className="text-muted-foreground text-xs">Overall status</p>
-              <p className="text-foreground text-sm font-medium">
+              <p className="text-xs text-muted-foreground">Overall status</p>
+              <p className="text-sm font-medium text-foreground">
                 {data.complianceScorePercent}% of controls are current
               </p>
             </div>

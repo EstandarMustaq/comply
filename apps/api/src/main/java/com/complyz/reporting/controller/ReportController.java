@@ -10,6 +10,9 @@ import com.complyz.reporting.repository.SuspiciousActivityReportRepository;
 import com.complyz.reporting.service.ReportExportService;
 import com.complyz.tenancy.service.TenantAccessService;
 import com.complyz.users.entity.User;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
@@ -178,6 +181,9 @@ public class ReportController {
         }
     }
 
+    @ApiResponse(responseCode = "200", description = "Report file",
+            content = @Content(mediaType = "application/pdf",
+                    schema = @Schema(type = "string", format = "binary")))
     @GetMapping("/exports/str/{id}.pdf")
     @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
     public ResponseEntity<?> exportStrPdf(@PathVariable UUID id, Authentication authentication) {
@@ -199,6 +205,9 @@ public class ReportController {
                 .body(content);
     }
 
+    @ApiResponse(responseCode = "200", description = "Report file",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary")))
     @GetMapping("/exports/annual/{year}.xlsx")
     @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
     public ResponseEntity<?> exportAnnual(@PathVariable int year, Authentication authentication) throws IOException {

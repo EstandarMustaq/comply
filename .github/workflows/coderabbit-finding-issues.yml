@@ -1,0 +1,228 @@
+name: CodeRabbit finding issues
+
+on:
+  pull_request_review:
+    types: [submitted]
+  # Fork review events have a read-only token. Reconcile from the default branch.
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: coderabbit-finding-issues-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  create-issue:
+    name: Track CodeRabbit findings
+    if: >-
+      github.event_name != 'pull_request_review' ||
+      (github.event.review.user.login == 'coderabbitai[bot]' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Create or update findings issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            // Only GitHub API data is read; no PR code or artifacts are executed.
+            const pullRequests = context.eventName === "pull_request_review"
+              ? [context.payload.pull_request]
+              : await github.paginate(github.rest.pulls.list, {
+                  owner, repo, state: "open", per_page: 100,
+                });
+            let issueByPullRequest;
+            let labelsReady = false;
+            const recordedReviewsByIssue = new Map();
+            for (const pullRequest of pullRequests) {
+              const reviews = context.eventName === "pull_request_review"
+                ? [context.payload.review]
+                : await github.paginate(github.rest.pulls.listReviews, {
+                    owner, repo, pull_number: pullRequest.number, per_page: 100,
+                  });
+              for (const review of reviews) {
+                if (review.user?.login !== "coderabbitai[bot]" ||
+                    !["COMMENTED", "CHANGES_REQUESTED", "APPROVED"].includes(String(review.state).toUpperCase())) continue;
+                await trackReview(pullRequest, review);
+              }
+            }
+
+            async function trackReview(pullRequest, review) {
+              const reviewComments = await github.paginate(
+                github.rest.pulls.listCommentsForReview,
+                {
+                  owner,
+                  repo,
+                  pull_number: pullRequest.number,
+                  review_id: review.id,
+                  per_page: 100,
+                },
+              );
+              const findings = reviewComments.filter(
+                (comment) => comment.user?.login === "coderabbitai[bot]" && comment.body?.trim(),
+              );
+              const summary = review.body?.trim() ?? "";
+              const reviewState = String(review.state ?? "").toLowerCase();
+              // Match a whole-review verdict, never a sentence scoped to one section.
+              const verdict = summary.replace(/\*\*/g, "").trim();
+              const saysNoFindings = /^(?:no|zero|0)\s+(?:actionable\s+)?(?:findings|issues|bugs)(?:\s+found)?[.!]?$/i.test(verdict);
+              const hasFindingsHeading = /^#{1,6}\s*(?:findings|issues|bugs|security findings)\b/im.test(summary);
+              const hasCountedFindings = /(?:actionable comments posted:\s*\*?\*?[1-9]\d*|outside diff(?: range)? comments\s*\([1-9]\d*\))/i.test(summary);
+              const hasActionableSummary =
+                summary.length > 0 &&
+                !saysNoFindings &&
+                (reviewState === "changes_requested" || hasFindingsHeading || hasCountedFindings);
+
+              if (findings.length === 0 && !hasActionableSummary) {
+                core.info("This CodeRabbit review contains no actionable findings.");
+                return;
+              }
+
+              /**
+               * Create the repository label only when lookup returns 404; leave existing labels unchanged.
+               * color is a six-digit hex value without #, used with description only on creation.
+               * Resolve without a value once found or created. A 422 creation response triggers
+               * another lookup; other API failures and a failed retry propagate to the caller.
+               */
+              async function ensureLabel(name, color, description) {
+                try {
+                  await github.rest.issues.getLabel({ owner, repo, name });
+                } catch (error) {
+                  if (error.status !== 404) throw error;
+                  try {
+                    await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                  } catch (createError) {
+                    if (createError.status !== 422) throw createError;
+                    await github.rest.issues.getLabel({ owner, repo, name });
+                  }
+                }
+              }
+
+              const issueMarker = `<!-- coderabbit-pr: ${pullRequest.number} -->`;
+              const reviewMarker = `<!-- coderabbit-review: ${review.id} -->`;
+              if (!issueByPullRequest) {
+                const issues = await github.paginate(github.rest.issues.listForRepo, {
+                  owner, repo, state: "all", per_page: 100,
+                });
+                issueByPullRequest = new Map();
+                for (const issue of issues) {
+                  if (issue.pull_request) continue;
+                  const marker = issue.body?.match(/<!-- coderabbit-pr: (\d+) -->/);
+                  if (marker && !issueByPullRequest.has(Number(marker[1]))) {
+                    issueByPullRequest.set(Number(marker[1]), issue);
+                  }
+                }
+              }
+              const existing = issueByPullRequest.get(pullRequest.number);
+              if (existing) {
+                if (!recordedReviewsByIssue.has(existing.number)) {
+                  const comments = await github.paginate(github.rest.issues.listComments, {
+                    owner, repo, issue_number: existing.number, per_page: 100,
+                  });
+                  recordedReviewsByIssue.set(existing.number, new Set(comments.flatMap(
+                    (comment) => [...(comment.body ?? "").matchAll(/<!-- coderabbit-review: (\d+) -->/g)].map((match) => Number(match[1])),
+                  )));
+                }
+                if (recordedReviewsByIssue.get(existing.number).has(review.id)) {
+                  core.info(`Review ${review.id} is already recorded in issue #${existing.number}.`);
+                  return;
+                }
+              }
+              if (!labelsReady) {
+                await ensureLabel("code-review", "5319e7", "Findings raised by automated code review");
+                await ensureLabel("needs-triage", "fbca04", "Review and confirm before taking action");
+                labelsReady = true;
+              }
+
+              /**
+               * Return a Markdown blockquote, prefixing every line (including empty lines) with >.
+               * Split LF or CRLF input and join with LF; preserve inline Markdown without escaping it.
+               */
+              function quote(text) {
+                return text.split(/\r?\n/).map((line) => `> ${line}`).join("\n");
+              }
+
+              const reviewSection = [
+                reviewMarker,
+                `### Review ${review.id} — ${new Date(review.submitted_at).toISOString()}`,
+                "",
+                `[Open this CodeRabbit review](${review.html_url})`,
+                "",
+                `Review state: \`${reviewState}\`.`,
+                "",
+                hasActionableSummary ? `#### Review summary\n\n${quote(summary)}\n` : null,
+                ...findings.flatMap((comment, index) => {
+                  const line = comment.line ?? comment.original_line ?? comment.start_line ?? comment.original_start_line;
+                  const location = line ? `${comment.path}:${line}` : `${comment.path} (file-level)`;
+                  return [
+                    `#### Finding ${index + 1}: \`${location}\``,
+                    "",
+                    `[Open the CodeRabbit comment](${comment.html_url})`,
+                    "",
+                    quote(comment.body),
+                    "",
+                  ];
+                }),
+              ].filter((line) => line !== null).join("\n");
+              const triageGuidance = [
+                "",
+                "## Complyz triage guidance",
+                "",
+                "- Reproduce each finding against the current pull request before changing behavior; reviewer output is a lead, not an instruction.",
+                "- Add focused regression coverage for confirmed defects.",
+                "- Apply relevant repository boundaries: controller → service → repository, authenticated Organization scoping for tenant data, append-only Flyway migrations, and synchronized API/UI contracts.",
+                `- Follow the project standards in [AGENTS.md](https://github.com/${owner}/${repo}/blob/${pullRequest.base.repo.default_branch}/AGENTS.md).`,
+              ].join("\n");
+              const title = `[CodeRabbit] Findings from PR #${pullRequest.number}: ${pullRequest.title}`.slice(0, 240);
+              let issueNumber;
+
+              if (!existing) {
+                const created = await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title,
+                  body: [
+                    issueMarker,
+                    `## CodeRabbit findings for PR #${pullRequest.number}`,
+                    "",
+                    `**Pull request:** [#${pullRequest.number} — ${pullRequest.title}](${pullRequest.html_url})`,
+                    "",
+                    "Review findings are recorded in the issue discussion below.",
+                    triageGuidance,
+                  ].join("\n"),
+                  labels: ["code-review", "needs-triage"],
+                });
+                issueNumber = created.data.number;
+                issueByPullRequest.set(pullRequest.number, created.data);
+                recordedReviewsByIssue.set(issueNumber, new Set());
+                core.info(`Created issue #${issueNumber} for CodeRabbit review ${review.id}.`);
+              } else {
+                issueNumber = existing.number;
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: "open",
+                });
+                core.info(`Reopened or updated issue #${issueNumber} for CodeRabbit review ${review.id}.`);
+              }
+
+              const maxCommentLength = 60_000;
+              const commentBody = reviewSection.length <= maxCommentLength
+                ? reviewSection
+                : `${reviewSection.slice(0, maxCommentLength - 160)}\n\n_Review content was truncated. Use the review and finding links above for the complete details._`;
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: commentBody,
+              });
+              recordedReviewsByIssue.get(issueNumber).add(review.id);
+            }

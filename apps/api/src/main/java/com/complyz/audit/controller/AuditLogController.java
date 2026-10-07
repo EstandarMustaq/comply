@@ -6,6 +6,7 @@ import com.complyz.audit.service.AuditLogQueryService;
 import com.complyz.users.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -29,7 +30,7 @@ public class AuditLogController {
     @GetMapping
     public ResponseEntity<Page<AuditLog>> listAuditLogs(
             @RequestParam(required = false) AuditAction action,
-            Pageable pageable,
+            @ParameterObject Pageable pageable,
             Authentication authentication
     ) {
         User actor = (User) authentication.getPrincipal();

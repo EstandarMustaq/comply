@@ -1,0 +1,204 @@
+name: Dependabot security issues
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: dependabot-security-issues-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  create-issues:
+    name: Track open Dependabot alerts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Create or reconcile alert issues
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          DEPENDABOT_ALERTS_TOKEN: ${{ secrets.DEPENDABOT_ALERTS_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const alertsToken = process.env.DEPENDABOT_ALERTS_TOKEN;
+            if (!alertsToken) {
+              core.setFailed(
+                "Add the repository secret DEPENDABOT_ALERTS_TOKEN with read-only Dependabot alerts and metadata access.",
+              );
+              return;
+            }
+
+            const apiBase = process.env.GITHUB_API_URL.replace(/\/+$/, "");
+            let nextUrl = new URL(`${apiBase}/repos/${owner}/${repo}/dependabot/alerts`);
+            nextUrl.searchParams.set("per_page", "100");
+            const alerts = [];
+
+            while (nextUrl) {
+              const response = await fetch(nextUrl, {
+                headers: {
+                  Accept: "application/vnd.github+json",
+                  Authorization: `Bearer ${alertsToken}`,
+                  "User-Agent": "complyz-dependabot-alert-issues",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              });
+
+              if (!response.ok) {
+                const detail = (await response.text()).slice(0, 500);
+                throw new Error(`Dependabot alerts API returned ${response.status}: ${detail}`);
+              }
+
+              const page = await response.json();
+              if (!Array.isArray(page)) {
+                throw new Error("Dependabot alerts API returned an unexpected response.");
+              }
+              alerts.push(...page);
+
+              const nextLink = response.headers
+                .get("link")
+                ?.match(/<([^>]+)>;\s*rel="next"/);
+              nextUrl = nextLink ? new URL(nextLink[1]) : null;
+            }
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: "all",
+              per_page: 100,
+            });
+            const issueByAlert = new Map();
+
+            for (const issue of issues) {
+              if (issue.pull_request || !issue.body) continue;
+              const marker = issue.body.match(/<!-- dependabot-alert: (\d+) -->/);
+              if (!marker) continue;
+
+              const alertNumber = Number(marker[1]);
+              const current = issueByAlert.get(alertNumber);
+              if (!current || (issue.state === "open" && current.state === "closed")) {
+                issueByAlert.set(alertNumber, issue);
+              }
+            }
+
+            /**
+             * Create the repository label only when lookup returns 404; leave existing labels unchanged.
+             * color is a six-digit hex value without #, used with description only on creation.
+             * Resolve without a value once found or created. Non-404 lookup errors and all
+             * creation errors propagate to the caller.
+             */
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+
+            const openAlerts = alerts.filter((alert) => alert.state === "open");
+            if (openAlerts.length > 0) {
+              await ensureLabel("security", "b60205", "Security vulnerability triage");
+              await ensureLabel("dependencies", "0366d6", "Dependency updates and vulnerabilities");
+            }
+
+            /**
+             * Return trimmed text with carriage returns, newlines, pipes, and backticks replaced by spaces.
+             * Use fallback for nullish input or an empty normalized result; the latter fallback
+             * is returned unchanged. Other Markdown syntax is preserved.
+             */
+            function plainText(value, fallback = "Not provided") {
+              return String(value ?? fallback).replace(/[\r\n|`]/g, " ").trim() || fallback;
+            }
+
+            for (const alert of alerts) {
+              const existing = issueByAlert.get(alert.number);
+              if (alert.state !== "open") {
+                if (existing?.state === "open") {
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: existing.number,
+                    body: `Dependabot reports alert **#${alert.number}** as \`${alert.state}\`, so this issue was closed automatically. Reopen it if remediation work remains: ${alert.html_url}`,
+                  });
+                  await github.rest.issues.update({
+                    owner,
+                    repo,
+                    issue_number: existing.number,
+                    state: "closed",
+                  });
+                  core.info(`Closed issue #${existing.number} for ${alert.state} alert #${alert.number}.`);
+                }
+                continue;
+              }
+
+              const vulnerability = alert.security_vulnerability ?? {};
+              const advisory = alert.security_advisory ?? {};
+              const dependency = alert.dependency ?? {};
+              const packageInfo = dependency.package ?? {};
+              const severity = plainText(vulnerability.severity, "unknown").toUpperCase();
+              const packageName = plainText(packageInfo.name);
+              const marker = `<!-- dependabot-alert: ${alert.number} -->`;
+              const title = `[Security] Dependabot alert #${alert.number}: ${packageName} (${severity})`.slice(0, 240);
+              const advisoryIds = [advisory.ghsa_id, advisory.cve_id].filter(Boolean).join(", ") || "No advisory ID provided";
+              const vulnerableRange = plainText(vulnerability.vulnerable_version_range);
+              const patchedVersion = plainText(vulnerability.first_patched_version?.identifier);
+              const body = [
+                marker,
+                "## Vulnerability alert",
+                "",
+                `Dependabot reports an open **${severity}** vulnerability for **${packageName}**.`,
+                "",
+                `- Alert: [Dependabot alert #${alert.number}](${alert.html_url})`,
+                `- Advisory: ${plainText(advisoryIds)}`,
+                `- Ecosystem: ${plainText(packageInfo.ecosystem)}`,
+                `- Manifest: \`${plainText(dependency.manifest_path)}\``,
+                `- Dependency scope: ${plainText(dependency.scope)}`,
+                `- Vulnerable versions: \`${vulnerableRange}\``,
+                `- First patched version: \`${patchedVersion}\``,
+                advisory.summary ? `- Summary: ${plainText(advisory.summary)}` : null,
+                "",
+                "## Remediation",
+                "",
+                "- Confirm the affected dependency and whether the vulnerable code is reachable in this application.",
+                "- Update the dependency and its lockfile through the appropriate Gradle, pnpm, or container workflow.",
+                "- Run the focused tests for the affected module and the relevant API, UI, or contract checks.",
+                "- Confirm that Dependabot closes the alert, or record a reviewed and time-bounded risk decision.",
+                "",
+                `Follow the repository's engineering standards in [AGENTS.md](https://github.com/${owner}/${repo}/blob/main/AGENTS.md). This issue tracks the alert; the linked Dependabot alert remains the source of truth for its status.`,
+              ].filter((line) => line !== null).join("\n");
+
+              if (!existing) {
+                const created = await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title,
+                  body,
+                  labels: ["security", "dependencies"],
+                });
+                issueByAlert.set(alert.number, created.data);
+                core.info(`Created issue #${created.data.number} for Dependabot alert #${alert.number}.`);
+              } else if (existing.state === "closed") {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  body: `Dependabot still reports alert **#${alert.number}** as open. Reopened this issue for triage: ${alert.html_url}`,
+                });
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: "open",
+                });
+                core.info(`Reopened issue #${existing.number} for open alert #${alert.number}.`);
+              } else {
+                core.info(`Issue #${existing.number} already tracks open alert #${alert.number}.`);
+              }
+            }

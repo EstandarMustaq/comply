@@ -1,0 +1,2097 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Complyz API",
+    "description": "API for Complyz's financial compliance workspace.",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "https://api.trycomplyz.com", "description": "Production" }],
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/v1/settings/threshold-rules/{id}": {
+      "put": {
+        "tags": ["Settings"],
+        "operationId": "updateThresholdRule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateThresholdRuleRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/system-config/{key}": {
+      "put": {
+        "tags": ["Settings"],
+        "operationId": "updateSystemConfig",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSystemConfigRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/str/{id}": {
+      "get": {
+        "tags": ["Reports"],
+        "operationId": "getStr",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Reports"],
+        "operationId": "updateStr",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateStrRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/users": {
+      "get": {
+        "tags": ["Users"],
+        "operationId": "listUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "type": "object", "additionalProperties": {} }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "501": {
+            "description": "Direct user creation is not available.",
+            "content": {
+              "*/*": { "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" } },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/str/{id}/submit": {
+      "post": {
+        "tags": ["Reports"],
+        "operationId": "submitStr",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubmitStrRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/ctr/{id}/submit": {
+      "post": {
+        "tags": ["Reports"],
+        "operationId": "submitCtr",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/import-batches": {
+      "get": {
+        "tags": ["Imports"],
+        "operationId": "listBatches",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ImportBatch" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Imports"],
+        "operationId": "uploadBatch",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": { "file": { "type": "string", "format": "binary" } },
+                "required": ["file"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/import-batches/{id}/confirm-mapping": {
+      "post": {
+        "tags": ["Imports"],
+        "operationId": "confirmMapping",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "additionalProperties": { "type": "string" } }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flags/{id}/escalate-to-str": {
+      "post": {
+        "tags": ["Alerts"],
+        "operationId": "escalateToStr",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients": {
+      "get": {
+        "tags": ["Customers"],
+        "operationId": "listClients",
+        "parameters": [
+          {
+            "name": "regime",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["NORMAL", "SIMPLIFIED"] }
+          },
+          {
+            "name": "risk",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["LOW", "MODERATE", "HIGH"] }
+          },
+          {
+            "name": "pep",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "minimum": 0 }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "minimum": 1 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/PageClient" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "operationId": "createClient",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateClientRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/{clientId}/kyc/recalculate": {
+      "post": {
+        "tags": ["Customers"],
+        "operationId": "recalculate",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/{clientId}/beneficial-owners": {
+      "get": {
+        "tags": ["Customers"],
+        "operationId": "listOwners",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/BeneficialOwner" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "operationId": "addOwner",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BeneficialOwnerRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/beneficial-owners/{ownerId}/verify": {
+      "post": {
+        "tags": ["Customers"],
+        "operationId": "verifyOwner",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/mfa/verify": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "verifyMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MfaVerifyRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/mfa/enroll": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "enrollMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "additionalProperties": { "type": "string" } }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/mfa/confirm": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "confirmMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MfaConfirmRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/settings/users/{id}/reset-mfa": {
+      "patch": {
+        "tags": ["Users"],
+        "operationId": "resetMfa",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flags/{id}/review": {
+      "patch": {
+        "tags": ["Alerts"],
+        "operationId": "reviewFlag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReviewFlagRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/{id}/risk-rating": {
+      "patch": {
+        "tags": ["Customers"],
+        "operationId": "updateRiskRating",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRiskRatingRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/{id}/pep-review": {
+      "patch": {
+        "tags": ["Customers"],
+        "operationId": "registerPepReview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/threshold-rules": {
+      "get": {
+        "tags": ["Settings"],
+        "operationId": "listThresholdRules",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ThresholdRule" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/system-config": {
+      "get": {
+        "tags": ["Settings"],
+        "operationId": "listSystemConfigs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/SystemConfigResponse" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/str": {
+      "get": {
+        "tags": ["Reports"],
+        "operationId": "listStrs",
+        "parameters": [
+          {
+            "name": "submitted",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/SuspiciousActivityReport" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/exports/str/{id}.pdf": {
+      "get": {
+        "tags": ["Reports"],
+        "operationId": "exportStrPdf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report file",
+            "content": {
+              "application/pdf": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/exports/annual/{year}.xlsx": {
+      "get": {
+        "tags": ["Reports"],
+        "operationId": "exportAnnual",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report file",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/ctr": {
+      "get": {
+        "tags": ["Reports"],
+        "operationId": "listCtrs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CurrencyTransactionReport"
+                      }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/insights/summary": {
+      "get": {
+        "tags": ["Insights"],
+        "operationId": "getSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/InsightsSummaryResponse" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/import-batches/{id}": {
+      "get": {
+        "tags": ["Imports"],
+        "operationId": "getBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/flags": {
+      "get": {
+        "tags": ["Alerts"],
+        "operationId": "listFlags",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING", "IN_REVIEW", "ESCALATED_TO_STR", "RESOLVED"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KYC_INCOMPLETE",
+                "THRESHOLD_VALUE",
+                "STRUCTURING_SUSPECTED",
+                "SANCTIONS_MATCH",
+                "PEP_REVIEW_DUE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Flag" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clients/{id}": {
+      "get": {
+        "tags": ["Customers"],
+        "operationId": "getClient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "operationId": "getCurrentUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "object" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audit-log": {
+      "get": {
+        "tags": ["Activity history"],
+        "operationId": "listAuditLogs",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "LOGIN",
+                "LOGOUT",
+                "MFA_ENROLLED",
+                "MFA_VERIFIED",
+                "UPLOAD",
+                "FLAG_REVIEWED",
+                "STR_SUBMITTED",
+                "CTR_SUBMITTED",
+                "CLIENT_UPDATED",
+                "PEP_REVIEWED",
+                "SETTINGS_UPDATED",
+                "USER_CREATED",
+                "USER_UPDATED",
+                "REGULATORY_EXPORT"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "minimum": 0 }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "minimum": 1 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/PageAuditLog" },
+                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+                  },
+                  "required": ["data", "meta"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The service returned an error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiErrorEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponseMetadata": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "requestId": { "type": "string", "format": "uuid" }
+        },
+        "required": ["requestId", "timestamp"]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "details": { "type": "object", "additionalProperties": true }
+        },
+        "required": ["code", "details", "message"]
+      },
+      "ApiErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": { "$ref": "#/components/schemas/ApiError" },
+          "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
+        },
+        "required": ["error", "meta"]
+      },
+      "UpdateThresholdRuleRequest": {
+        "type": "object",
+        "properties": {
+          "valueThreshold": { "type": "number" },
+          "aggregationWindowDays": { "type": "integer", "format": "int32" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "UpdateSystemConfigRequest": {
+        "type": "object",
+        "properties": { "jsonValue": { "type": "string" } },
+        "required": ["jsonValue"]
+      },
+      "UpdateStrRequest": {
+        "type": "object",
+        "properties": {
+          "accountNumber": { "type": "string" },
+          "accountHolder": { "type": "string" },
+          "transactionExecutor": { "type": "string" },
+          "monetaryValue": { "type": "number" },
+          "suspicionDescription": { "type": "string" },
+          "businessRelationshipDescription": { "type": "string" },
+          "internalEmployeeInvolved": { "type": "boolean" },
+          "voluntaryStatement": { "type": "string" }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email", "minLength": 1 },
+          "password": { "type": "string", "minLength": 1 },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "COMPLIANCE_OFFICER", "OCOS", "AUDITOR_READONLY"]
+          }
+        },
+        "required": ["email", "fullName", "password", "role"]
+      },
+      "SubmitStrRequest": {
+        "type": "object",
+        "properties": { "gifimRegistrationNumber": { "type": "string", "minLength": 1 } },
+        "required": ["gifimRegistrationNumber"]
+      },
+      "CreateClientRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": { "type": "string", "minLength": 1 },
+          "idDocumentType": { "type": "string", "minLength": 1 },
+          "idDocumentNumber": { "type": "string", "minLength": 1 },
+          "clientType": { "type": "string", "enum": ["INDIVIDUAL", "CORPORATE"] },
+          "nuib": { "type": "string" },
+          "dueDiligenceRegime": { "type": "string", "enum": ["NORMAL", "SIMPLIFIED"] },
+          "isPep": { "type": "boolean" },
+          "pepCategory": { "type": "string" },
+          "seniorManagementApproved": { "type": "boolean" }
+        },
+        "required": ["fullName", "idDocumentNumber", "idDocumentType"]
+      },
+      "BeneficialOwnerRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": { "type": "string", "minLength": 1 },
+          "role": {
+            "type": "string",
+            "enum": [
+              "FOUNDER",
+              "ADMINISTRATOR",
+              "TRUSTEE",
+              "BENEFICIARY",
+              "CONTROLLING_PERSON"
+            ]
+          },
+          "ownershipPercentage": { "type": "number" }
+        },
+        "required": ["fullName", "role"]
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "properties": { "refreshToken": { "type": "string", "minLength": 1 } },
+        "required": ["refreshToken"]
+      },
+      "MfaVerifyRequest": {
+        "type": "object",
+        "properties": {
+          "challengeToken": { "type": "string" },
+          "tempToken": { "type": "string" },
+          "code": { "type": "string" },
+          "totpCode": { "type": "string" }
+        }
+      },
+      "MfaConfirmRequest": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "enrollmentToken": { "type": "string" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email", "minLength": 1 },
+          "password": { "type": "string" },
+          "passwordHash": { "type": "string" }
+        },
+        "required": ["email"]
+      },
+      "ReviewFlagRequest": {
+        "type": "object",
+        "properties": {
+          "note": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "IN_REVIEW", "ESCALATED_TO_STR", "RESOLVED"]
+          }
+        },
+        "required": ["note"]
+      },
+      "UpdateRiskRatingRequest": {
+        "type": "object",
+        "properties": {
+          "riskRating": { "type": "string", "enum": ["LOW", "MODERATE", "HIGH"] }
+        },
+        "required": ["riskRating"]
+      },
+      "ThresholdRule": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["SINGLE_TRANSACTION_VALUE", "MONTHLY_AGGREGATE_VALUE", "STRUCTURING"]
+          },
+          "valueThreshold": { "type": "number" },
+          "aggregationWindowDays": { "type": "integer", "format": "int32" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "SystemConfigResponse": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string" },
+          "value": { "type": "string" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Flag": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "KYC_INCOMPLETE",
+              "THRESHOLD_VALUE",
+              "STRUCTURING_SUSPECTED",
+              "SANCTIONS_MATCH",
+              "PEP_REVIEW_DUE"
+            ]
+          },
+          "reason": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "IN_REVIEW", "ESCALATED_TO_STR", "RESOLVED"]
+          },
+          "slaDeadline": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "reviewedAt": { "type": "string", "format": "date-time" },
+          "reviewNote": { "type": "string" }
+        }
+      },
+      "SuspiciousActivityReport": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "flag": { "$ref": "#/components/schemas/Flag" },
+          "reportingInstitution": { "type": "string" },
+          "accountNumber": { "type": "string" },
+          "accountHolder": { "type": "string" },
+          "transactionExecutor": { "type": "string" },
+          "monetaryValue": { "type": "number" },
+          "suspicionDescription": { "type": "string" },
+          "businessRelationshipDescription": { "type": "string" },
+          "internalEmployeeInvolved": { "type": "boolean" },
+          "voluntaryStatement": { "type": "string" },
+          "ocosName": { "type": "string" },
+          "gifimRegistrationNumber": { "type": "string" },
+          "submittedAt": { "type": "string", "format": "date-time" },
+          "retentionUntil": { "type": "string", "format": "date" },
+          "submitted": { "type": "boolean" }
+        }
+      },
+      "Client": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string" },
+          "idDocumentType": { "type": "string" },
+          "idDocumentNumber": { "type": "string" },
+          "clientType": { "type": "string", "enum": ["INDIVIDUAL", "CORPORATE"] },
+          "nuib": { "type": "string" },
+          "riskRating": { "type": "string", "enum": ["LOW", "MODERATE", "HIGH"] },
+          "riskRatingUpdatedAt": { "type": "string", "format": "date" },
+          "dueDiligenceRegime": { "type": "string", "enum": ["NORMAL", "SIMPLIFIED"] },
+          "pep": { "type": "boolean" },
+          "pepCategory": { "type": "string" },
+          "pepLastReviewedAt": { "type": "string", "format": "date" },
+          "seniorManagementApproved": { "type": "boolean" },
+          "kycComplete": { "type": "boolean" },
+          "sanctionsFrozen": { "type": "boolean" },
+          "sanctionsFrozenAt": { "type": "string", "format": "date-time" },
+          "sanctionsFreezeReason": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "organization": { "$ref": "#/components/schemas/Organization" }
+        }
+      },
+      "CurrencyTransactionReport": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "client": { "$ref": "#/components/schemas/Client" },
+          "aggregationPeriodStart": { "type": "string", "format": "date" },
+          "aggregationPeriodEnd": { "type": "string", "format": "date" },
+          "aggregateValue": { "type": "number" },
+          "currency": { "type": "string" },
+          "thresholdRule": { "$ref": "#/components/schemas/ThresholdRule" },
+          "submittedAt": { "type": "string", "format": "date-time" },
+          "retentionUntil": { "type": "string", "format": "date" },
+          "submitted": { "type": "boolean" }
+        }
+      },
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "InsightsSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "totalClients": { "type": "integer", "format": "int64" },
+          "kycCompleteCount": { "type": "integer", "format": "int64" },
+          "kycCompletenessPercentage": { "type": "number", "format": "double" },
+          "simplifiedRegimeCount": { "type": "integer", "format": "int64" },
+          "normalRegimeCount": { "type": "integer", "format": "int64" },
+          "pendingFlagsCount": { "type": "integer", "format": "int64" },
+          "sanctionsMatchCount": { "type": "integer", "format": "int64" },
+          "overdueSlaCount": { "type": "integer", "format": "int64" },
+          "pepReviewDueCount": { "type": "integer", "format": "int64" },
+          "totalTransactionsCount": { "type": "integer", "format": "int64" },
+          "retentionExpiringCount": { "type": "integer", "format": "int64" }
+        }
+      },
+      "ImportBatch": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fileName": { "type": "string" },
+          "format": { "type": "string", "enum": ["CSV", "XLSX"] },
+          "columnMapping": { "type": "string" },
+          "totalRows": { "type": "integer", "format": "int32" },
+          "errorRows": { "type": "integer", "format": "int32" },
+          "sourceFilePath": { "type": "string" },
+          "importedBy": { "$ref": "#/components/schemas/User" },
+          "organization": { "$ref": "#/components/schemas/Organization" },
+          "importedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string" },
+          "email": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "COMPLIANCE_OFFICER", "OCOS", "AUDITOR_READONLY"]
+          },
+          "mfaEnabled": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "lastLoginAt": { "type": "string", "format": "date-time" },
+          "organization": { "$ref": "#/components/schemas/Organization" }
+        }
+      },
+      "BeneficialOwner": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": [
+              "FOUNDER",
+              "ADMINISTRATOR",
+              "TRUSTEE",
+              "BENEFICIARY",
+              "CONTROLLING_PERSON"
+            ]
+          },
+          "ownershipPercentage": { "type": "number" },
+          "verifiedAt": { "type": "string", "format": "date" }
+        }
+      },
+      "PageClient": {
+        "type": "object",
+        "properties": {
+          "totalPages": { "type": "integer", "format": "int32" },
+          "totalElements": { "type": "integer", "format": "int64" },
+          "size": { "type": "integer", "format": "int32" },
+          "content": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Client" }
+          },
+          "number": { "type": "integer", "format": "int32" },
+          "sort": { "$ref": "#/components/schemas/SortObject" },
+          "pageable": { "$ref": "#/components/schemas/PageableObject" },
+          "numberOfElements": { "type": "integer", "format": "int32" },
+          "first": { "type": "boolean" },
+          "last": { "type": "boolean" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": { "type": "integer", "format": "int64" },
+          "paged": { "type": "boolean" },
+          "pageNumber": { "type": "integer", "format": "int32" },
+          "pageSize": { "type": "integer", "format": "int32" },
+          "sort": { "$ref": "#/components/schemas/SortObject" },
+          "unpaged": { "type": "boolean" }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": { "type": "boolean" },
+          "sorted": { "type": "boolean" },
+          "unsorted": { "type": "boolean" }
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "actor": { "$ref": "#/components/schemas/User" },
+          "action": {
+            "type": "string",
+            "enum": [
+              "LOGIN",
+              "LOGOUT",
+              "MFA_ENROLLED",
+              "MFA_VERIFIED",
+              "UPLOAD",
+              "FLAG_REVIEWED",
+              "STR_SUBMITTED",
+              "CTR_SUBMITTED",
+              "CLIENT_UPDATED",
+              "PEP_REVIEWED",
+              "SETTINGS_UPDATED",
+              "USER_CREATED",
+              "USER_UPDATED",
+              "REGULATORY_EXPORT"
+            ]
+          },
+          "entity": { "type": "string" },
+          "entityId": { "type": "string", "format": "uuid" },
+          "details": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PageAuditLog": {
+        "type": "object",
+        "properties": {
+          "totalPages": { "type": "integer", "format": "int32" },
+          "totalElements": { "type": "integer", "format": "int64" },
+          "size": { "type": "integer", "format": "int32" },
+          "content": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AuditLog" }
+          },
+          "number": { "type": "integer", "format": "int32" },
+          "sort": { "$ref": "#/components/schemas/SortObject" },
+          "pageable": { "$ref": "#/components/schemas/PageableObject" },
+          "numberOfElements": { "type": "integer", "format": "int32" },
+          "first": { "type": "boolean" },
+          "last": { "type": "boolean" },
+          "empty": { "type": "boolean" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  }
+}

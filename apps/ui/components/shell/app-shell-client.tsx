@@ -40,6 +40,10 @@ import { Separator } from "@/components/ui/separator"
 import { api } from "@/lib/api-client"
 import type { InsightsData } from "@/lib/types"
 
+/**
+ * Wrap route content with module navigation, command search, and account controls.
+ * Fetch insights once for navigation badges; a failed request leaves badges absent.
+ */
 export function AppShellClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -154,7 +158,7 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
             </Link>
             <Separator
               orientation="vertical"
-              className="bg-muted-foreground/75 h-4 w-[1px]"
+              className="h-4 w-[1px] bg-muted-foreground/75"
             />
             <OrganizationSelector
               organizations={[{ id: "default", name: "Organization", short: "ORG" }]}
@@ -240,7 +244,7 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
                         <span className="flex w-full items-center justify-between gap-2">
                           <span className="truncate">{item.title}</span>
                           {typeof badge === "number" && badge > 0 && (
-                            <span className="border-border bg-muted text-muted-foreground rounded-full border px-1.5 py-0.5 font-mono text-[10px] font-semibold">
+                            <span className="rounded-full border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] font-semibold text-muted-foreground">
                               {badge}
                             </span>
                           )}

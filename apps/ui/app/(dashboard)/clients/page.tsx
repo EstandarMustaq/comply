@@ -42,6 +42,11 @@ import {
 import { api } from "@/lib/api-client"
 import { type Client, type ClientRegime, type ClientRiskRating } from "@/lib/types"
 
+/**
+ * Load and search the first 100 matching customers, filter them by regime,
+ * and provide profile creation and detail views. Load failures retain the
+ * previous list; creation failures appear in the form.
+ */
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -156,7 +161,7 @@ export default function ClientsPage() {
         {/* Customer search and filters */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="relative w-full sm:w-80">
-            <Search className="text-muted-foreground absolute left-3 top-2.5 h-4 w-4" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search by name, document or NUIB..."
@@ -195,7 +200,7 @@ export default function ClientsPage() {
         <Card className="border-border shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
-              <Users className="text-primary h-4 w-4" />
+              <Users className="h-4 w-4 text-primary" />
               Customers ({filteredClients.length})
             </CardTitle>
             <CardDescription className="text-xs">
@@ -204,7 +209,7 @@ export default function ClientsPage() {
           </CardHeader>
           <CardContent>
             {filteredClients.length === 0 ? (
-              <div className="text-muted-foreground py-12 text-center text-xs">
+              <div className="py-12 text-center text-xs text-muted-foreground">
                 No customers match these filters.
               </div>
             ) : (
@@ -224,19 +229,19 @@ export default function ClientsPage() {
                   {filteredClients.map((client) => (
                     <TableRow
                       key={client.id}
-                      className="hover:bg-muted/50 cursor-pointer"
+                      className="cursor-pointer hover:bg-muted/50"
                       onClick={() => openClientDetail(client)}
                     >
                       <TableCell className="text-xs font-semibold">
                         {client.fullName}
-                        <div className="text-muted-foreground text-[10px] font-normal">
+                        <div className="text-[10px] font-normal text-muted-foreground">
                           {client.clientType === "INDIVIDUAL" ? "Individual" : "Business"}
                         </div>
                       </TableCell>
                       <TableCell className="font-mono text-xs">
                         {client.documentNumber}
                         {client.nuib && (
-                          <div className="text-muted-foreground text-[10px]">
+                          <div className="text-[10px] text-muted-foreground">
                             NUIB: {client.nuib}
                           </div>
                         )}
@@ -267,7 +272,7 @@ export default function ClientsPage() {
                             PEP ({client.pepCategory || "Nacional"})
                           </Badge>
                         ) : (
-                          <span className="text-muted-foreground text-[11px]">—</span>
+                          <span className="text-[11px] text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-xs font-semibold">
@@ -310,7 +315,7 @@ export default function ClientsPage() {
         <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="text-primary h-5 w-5" />
+              <UserPlus className="h-5 w-5 text-primary" />
               Add customer
             </DialogTitle>
             <DialogDescription className="text-xs">
@@ -406,15 +411,15 @@ export default function ClientsPage() {
             </div>
 
             {/* Politically exposed person indicator */}
-            <div className="bg-muted/40 space-y-2 rounded-lg border p-3">
+            <div className="space-y-2 rounded-lg border bg-muted/40 p-3">
               <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={newClientIsPep}
                   onChange={(e) => setNewClientIsPep(e.target.checked)}
-                  className="border-input text-primary focus:ring-primary h-4 w-4 rounded"
+                  className="h-4 w-4 rounded border-input text-primary focus-visible:ring-primary"
                 />
-                <span className="text-foreground font-semibold">
+                <span className="font-semibold text-foreground">
                   Politically exposed person
                 </span>
               </label>

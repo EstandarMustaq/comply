@@ -827,13 +827,6 @@ export interface components {
       lastLoginAt?: string
       organization?: components["schemas"]["Organization"]
     }
-    Pageable: {
-      /** Format: int32 */
-      page?: number
-      /** Format: int32 */
-      size?: number
-      sort?: string[]
-    }
     BeneficialOwner: {
       /** Format: uuid */
       id?: string
@@ -1260,9 +1253,9 @@ export interface operations {
       path?: never
       cookie?: never
     }
-    requestBody?: {
+    requestBody: {
       content: {
-        "application/json": {
+        "multipart/form-data": {
           /** Format: binary */
           file: string
         }
@@ -1368,12 +1361,17 @@ export interface operations {
   }
   listClients: {
     parameters: {
-      query: {
+      query?: {
         regime?: "NORMAL" | "SIMPLIFIED"
         risk?: "LOW" | "MODERATE" | "HIGH"
         pep?: boolean
         search?: string
-        pageable: components["schemas"]["Pageable"]
+        /** @description Zero-based page index (0..N) */
+        page?: number
+        /** @description The size of the page to be returned */
+        size?: number
+        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[]
       }
       header?: never
       path?: never
@@ -2047,16 +2045,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Report file */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": {
-            data: Record<string, never>
-            meta: components["schemas"]["ApiResponseMetadata"]
-          }
+          "application/pdf": string
         }
       }
       /** @description The service returned an error. */
@@ -2081,16 +2076,13 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description OK */
+      /** @description Report file */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "application/json": {
-            data: Record<string, never>
-            meta: components["schemas"]["ApiResponseMetadata"]
-          }
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
         }
       }
       /** @description The service returned an error. */
@@ -2310,7 +2302,7 @@ export interface operations {
   }
   listAuditLogs: {
     parameters: {
-      query: {
+      query?: {
         action?:
           | "LOGIN"
           | "LOGOUT"
@@ -2326,7 +2318,12 @@ export interface operations {
           | "USER_CREATED"
           | "USER_UPDATED"
           | "REGULATORY_EXPORT"
-        pageable: components["schemas"]["Pageable"]
+        /** @description Zero-based page index (0..N) */
+        page?: number
+        /** @description The size of the page to be returned */
+        size?: number
+        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[]
       }
       header?: never
       path?: never

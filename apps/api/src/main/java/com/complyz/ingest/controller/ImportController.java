@@ -5,6 +5,7 @@ import com.complyz.ingest.entity.ImportBatch;
 import com.complyz.ingest.service.ImportService;
 import com.complyz.users.entity.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,8 @@ public class ImportController {
         this.importService = importService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> uploadBatch(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
