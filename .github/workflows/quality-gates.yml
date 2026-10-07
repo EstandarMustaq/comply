@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - name: Test and package API
         run: ./gradlew --no-daemon :api:test :api:bootJar
 
@@ -96,7 +96,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - uses: pnpm/action-setup@v6
         with:
           version: 12.8.1
