@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -46,7 +47,7 @@ public class ClientController {
             @RequestParam(required = false) RiskRating risk,
             @RequestParam(required = false) Boolean pep,
             @RequestParam(required = false) String search,
-            Pageable pageable,
+            @ParameterObject Pageable pageable,
             Authentication authentication
     ) {
         Organization organization = tenantAccessService.requireOrganization((User) authentication.getPrincipal());

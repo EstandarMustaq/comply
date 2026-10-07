@@ -18,7 +18,7 @@ Use the Complyz API to connect authorized applications to your Organization's wo
 Send your account email and password to the full login URL:
 
 ```http
-POST https://api.trycomplyz.com/api/v1/auth/login
+POST https://<your-deployment>/api/v1/auth/login
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ The response tells you which multi-factor authentication step to complete:
 - `MFA_ENROLLMENT_REQUIRED`: set up multi-factor authentication for the account.
 - `MFA_REQUIRED`: verify the sign-in challenge.
 
-For first-time setup, start enrollment and confirm the verification code. For an existing setup, verify the sign-in challenge. Successful verification or enrollment confirmation returns an access token and a refresh token. See the matching operations in the [API reference](/api).
+For first-time setup, start enrollment and confirm the verification code. For an existing setup, verify the sign-in challenge. Successful verification or enrollment confirmation returns an access token and a refresh token. In the **Authentication** sidebar, open `enrollMfa` to start enrollment, `confirmMfa` to confirm it, or `verifyMfa` to verify a sign-in challenge.
 
 <Warning>
   Replace the example credentials with your own. Do not commit credentials or tokens.
@@ -44,7 +44,7 @@ Send the access token in the `Authorization` header. For example, this request r
 
 ```bash
 curl --request GET \
-  --url https://api.trycomplyz.com/api/v1/insights/summary \
+  --url "https://<your-deployment>/api/v1/insights/summary" \
   --header "Authorization: Bearer ${COMPLYZ_ACCESS_TOKEN}"
 ```
 
@@ -55,7 +55,7 @@ Replace `COMPLYZ_ACCESS_TOKEN` with the access token returned after authenticati
 When the access token expires, send the current refresh token to:
 
 ```http
-POST https://api.trycomplyz.com/api/v1/auth/refresh
+POST https://<your-deployment>/api/v1/auth/refresh
 Content-Type: application/json
 
 {
@@ -95,6 +95,6 @@ Errors include an error code, message, and details. Use the HTTP status and erro
 
 ## Versioning and access
 
-Use the versioned request URL shown in the API reference. Current operations use `https://api.trycomplyz.com/api/v1`; do not omit the version path or add it twice.
+Append `/api/v1` once to the deployment base URL provided by your administrator. Use that base URL in place of `https://<your-deployment>` in these examples.
 
 The API authorizes access using the signed-in account and its Organization. Use operations only for information you are authorized to view or change. An Organization ID does not grant access to another Organization's data.

@@ -38,6 +38,9 @@ jobs:
               : await github.paginate(github.rest.pulls.list, {
                   owner, repo, state: "open", per_page: 100,
                 });
+            let issueByPullRequest;
+            let labelsReady = false;
+            const recordedReviewsByIssue = new Map();
             for (const pullRequest of pullRequests) {
               const reviews = context.eventName === "pull_request_review"
                 ? [context.payload.review]
@@ -102,32 +105,40 @@ jobs:
                 }
               }
 
-              await ensureLabel("code-review", "5319e7", "Findings raised by automated code review");
-              await ensureLabel("needs-triage", "fbca04", "Review and confirm before taking action");
-
               const issueMarker = `<!-- coderabbit-pr: ${pullRequest.number} -->`;
               const reviewMarker = `<!-- coderabbit-review: ${review.id} -->`;
-              const issues = await github.paginate(github.rest.issues.listForRepo, {
-                owner,
-                repo,
-                state: "all",
-                per_page: 100,
-              });
-              const existing = issues.find(
-                (issue) => !issue.pull_request && issue.body?.includes(issueMarker),
-              );
-
-              if (existing) {
-                const issueComments = await github.paginate(github.rest.issues.listComments, {
-                  owner,
-                  repo,
-                  issue_number: existing.number,
-                  per_page: 100,
+              if (!issueByPullRequest) {
+                const issues = await github.paginate(github.rest.issues.listForRepo, {
+                  owner, repo, state: "all", per_page: 100,
                 });
-                if (issueComments.some((comment) => comment.body?.includes(reviewMarker))) {
+                issueByPullRequest = new Map();
+                for (const issue of issues) {
+                  if (issue.pull_request) continue;
+                  const marker = issue.body?.match(/<!-- coderabbit-pr: (\d+) -->/);
+                  if (marker && !issueByPullRequest.has(Number(marker[1]))) {
+                    issueByPullRequest.set(Number(marker[1]), issue);
+                  }
+                }
+              }
+              const existing = issueByPullRequest.get(pullRequest.number);
+              if (existing) {
+                if (!recordedReviewsByIssue.has(existing.number)) {
+                  const comments = await github.paginate(github.rest.issues.listComments, {
+                    owner, repo, issue_number: existing.number, per_page: 100,
+                  });
+                  recordedReviewsByIssue.set(existing.number, new Set(comments.flatMap(
+                    (comment) => [...(comment.body ?? "").matchAll(/<!-- coderabbit-review: (\d+) -->/g)].map((match) => Number(match[1])),
+                  )));
+                }
+                if (recordedReviewsByIssue.get(existing.number).has(review.id)) {
                   core.info(`Review ${review.id} is already recorded in issue #${existing.number}.`);
                   return;
                 }
+              }
+              if (!labelsReady) {
+                await ensureLabel("code-review", "5319e7", "Findings raised by automated code review");
+                await ensureLabel("needs-triage", "fbca04", "Review and confirm before taking action");
+                labelsReady = true;
               }
 
               /**
@@ -189,6 +200,8 @@ jobs:
                   labels: ["code-review", "needs-triage"],
                 });
                 issueNumber = created.data.number;
+                issueByPullRequest.set(pullRequest.number, created.data);
+                recordedReviewsByIssue.set(issueNumber, new Set());
                 core.info(`Created issue #${issueNumber} for CodeRabbit review ${review.id}.`);
               } else {
                 issueNumber = existing.number;
@@ -211,4 +224,5 @@ jobs:
                 issue_number: issueNumber,
                 body: commentBody,
               });
+              recordedReviewsByIssue.get(issueNumber).add(review.id);
             }

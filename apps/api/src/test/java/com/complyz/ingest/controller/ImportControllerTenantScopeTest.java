@@ -7,6 +7,10 @@ import com.complyz.tenancy.entity.Organization;
 import com.complyz.users.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +20,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ImportControllerTenantScopeTest {
+
+    @Test
+    void uploadAcceptsMultipartFileAndRequiresTheFilePart() throws Exception {
+        ImportService service = mock(ImportService.class);
+        var mvc = MockMvcBuilders.standaloneSetup(new ImportController(service)).build();
+        User actor = new User();
+        var authentication = new TestingAuthenticationToken(actor, null);
+        var file = new MockMultipartFile("file", "transactions.csv", "text/csv", "amount\n10".getBytes());
+
+        mvc.perform(multipart("/import-batches").file(file).principal(authentication))
+                .andExpect(status().isOk());
+        verify(service).createUploadBatch(file, actor);
+        mvc.perform(multipart("/import-batches").principal(authentication))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void uploadRejectsJsonInsteadOfAFileUpload() throws Exception {
+        ImportService service = mock(ImportService.class);
+        var mvc = MockMvcBuilders.standaloneSetup(new ImportController(service)).build();
+
+        mvc.perform(post("/import-batches").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnsupportedMediaType());
+        verifyNoInteractions(service);
+    }
 
     @Test
     void listAndDetailUseTheAuthenticatedOrganization() {

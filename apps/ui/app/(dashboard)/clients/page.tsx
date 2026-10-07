@@ -417,7 +417,7 @@ export default function ClientsPage() {
                   type="checkbox"
                   checked={newClientIsPep}
                   onChange={(e) => setNewClientIsPep(e.target.checked)}
-                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                  className="h-4 w-4 rounded border-input text-primary focus-visible:ring-primary"
                 />
                 <span className="font-semibold text-foreground">
                   Politically exposed person

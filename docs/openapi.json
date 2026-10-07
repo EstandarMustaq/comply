@@ -375,14 +375,15 @@
         "operationId": "uploadBatch",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": { "file": { "type": "string", "format": "binary" } },
                 "required": ["file"]
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -527,10 +528,25 @@
             "schema": { "type": "string" }
           },
           {
-            "name": "pageable",
+            "name": "page",
             "in": "query",
-            "required": true,
-            "schema": { "$ref": "#/components/schemas/Pageable" }
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "minimum": 0 }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "minimum": 1 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
           }
         ],
         "responses": {
@@ -1288,18 +1304,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Report file",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": { "type": "object" },
-                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
-                  },
-                  "required": ["data", "meta"]
-                }
-              }
+              "application/pdf": { "schema": { "type": "string", "format": "binary" } }
             }
           },
           "default": {
@@ -1327,17 +1334,10 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Report file",
             "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": { "type": "object" },
-                    "meta": { "$ref": "#/components/schemas/ApiResponseMetadata" }
-                  },
-                  "required": ["data", "meta"]
-                }
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
               }
             }
           },
@@ -1618,10 +1618,25 @@
             }
           },
           {
-            "name": "pageable",
+            "name": "page",
             "in": "query",
-            "required": true,
-            "schema": { "$ref": "#/components/schemas/Pageable" }
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": { "type": "integer", "default": 0, "minimum": 0 }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "minimum": 1 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
           }
         ],
         "responses": {
@@ -1966,14 +1981,6 @@
           "createdAt": { "type": "string", "format": "date-time" },
           "lastLoginAt": { "type": "string", "format": "date-time" },
           "organization": { "$ref": "#/components/schemas/Organization" }
-        }
-      },
-      "Pageable": {
-        "type": "object",
-        "properties": {
-          "page": { "type": "integer", "format": "int32", "minimum": 0 },
-          "size": { "type": "integer", "format": "int32", "minimum": 1 },
-          "sort": { "type": "array", "items": { "type": "string" } }
         }
       },
       "BeneficialOwner": {

@@ -1,5 +1,8 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { execFileSync, spawnSync } from "node:child_process"
 import { test } from "node:test"
 
 // Execute the actual github-script block with synthetic API responses and no network.
@@ -44,6 +47,7 @@ function review(body, state = "COMMENTED") {
 }
 function harness({ reviews = [], findings = [], issues = [], comments = [] } = {}) {
   const writes = []
+  const reads = []
   const rest = {}
   for (const [group, names] of Object.entries({
     pulls: ["list", "listReviews", "listCommentsForReview"],
@@ -61,7 +65,10 @@ function harness({ reviews = [], findings = [], issues = [], comments = [] } = {
       names.map((name) => [
         name,
         async (args) => {
-          if (name === "getLabel") return { data: {} }
+          if (name === "getLabel") {
+            reads.push({ ...args, name })
+            return { data: {} }
+          }
           writes.push({ name, ...args })
           return { data: { number: 100 } }
         },
@@ -77,10 +84,12 @@ function harness({ reviews = [], findings = [], issues = [], comments = [] } = {
   ])
   return {
     writes,
+    reads,
     github: {
       rest,
       paginate: async (method) => {
         assert.ok(pages.has(method))
+        reads.push({ method })
         return pages.get(method)
       },
     },
@@ -293,3 +302,97 @@ for (const summary of [
     assert.match(writes.find((w) => w.name === "createComment").body, /Fix the API URL/)
   })
 }
+
+test("reconciliation indexes issues and labels once and reuses newly created issues", async () => {
+  const first = review("## Findings\nFirst issue")
+  const second = { ...review("## Findings\nSecond issue"), id: 43 }
+  const h = harness({ reviews: [first, second, first] })
+  await (
+    await workflow("coderabbit-finding-issues")
+  )(h.github, h.context, h.core)
+  assert.equal(
+    h.reads.filter((r) => r.method === h.github.rest.issues.listForRepo).length,
+    1
+  )
+  assert.equal(h.reads.filter((r) => r.name === "getLabel").length, 2)
+  assert.equal(h.writes.filter((w) => w.name === "create").length, 1)
+  assert.equal(h.writes.filter((w) => w.name === "createComment").length, 2)
+  assert.equal(
+    h.reads.filter((r) => r.method === h.github.rest.issues.listComments).length,
+    0
+  )
+})
+
+test("existing issue comments are fetched once across multiple reviews", async () => {
+  const h = harness({
+    reviews: [
+      review("## Findings\nOld finding"),
+      { ...review("## Findings\nNew finding"), id: 43 },
+    ],
+    issues: [{ number: 100, body: "<!-- coderabbit-pr: 19 -->" }],
+    comments: [{ body: "<!-- coderabbit-review: 42 -->" }],
+  })
+  await (
+    await workflow("coderabbit-finding-issues")
+  )(h.github, h.context, h.core)
+  assert.equal(
+    h.reads.filter((r) => r.method === h.github.rest.issues.listComments).length,
+    1
+  )
+  assert.equal(h.writes.filter((w) => w.name === "createComment").length, 1)
+  assert.match(h.writes.find((w) => w.name === "createComment").body, /New finding/)
+})
+
+test("OpenAPI drift gate catches modified, deleted, staged and untracked contracts", async () => {
+  const source = await readFile(
+    new URL("../.github/workflows/quality-gates.yml", import.meta.url),
+    "utf8"
+  )
+  const script = source
+    .split(
+      "      - name: Verify the checked-in documentation contract\n        run: |\n"
+    )[1]
+    .split("      - name:")[0]
+  const root = await mkdtemp(join(tmpdir(), "complyz-contract-drift-"))
+  const git = (...args) => execFileSync("git", args, { cwd: root, stdio: "pipe" })
+  const status = () => spawnSync("bash", ["-c", script], { cwd: root }).status
+  try {
+    git("init")
+    await mkdir(join(root, "docs"))
+    const file = join(root, "docs/openapi.json")
+    await writeFile(file, "{}\n")
+    git("add", ".")
+    git(
+      "-c",
+      "user.name=Test",
+      "-c",
+      "user.email=test@example.invalid",
+      "commit",
+      "-m",
+      "fixture"
+    )
+    assert.equal(status(), 0)
+    await writeFile(file, '{"changed":true}\n')
+    assert.equal(status(), 1)
+    git("add", ".")
+    assert.equal(status(), 1)
+    git("reset", "--hard", "HEAD")
+    await rm(file)
+    assert.equal(status(), 1)
+    git("rm", "docs/openapi.json")
+    git(
+      "-c",
+      "user.name=Test",
+      "-c",
+      "user.email=test@example.invalid",
+      "commit",
+      "-m",
+      "remove contract"
+    )
+    await mkdir(join(root, "docs"), { recursive: true })
+    await writeFile(file, "{}\n")
+    assert.equal(status(), 1)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})

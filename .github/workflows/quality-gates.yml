@@ -137,7 +137,12 @@ jobs:
           COMPLYZ_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
         run: pnpm api:openapi
       - name: Verify the checked-in documentation contract
-        run: git diff --exit-code -- docs/openapi.json
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=all -- docs/openapi.json)" ]; then
+            echo "Regenerate and commit docs/openapi.json with pnpm api:openapi."
+            git status --short -- docs/openapi.json
+            exit 1
+          fi
       - name: Type-check generated API client
         run: pnpm --filter @complyz/api-clients run typecheck
       - name: Run API/UI contract assertions
