@@ -111,13 +111,33 @@ export function validateDeploymentEnvironment(env) {
   const origins = (env.CORS_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((origin) => origin.trim())
-  if (
-    origins.length === 0 ||
-    origins.some((origin) => !origin || /localhost|127\.0\.0\.1|\*/i.test(origin))
-  ) {
+    .filter(Boolean)
+  if (origins.length === 0) {
     throw new Error("CORS_ALLOWED_ORIGINS must contain only explicit production origins.")
   }
-  if (!origins.includes("https://trycomplyz.com")) {
+  const normalizedOrigins = origins.map((origin) => {
+    let parsed
+    try {
+      parsed = new URL(origin)
+    } catch {
+      throw new Error("CORS_ALLOWED_ORIGINS must contain only explicit production origins.")
+    }
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.hostname === "localhost" ||
+      parsed.hostname === "127.0.0.1" ||
+      parsed.hostname.includes("*") ||
+      parsed.pathname !== "/" ||
+      parsed.search ||
+      parsed.hash ||
+      parsed.username ||
+      parsed.password
+    ) {
+      throw new Error("CORS_ALLOWED_ORIGINS must contain only explicit production origins.")
+    }
+    return parsed.origin
+  })
+  if (!normalizedOrigins.includes("https://trycomplyz.com")) {
     throw new Error("CORS_ALLOWED_ORIGINS must allow https://trycomplyz.com.")
   }
   if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomplyz.com/api/v1") {
