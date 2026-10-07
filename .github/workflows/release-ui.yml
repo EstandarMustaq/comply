@@ -66,5 +66,6 @@ jobs:
           tags: |
             ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ github.sha }}
             ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ github.ref_name }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -9,7 +9,7 @@ on:
         default: production
         type: environment
       image-tag:
-        description: Immutable GHCR image tag to deploy
+        description: Commit SHA with a successful main-branch Quality Gates run; images deploy by digest
         required: true
         type: string
       task-definition:
@@ -27,53 +27,135 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-  packages: read
 
 concurrency:
   group: deploy-ecs-${{ inputs.environment }}
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Deploy approved revision to ECS
+  verify:
+    name: Verify validated container images
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    environment: ${{ inputs.environment }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+    outputs:
+      api-image: ${{ steps.verify-images.outputs.api-image }}
+      ui-image: ${{ steps.verify-images.outputs.ui-image }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
 
+      - name: Validate source revision and successful quality run
+        id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGE_TAG: ${{ inputs.image-tag }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "Deployments must be dispatched from main." >&2
+            exit 1
+          fi
+          if [[ ! "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "image-tag must be a 40-character lowercase commit SHA." >&2
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$IMAGE_TAG" FETCH_HEAD; then
+            echo "The requested commit is not reachable from main." >&2
+            exit 1
+          fi
+          runs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/quality-gates.yml/runs?head_sha=${IMAGE_TAG}&branch=main&event=push&per_page=100")"
+          if ! jq --exit-status --arg sha "$IMAGE_TAG" \
+            'any(.workflow_runs[]; .head_sha == $sha and .head_branch == "main" and .event == "push" and .conclusion == "success")' \
+            <<< "$runs" >/dev/null; then
+            echo "No successful Quality Gates run was found for this main-branch commit." >&2
+            exit 1
+          fi
       - name: Normalize image namespace
         id: image-names
         env:
           REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: echo "owner=${REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify both images were built from the validated revision
+        id: verify-images
+        env:
+          OWNER: ${{ steps.image-names.outputs.owner }}
+          IMAGE_TAG: ${{ inputs.image-tag }}
+        run: |
+          set -euo pipefail
+          verify_image() {
+            local base="$1"
+            local output="$2"
+            local image="${base}:${IMAGE_TAG}"
+            docker pull "$image"
+            revision="$(docker image inspect --format='{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image")"
+            if [[ "$revision" != "$IMAGE_TAG" ]]; then
+              echo "Image $image does not identify the requested source revision." >&2
+              exit 1
+            fi
+            digest="$(docker image inspect --format='{{ index .RepoDigests 0 }}' "$image")"
+            if [[ "$digest" != "${base}@sha256:"* || ! "${digest#*@sha256:}" =~ ^[0-9a-f]{64}$ ]]; then
+              echo "Image $image did not resolve to a valid registry digest." >&2
+              exit 1
+            fi
+            echo "${output}=${digest}" >> "$GITHUB_OUTPUT"
+          }
+          verify_image "ghcr.io/${OWNER}/complyz-api" api-image
+          verify_image "ghcr.io/${OWNER}/complyz-ui" ui-image
+
+  deploy:
+    name: Deploy approved revision to ECS
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
       - name: Configure AWS credentials with OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
 
       - name: Render ECS task definition
         id: task-definition
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        uses: aws-actions/amazon-ecs-render-task-definition@8d79160660ad39c402a16e5fc7cd2a32e8f7d6b7
         with:
           task-definition: ${{ inputs.task-definition }}
           container-name: complyz-api
-          image: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-api:${{ inputs.image-tag }}
+          image: ${{ needs.verify.outputs.api-image }}
 
       - name: Render UI image
         id: ui-task-definition
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        uses: aws-actions/amazon-ecs-render-task-definition@8d79160660ad39c402a16e5fc7cd2a32e8f7d6b7
         with:
           task-definition: ${{ steps.task-definition.outputs.task-definition }}
           container-name: complyz-ui
-          image: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ inputs.image-tag }}
+          image: ${{ needs.verify.outputs.ui-image }}
 
       - name: Deploy ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        uses: aws-actions/amazon-ecs-deploy-task-definition@c465972ecbd160473f22e683363b422a5412a3de
         with:
           task-definition: ${{ steps.ui-task-definition.outputs.task-definition }}
           service: ${{ inputs.service }}

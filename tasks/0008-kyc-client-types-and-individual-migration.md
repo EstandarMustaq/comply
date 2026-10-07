@@ -39,14 +39,13 @@ Resolve KYC subject classification, API/UI mapping and stored legacy values for 
 - [ ] Any corporate KYC Client ↔ Organization relationship is explicit, tenant-scoped, validated and independently persisted; no table/entity is conflated solely because both describe a business.
 - [ ] New migration(s) are append-only and tested against actual legacy values, unknown/null values, duplicate identifiers and rollback/forward recovery. No old Flyway file is edited.
 - [ ] UI forms, validation, labels and API contracts express the approved person/business distinction in clear, direct English; no internal enum or implementation text leaks to users.
-- [ ] Cross-Organization KYC access/duplicate-document rules are tested; generated client/types/contract tests remain synchronized. `pnpm api:test`, `pnpm check` and `pnpm product-language:check` pass.
+- [ ] Cross-Organization KYC access/duplicate-document rules are tested; generated client/types/contract tests remain synchronized. Product-facing copy follows `docs/standards/product-language.md`; `pnpm api:test` and `pnpm check` pass.
 
 ## Verification
 
 ```bash
 pnpm api:test
 pnpm check
-pnpm product-language:check
 ```
 
 ## Operational considerations

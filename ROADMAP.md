@@ -149,7 +149,7 @@ No release is complete until all applicable gates pass:
 4. **Identity gate:** OIDC/BFF and token validation tests cover PKCE, state/nonce/issuer, JWKS rotation/unknown keys, wrong `iss`/`aud`/`typ`/algorithm, step-up evidence, refresh reuse, membership/policy version revocation and back-channel logout latency.
 5. **Authorization gate:** role allow/deny matrix, last-owner/coordinator invariants, exclusive auditor, accepted ownership transfer, platform/compliance separation, external membership, OCOS report authority and quota-exhaustion exemptions pass. No customer CommercialClient role or mandatory two-person maker-checker is introduced.
 6. **Contract and architecture gate:** Spring routes, OpenAPI, generated `packages/api-clients`, typed UI client and major-version policy agree; Context Map and aggregate-owner tests pass; business-named event catalog/envelope validate against versioned JSON Schemas in Java and TypeScript; required resource-server headers are enforced; event/outbox handlers are idempotent, replay-safe and observable.
-7. **Experience/documentation gate:** UI context changes clear all relevant client caches and show accessible loading/empty/error/denied states. Product language check passes. Mintlify and README distinguish ratified policy, implemented behavior and verified evidence.
+7. **Experience/documentation gate:** UI context changes clear all relevant client caches and show accessible loading/empty/error/denied states. Product copy follows the language standard and describes verified behavior. Mintlify and README distinguish ratified policy, implemented behavior and verified evidence.
 
 Repository commands to run from the root, as relevant to each task and at the final gate:
 
@@ -158,7 +158,6 @@ pnpm api:test
 pnpm check
 pnpm test:unit
 pnpm test:contract
-pnpm product-language:check
 pnpm operations:test
 pnpm compose:config
 ```

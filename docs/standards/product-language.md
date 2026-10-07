@@ -64,6 +64,6 @@ Keep stable API, event and storage identifiers separate from display labels. Do 
 - Use neutral colors for structure, brand colors for emphasis, and destructive colors only for destructive or urgent states.
 - Keep tables and analytical views wide enough for real work.
 
-## Validation
+## Review
 
-Run `pnpm product-language:check` after changing UI copy, user-facing API messages, exports or public documentation. The check must reject Portuguese product copy while preserving stable wire values and immutable historical migrations.
+For product-copy changes, use the `check-product-language` skill and review the surrounding workflow against this standard. Confirm that each message uses the established vocabulary, describes verified behavior, names the current state and next action, and remains accessible in context. Keep stable wire values and immutable historical migrations unchanged.

@@ -3,7 +3,8 @@ name: complyz
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: complyz-postgres
+    container_name: complyz-postgres-dev
+    profiles: [app]
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-complyz_db}
@@ -12,7 +13,7 @@ services:
     ports:
       - "${DB_BIND_ADDRESS:-127.0.0.1}:${DB_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -27,7 +28,8 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: complyz-redis
+    container_name: complyz-redis-dev
+    profiles: [app]
     restart: unless-stopped
     command:
       [
@@ -40,7 +42,87 @@ services:
     ports:
       - "${REDIS_BIND_ADDRESS:-127.0.0.1}:${REDIS_PORT:-6379}:6379"
     volumes:
-      - redis_data:/data
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_dev_password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [complyz]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  production-preflight:
+    image: node:26-alpine
+    profiles: [production]
+    entrypoint: ["node", "/production-compose-preflight.mjs"]
+    volumes:
+      - ./scripts/production-compose-preflight.mjs:/production-compose-preflight.mjs:ro
+      - ./scripts/deploy-production.mjs:/deploy-production.mjs:ro
+    environment:
+      COMPLYZ_ENVIRONMENT: ${COMPLYZ_ENVIRONMENT:-}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
+      DOMAIN: ${DOMAIN:-}
+      API_DOMAIN: ${API_DOMAIN:-}
+      POSTGRES_DB: ${POSTGRES_DB:-}
+      POSTGRES_USER: ${POSTGRES_USER:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-}
+      POSTGRES_VOLUME_NAME: ${POSTGRES_VOLUME_NAME:-}
+      REDIS_VOLUME_NAME: ${REDIS_VOLUME_NAME:-}
+
+  postgres-production:
+    image: postgres:16-alpine
+    container_name: complyz-postgres
+    profiles: [production]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-complyz_db}
+      POSTGRES_USER: ${POSTGRES_USER:-complyz_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    depends_on:
+      production-preflight:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [complyz]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  redis-production:
+    image: redis:7-alpine
+    container_name: complyz-redis
+    profiles: [production]
+    restart: unless-stopped
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${REDIS_PASSWORD:-redis_dev_password}",
+      ]
+    volumes:
+      - redis_prod_data:/data
+    depends_on:
+      production-preflight:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_dev_password}", "ping"]
       interval: 10s
@@ -54,8 +136,8 @@ services:
         max-file: "3"
 
   api:
-    container_name: complyz-api
-    profiles: [app, production]
+    container_name: complyz-api-dev
+    profiles: [app]
     build:
       context: .
       dockerfile: Dockerfile
@@ -65,7 +147,7 @@ services:
     ports:
       - "${API_BIND_ADDRESS:-127.0.0.1}:${SERVER_PORT:-8080}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_PROFILES_ACTIVE: dev
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DB:-complyz_db}
@@ -117,9 +199,73 @@ services:
         max-size: 10m
         max-file: "3"
 
+  api-production:
+    container_name: complyz-api
+    profiles: [production]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    image: ghcr.io/estandarmustaq/complyz-api:${COMPLYZ_IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      DB_HOST: postgres-production
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-complyz_db}
+      DB_USER: ${POSTGRES_USER:-complyz_app}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+      REDIS_HOST: redis-production
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_dev_password}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}
+      MFA_AES_KEY: ${MFA_AES_KEY:-0123456789abcdef0123456789abcdef}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-}
+      COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:-}
+      COMPLYZ_BOOTSTRAP_ADMIN_EMAIL: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:-}
+      COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:-}
+      COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:-}
+      COMPLYZ_BOOTSTRAP_OCOS_EMAIL: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:-}
+      COMPLYZ_BOOTSTRAP_OCOS_PASSWORD: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:-}
+      COMPLYZ_IMPORT_STORAGE_PATH: /var/lib/complyz/imports
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:-health,info,metrics,prometheus}
+    volumes:
+      - imports:/var/lib/complyz/imports
+    depends_on:
+      production-preflight:
+        condition: service_completed_successfully
+      postgres-production:
+        condition: service_healthy
+      redis-production:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:8080/actuator/health/readiness || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 45s
+      retries: 5
+    cpus: ${API_CPU_LIMIT:-1.00}
+    mem_limit: ${API_MEMORY_LIMIT:-1024m}
+    labels:
+      com.complyz.environment: production
+      com.complyz.service: api
+      com.complyz.cost-center: product
+    networks: [complyz]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
   ui:
-    container_name: complyz-ui
-    profiles: [app, production]
+    container_name: complyz-ui-dev
+    profiles: [app]
     build:
       context: .
       dockerfile: Dockerfile
@@ -161,6 +307,48 @@ services:
         max-size: 10m
         max-file: "3"
 
+  ui-production:
+    container_name: complyz-ui
+    profiles: [production]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Complyz}
+    image: ghcr.io/estandarmustaq/complyz-ui:${COMPLYZ_IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      api-production:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    cpus: ${UI_CPU_LIMIT:-0.50}
+    mem_limit: ${UI_MEMORY_LIMIT:-512m}
+    labels:
+      com.complyz.environment: production
+      com.complyz.service: ui
+      com.complyz.cost-center: product
+    networks: [complyz]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
   caddy:
     container_name: complyz-caddy
     profiles: [production]
@@ -177,9 +365,9 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      api:
+      api-production:
         condition: service_healthy
-      ui:
+      ui-production:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
@@ -200,10 +388,14 @@ services:
         max-file: "3"
 
 volumes:
-  postgres_data:
-    name: ${POSTGRES_VOLUME_NAME:-complyz_postgres_data}
-  redis_data:
-    name: ${REDIS_VOLUME_NAME:-complyz_redis_data}
+  postgres_dev_data:
+    name: complyz_postgres_data
+  redis_dev_data:
+    name: complyz_redis_data
+  postgres_prod_data:
+    name: ${POSTGRES_VOLUME_NAME:-complyz_postgres_prod_data}
+  redis_prod_data:
+    name: ${REDIS_VOLUME_NAME:-complyz_redis_prod_data}
   imports:
     name: ${COMPLYZ_IMPORT_VOLUME_NAME:-complyz_complyz_imports}
   caddy_data:

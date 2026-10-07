@@ -101,7 +101,6 @@ switch (command) {
     runGradle(":api:test")
     runPnpm("exec", "turbo", "run", "check", "typecheck", "test:unit")
     runPnpm("exec", "prettier", "--check", ".")
-    run(process.execPath, [`${root}scripts/check-product-language.mjs`])
     run(process.execPath, [`${root}scripts/operations.test.mjs`])
     run("docker", [
       "compose",

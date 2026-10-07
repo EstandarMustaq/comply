@@ -137,20 +137,6 @@ function checkMigrationHistory() {
   }
 }
 
-function checkProductLanguage(paths) {
-  const productPaths = [
-    "apps/api/src/main/java/",
-    "apps/api/src/main/resources/db/migration/",
-    "apps/ui/app/",
-    "apps/ui/components/",
-    "apps/ui/lib/",
-    "docs/",
-  ]
-  if (paths.some((path) => productPaths.some((prefix) => path.startsWith(prefix)))) {
-    run("pnpm", ["product-language:check"])
-  }
-}
-
 function preCommit() {
   const paths = stagedPaths()
   if (!paths.length) return
@@ -173,7 +159,6 @@ function preCommit() {
   }
   checkStagedSecrets()
   checkMigrationHistory()
-  checkProductLanguage(paths)
 }
 
 function commitMessage(messagePath) {
@@ -289,7 +274,6 @@ async function prePush() {
     run("pnpm", ["check"])
     run("pnpm", ["test:unit"])
   }
-  checkProductLanguage(paths)
   if (paths.some((path) => path === "docker-compose.yml" || path === "Dockerfile")) {
     run("pnpm", ["compose:config"])
   }

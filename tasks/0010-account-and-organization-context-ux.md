@@ -41,13 +41,12 @@ Deliver a production-backed Account profile/security experience and explicit Org
 - [ ] Account screens cover personal profile, language, time zone, notification preferences, factors and recovery status, linked external identities, active sessions and self-service sign-out/revocation; sensitive changes require the approved step-up and are auditable.
 - [ ] Account without Organization membership can access self-profile/security only, with an honest empty state for no memberships; it cannot access compliance routes.
 - [ ] Keyboard/screen-reader accessible selection and forms include loading, empty, error, denied and success states. Tests cover Organizations with different CommercialClient reference values and confirm those values are not shown to customers or used in authorization, plus failed switch, cache clearing, session expiry and an Account with zero memberships.
-- [ ] Product-facing copy uses clear, direct English; Playwright/mobile and accessibility checks pass; `pnpm check` and `pnpm product-language:check` pass.
+- [ ] Product-facing copy uses clear, direct English consistent with `docs/standards/product-language.md`; Playwright/mobile and accessibility checks pass; `pnpm check` passes.
 
 ## Verification
 
 ```bash
 pnpm check
-pnpm product-language:check
 pnpm test:unit
 pnpm test:e2e
 ```

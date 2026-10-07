@@ -47,12 +47,11 @@ Update customer-facing Mintlify documentation, API auth/version/header and integ
 - [ ] Customer documentation identifies Organization as the client institution and tenant. It uses the canonical `Organization` term and never presents CommercialClient as a customer concept. Restricted operator documentation defines CommercialClient as the identifier/name/contract-reference/status record referenced by `organization.commercial_client_id`, with no Organization grouping/management or authorization semantics; no guide instructs users to submit tenant IDs for authorization.
 - [ ] Public docs state only capabilities present and tested in the release, distinguish availability/preview/deferred items, explain compatible API and event-contract evolution/deprecation when relevant, and contain no internal implementation acronyms/citations or unapproved security promises.
 - [ ] Operator guides cover migration/backfill/recovery, IdP/JWKS rotation, revocation/logout, quota reconciliation/exemptions, event-store backup/replay/schema evolution, outbox/DLQ, external client credentials and cross-tenant incident response as applicable to shipped features.
-- [ ] User-facing copy uses clear, direct, confident English, with accessible terminology consistent with product-language standards. `pnpm product-language:check` and `pnpm exec prettier --check ROADMAP.md README.md docs` pass.
+- [ ] User-facing copy uses clear, direct, confident English, with accessible terminology consistent with `docs/standards/product-language.md`. `pnpm exec prettier --check ROADMAP.md README.md docs` passes.
 
 ## Verification
 
 ```bash
-pnpm product-language:check
 pnpm exec prettier --check ROADMAP.md README.md docs
 pnpm api:openapi
 ```

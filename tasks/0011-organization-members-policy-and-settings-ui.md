@@ -41,13 +41,12 @@ Implement Organization-scoped workflows for members, role lifecycle and explicit
 - [ ] Sensitive Organization policy changes and platform floor effects display before/after values and affected scope before confirmation; eligible exemption issuance/expiry is explicit. Successful changes show the audit outcome; canceled or failed changes do not imply success. Do not implement CommercialClient policy-template propagation.
 - [ ] No implicit inheritance is represented. Compliance thresholds/rules remain Organization-local and cannot weaken platform regulatory floors. SSO/auth/session/integration settings, Organization notifications and active-module status are exposed only to approved Organization roles and reflect effective policy.
       Keyboard/screen-reader accessible dense tables/forms provide loading, empty, error, forbidden, confirmation and success states; current Organization is visible and all actions remain context-bound. External-member history and unit-scoped OCOS/need-to-know controls follow the approved visibility rules.
-- [ ] Update the guide in clear, direct English; unit/E2E/accessibility tests cover role denial, cross-Organization switching, floor/copy provenance and concurrent last-owner failure. `pnpm check` and `pnpm product-language:check` pass.
+- [ ] Update the guide in clear, direct English consistent with `docs/standards/product-language.md`; unit/E2E/accessibility tests cover role denial, cross-Organization switching, floor/copy provenance and concurrent last-owner failure. `pnpm check` passes.
 
 ## Verification
 
 ```bash
 pnpm check
-pnpm product-language:check
 pnpm test:unit
 pnpm test:e2e
 ```

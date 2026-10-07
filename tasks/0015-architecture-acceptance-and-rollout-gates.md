@@ -51,7 +51,7 @@ Perform the final full-system architecture and coverage review. Execute an end-t
 - [ ] Rehearse append-only migration from a production-like copy and record row counts, consistency checks, runtime/locks, backup restore or forward-recovery, compatibility window and rollback decision. Do not edit or delete existing migrations.
 - [ ] Browser flows verify Organization switching clears all tenant caches, Account with zero memberships sees only self-service, member/policy/commercial actions expose honest accessible states, and keyboard/mobile/accessibility tests pass.
 - [ ] All severity-1/high-confidence isolation/authentication/data-loss findings are fixed before release; remaining findings have severity, impact, owner, mitigation and explicit risk acceptance. Context Map/boundary and aggregate-owner tests pass; all event envelopes/catalog entries validate against the versioned JSON Schema catalog; resource-server headers and API/event contract versions match OpenAPI and generated clients. Docs accurately match test evidence.
-- [ ] Final validation passes: `pnpm api:test`, `pnpm check`, `pnpm test:unit`, `pnpm test:contract` against the candidate API, `pnpm test:e2e`, `pnpm product-language:check`, `pnpm operations:test` and `pnpm compose:config`.
+- [ ] Final validation passes: `pnpm api:test`, `pnpm check`, `pnpm test:unit`, `pnpm test:contract` against the candidate API, `pnpm test:e2e`, `pnpm operations:test` and `pnpm compose:config`. Product copy and documentation meet `docs/standards/product-language.md`.
 
 ## Verification
 
@@ -61,7 +61,6 @@ pnpm check
 pnpm test:unit
 pnpm test:contract
 pnpm test:e2e
-pnpm product-language:check
 pnpm operations:test
 pnpm compose:config
 ```

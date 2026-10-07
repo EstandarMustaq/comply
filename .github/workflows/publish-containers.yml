@@ -5,7 +5,6 @@ on:
     workflows: ["Quality Gates"]
     types: [completed]
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,16 +18,16 @@ jobs:
   publish:
     name: Publish API and UI images
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push')
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Check out validated revision
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Normalize image namespace
         id: image-names
@@ -37,53 +36,35 @@ jobs:
         run: echo "owner=${REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract API image metadata
-        id: api-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-api
-          tags: |
-            type=sha,prefix=
-            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
-
-      - name: Extract UI image metadata
-        id: ui-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui
-          tags: |
-            type=sha,prefix=
-            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
 
       - name: Build and publish API
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           context: .
           file: Dockerfile
           target: api
           push: true
-          tags: ${{ steps.api-meta.outputs.tags }}
-          labels: ${{ steps.api-meta.outputs.labels }}
+          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-api:${{ github.event.workflow_run.head_sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
           cache-from: type=gha,scope=complyz-api
           cache-to: type=gha,mode=max,scope=complyz-api
 
       - name: Build and publish UI
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           context: .
           file: Dockerfile
           target: web
           push: true
-          tags: ${{ steps.ui-meta.outputs.tags }}
-          labels: ${{ steps.ui-meta.outputs.labels }}
+          tags: ghcr.io/${{ steps.image-names.outputs.owner }}/complyz-ui:${{ github.event.workflow_run.head_sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
           cache-from: type=gha,scope=complyz-ui
           cache-to: type=gha,mode=max,scope=complyz-ui

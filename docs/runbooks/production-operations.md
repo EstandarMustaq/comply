@@ -29,9 +29,13 @@ do not treat the local Compose command as an ECS release.
 
 ## Production configuration
 
-Set `SPRING_PROFILES_ACTIVE=production` and `COMPOSE_PROFILES=production` in
-the deployment environment. Production secrets must be supplied by the
-deployment environment and must not use development defaults.
+Set `SPRING_PROFILES_ACTIVE=production` and `COMPLYZ_ENVIRONMENT=production` in
+the deployment environment. Activate the production profile with `pnpm deploy`
+or `docker compose --profile production up -d --build`. Production Compose uses
+separate API, UI, PostgreSQL, and Redis services from the local application profile.
+The production preflight and API startup validator reject development secrets,
+unsafe bootstrap settings, and unexpected data volume names before production
+services can start.
 
 Before deploying, verify the configured PostgreSQL, Redis, imported-file, and
 proxy volume names against the target environment. Compose resolves them from

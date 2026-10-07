@@ -18,7 +18,11 @@ const requiredVariables = [
   "REDIS_PASSWORD",
   "JWT_SECRET",
   "MFA_ENCRYPTION_KEY",
+  "CORS_ALLOWED_ORIGINS",
+  "NEXT_PUBLIC_API_URL",
+  "COMPLYZ_BOOTSTRAP_ENABLED",
   "SPRING_PROFILES_ACTIVE",
+  "COMPLYZ_ENVIRONMENT",
   "POSTGRES_VOLUME_NAME",
   "REDIS_VOLUME_NAME",
 ]
@@ -99,7 +103,7 @@ export function validateDeploymentEnvironment(env) {
       throw new Error(`${name} is too short or uses its development default.`)
     }
   }
-  if (env.COMPLYZ_BOOTSTRAP_ENABLED === "true") {
+  if (env.COMPLYZ_BOOTSTRAP_ENABLED !== "false") {
     throw new Error(
       "COMPLYZ_BOOTSTRAP_ENABLED must be false for a production deployment."
     )
@@ -134,7 +138,7 @@ function run(args) {
     const child = spawn("docker", args, {
       cwd: root,
       stdio: "inherit",
-      env: process.env,
+      env: { ...process.env, COMPOSE_PROFILES: "production" },
     })
     child.once("error", reject)
     child.once("close", (code, signal) => {

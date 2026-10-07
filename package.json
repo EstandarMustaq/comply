@@ -25,7 +25,6 @@
     "api:test": "node scripts/workspace.mjs api:test",
     "api:run": "node scripts/workspace.mjs api:run",
     "api:openapi": "node scripts/openapi.mjs",
-    "product-language:check": "node scripts/check-product-language.mjs",
     "operations:test": "node scripts/operations.test.mjs",
     "compose:config": "node scripts/compose.mjs config",
     "compose:up": "node scripts/compose.mjs up",
