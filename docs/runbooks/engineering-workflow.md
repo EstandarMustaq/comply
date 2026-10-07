@@ -55,3 +55,40 @@ AWS, Docker, or production services.
 - Add Flyway migrations as new versions only. Existing migration files are immutable after they may have been applied.
 - For API contract changes, regenerate OpenAPI-derived client types with `pnpm api:openapi`, update UI types/client and contract assertions, and run the relevant API and UI tests.
 - Keep product copy in clear, direct, confident English. Use the `check-product-language` skill and review changes against `docs/standards/product-language.md`.
+
+## CI troubleshooting
+
+### Table dependency upgrades
+
+`apps/ui/components/data-table.tsx` uses the TanStack Table v9 compatibility API
+from `@tanstack/react-table/legacy`. Its column and row types come from that same
+entry point. Run the table component tests, workspace checks, and UI build when
+updating the dependency.
+
+### Dependabot reports `NoChangeError`
+
+Compare the package manifest, the installed version in `pnpm-lock.yaml`, and any
+`pnpm-workspace.yaml` overrides. An override can force a proposed update back to
+the existing version. Keep the intended dependency version in its owning manifest
+and regenerate the lockfile after changing an override.
+
+### Container publishing reports `permission_denied: write_package`
+
+The publishing workflows request `packages: write`. The target GHCR package must
+also grant this repository access:
+
+1. Open the affected package's settings. For the UI image, use
+   [complyz-ui package settings](https://github.com/users/EstandarMustaq/packages/container/complyz-ui/settings).
+2. Under **Manage Actions access**, grant `EstandarMustaq/complyz` **Write** access.
+   A package administrator must make this change.
+3. Rerun the failed publishing job after access is granted. It publishes the
+   revision selected by the workflow.
+
+Check the failure stage before changing build configuration. A completed image
+build followed by a rejected registry push indicates a publishing-access problem.
+
+### GitHub AI security scan reports a quota error
+
+When the scan reports an exhausted monthly quota, an account administrator must
+check the GitHub Copilot allowance. Rerun the scan when quota is available. A quota
+failure means that the scan did not produce a security assessment for that run.
