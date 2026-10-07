@@ -396,3 +396,62 @@ test("OpenAPI drift gate catches modified, deleted, staged and untracked contrac
     await rm(root, { recursive: true, force: true })
   }
 })
+
+test("UI releases use commit tags for branches and validate release aliases before publishing", async () => {
+  const source = await readFile(
+    new URL("../.github/workflows/release-ui.yml", import.meta.url),
+    "utf8"
+  )
+  const script = source
+    .split("      - name: Prepare image tags\n")[1]
+    .split("        run: |\n")[1]
+    .split("      - uses:")[0]
+  const root = await mkdtemp(join(tmpdir(), "complyz-image-tags-"))
+  const output = join(root, "output")
+  const sha = "a".repeat(40)
+  const image = "ghcr.io/example/complyz-ui"
+  async function run(refType, refName, revision = sha) {
+    await writeFile(output, "")
+    const result = spawnSync("bash", ["-c", script], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        REPOSITORY_OWNER: "Example",
+        GITHUB_REF_TYPE: refType,
+        GITHUB_REF_NAME: refName,
+        GITHUB_SHA: revision,
+        GITHUB_OUTPUT: output,
+      },
+    })
+    return { ...result, output: await readFile(output, "utf8") }
+  }
+  try {
+    for (const branch of ["main", "fix/release-tags"]) {
+      const result = await run("branch", branch)
+      assert.equal(result.status, 0, result.stderr)
+      assert.equal(result.output, `tags<<EOF\n${image}:${sha}\nEOF\n`)
+    }
+    const release = await run("tag", "ui-v1.2.3-rc.1")
+    assert.equal(release.status, 0, release.stderr)
+    assert.equal(
+      release.output,
+      `tags<<EOF\n${image}:${sha}\n${image}:ui-v1.2.3-rc.1\nEOF\n`
+    )
+    for (const tag of [
+      "ui-v1/invalid",
+      "ui-v1+metadata",
+      "api-v1.2.3",
+      `ui-v${"a".repeat(125)}`,
+      "ui-v1\nEOF\nextra=value",
+    ]) {
+      const result = await run("tag", tag)
+      assert.equal(result.status, 1, tag)
+      assert.equal(result.output, "", tag)
+    }
+    const invalidRevision = await run("branch", "main", "short-sha")
+    assert.equal(invalidRevision.status, 1)
+    assert.equal(invalidRevision.output, "")
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})

@@ -58,6 +58,17 @@ AWS, Docker, or production services.
 
 ## CI troubleshooting
 
+### UI builds and release tags
+
+The Quality Gates API job tests and packages the API with Java 21. The web job
+uses `pnpm exec turbo run build` for the UI and shared packages. The root
+`pnpm build` command also packages the API and requires Java.
+
+Manual UI releases from a branch publish the commit SHA tag. Releases from a
+`ui-v*` Git tag also publish that release tag. Release tags must use letters,
+digits, underscores, periods, or hyphens and fit within Docker's 128-character
+limit. The workflow validates tags before building.
+
 ### Table dependency upgrades
 
 `apps/ui/components/data-table.tsx` uses the TanStack Table v9 compatibility API
@@ -86,9 +97,13 @@ also grant this repository access:
 
 Check the failure stage before changing build configuration. A completed image
 build followed by a rejected registry push indicates a publishing-access problem.
+Published images include the repository source URL and commit revision as OCI
+labels. Existing package access must still be configured in GitHub.
 
 ### GitHub AI security scan reports a quota error
 
 When the scan reports an exhausted monthly quota, an account administrator must
 check the GitHub Copilot allowance. Rerun the scan when quota is available. A quota
 failure means that the scan did not produce a security assessment for that run.
+The `dynamic/agents/github-advanced-security` workflow is managed by GitHub; its
+quota is controlled outside the repository's workflow files.
