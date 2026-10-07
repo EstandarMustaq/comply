@@ -25,7 +25,7 @@
     "api:test": "node scripts/workspace.mjs api:test",
     "api:run": "node scripts/workspace.mjs api:run",
     "api:openapi": "node scripts/openapi.mjs",
-    "operations:test": "node scripts/operations.test.mjs",
+    "operations:test": "node scripts/operations.test.mjs && node --test scripts/review-workflows.test.mjs",
     "compose:config": "node scripts/compose.mjs config",
     "compose:up": "node scripts/compose.mjs up",
     "compose:down": "node scripts/compose.mjs down",

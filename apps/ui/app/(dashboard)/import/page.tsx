@@ -25,6 +25,10 @@ import { api } from "@/lib/api-client"
 import { type ImportBatch } from "@/lib/types"
 import { getImportStatusLabel } from "@/lib/labels"
 
+/**
+ * Show spreadsheet upload and import history, refreshing history on mount,
+ * on request, and after mapping confirmation. Failed loads retain prior history.
+ */
 export default function ImportPage() {
   const [batches, setBatches] = useState<ImportBatch[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -89,7 +93,7 @@ export default function ImportPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileSpreadsheet className="text-primary h-4 w-4" />
+                <FileSpreadsheet className="h-4 w-4 text-primary" />
                 Import history
               </CardTitle>
               <CardDescription className="text-xs">
@@ -109,7 +113,7 @@ export default function ImportPage() {
           </CardHeader>
           <CardContent>
             {batches.length === 0 ? (
-              <div className="text-muted-foreground py-8 text-center text-xs">
+              <div className="py-8 text-center text-xs text-muted-foreground">
                 No imports yet. Drop a spreadsheet above to get started.
               </div>
             ) : (
@@ -142,7 +146,7 @@ export default function ImportPage() {
                       <TableCell className="text-center text-xs font-semibold text-red-600">
                         {b.errorRows}
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-right text-xs">
+                      <TableCell className="text-right text-xs text-muted-foreground">
                         {new Date(b.createdAt).toLocaleString("en-MZ")}
                       </TableCell>
                     </TableRow>

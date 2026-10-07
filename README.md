@@ -6,6 +6,9 @@
 
 <p align="center">
   <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml/badge.svg?branch=main" alt="Quality gates"></a>
+  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/dependabot-alert-issues.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/dependabot-alert-issues.yml/badge.svg?branch=main" alt="Dependabot security issues"></a>
+  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/coderabbit-finding-issues.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/coderabbit-finding-issues.yml/badge.svg?branch=main" alt="CodeRabbit finding issues"></a>
+  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/mintlify.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/mintlify.yml/badge.svg?branch=main" alt="Mintlify documentation checks"></a>
   <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/publish-containers.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/publish-containers.yml/badge.svg?branch=main" alt="Container publishing"></a>
   <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/release-ui.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/release-ui.yml/badge.svg?branch=main" alt="Web release"></a>
   <a href="https://github.com/EstandarMustaq/complyz/commits/main/"><img src="https://img.shields.io/github/last-commit/EstandarMustaq/complyz?branch=main&label=last%20updated" alt="Last updated"></a>
@@ -15,6 +18,15 @@
 </p>
 
 </div>
+
+Maintainer setup: add the repository Actions secret `DEPENDABOT_ALERTS_TOKEN` with read-only Dependabot alerts and metadata access. The workflow uses `GITHUB_TOKEN` to open issues.
+
+Documentation uses the checked-in `docs/openapi.json`, generated from Springdoc by
+`pnpm api:openapi`. Run the API locally with OpenAPI enabled and regenerate this file
+after API changes. Mintlify checks use Node 24 LTS and do not require
+`api.trycomplyz.com` to be online. CodeRabbit reviews on fork pull requests are
+reconciled hourly from the default branch; maintainers can also run the workflow
+manually. The workflows become active after merging them into the default branch.
 
 Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
 

@@ -30,6 +30,10 @@ import {
   getUserRoleLabel,
 } from "@/lib/labels"
 
+/**
+ * Display monitoring rules or audit history for the selected tab.
+ * Load on tab changes and manual refresh; failed requests retain prior records.
+ */
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<string>("RULES")
   const [rules, setRules] = useState<ThresholdRule[]>([])
@@ -123,7 +127,7 @@ export default function SettingsPage() {
             <Card className="border-border shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                  <Scale className="text-primary h-4 w-4" />
+                  <Scale className="h-4 w-4 text-primary" />
                   Screening rules
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -132,7 +136,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 {rules.length === 0 ? (
-                  <div className="text-muted-foreground py-8 text-center text-xs">
+                  <div className="py-8 text-center text-xs text-muted-foreground">
                     {isLoading ? "Loading rules…" : "No rules configured."}
                   </div>
                 ) : (
@@ -153,11 +157,11 @@ export default function SettingsPage() {
                             {getRuleTypeLabel(rule.type)}
                           </TableCell>
                           <TableCell className="text-xs">
-                            <span className="text-foreground font-medium">
+                            <span className="font-medium text-foreground">
                               {rule.name}
                             </span>
                           </TableCell>
-                          <TableCell className="text-foreground text-xs font-bold">
+                          <TableCell className="text-xs font-bold text-foreground">
                             {rule.valueThreshold === null
                               ? "Not applicable"
                               : formatMt(rule.valueThreshold)}
@@ -200,7 +204,7 @@ export default function SettingsPage() {
                     <span>Annual limit</span>
                     <span className="font-bold">240.000 MT</span>
                   </div>
-                  <p className="text-muted-foreground pt-1 text-[11px]">
+                  <p className="pt-1 text-[11px] text-muted-foreground">
                     Applies to low-risk customers under simplified due diligence.
                     Exceeding the limit requires enhanced due diligence.
                   </p>
@@ -209,11 +213,11 @@ export default function SettingsPage() {
 
               <Card className="border-destructive/40">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-destructive text-sm font-bold">
+                  <CardTitle className="text-sm font-bold text-destructive">
                     Sanctions screening
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-muted-foreground space-y-2 text-xs">
+                <CardContent className="space-y-2 text-xs text-muted-foreground">
                   <div className="flex justify-between border-b pb-1">
                     <span>Decision window</span>
                     <span className="font-bold text-red-700">24 hours</span>
@@ -222,7 +226,7 @@ export default function SettingsPage() {
                     <span>Action required</span>
                     <span className="font-bold">Block and escalate</span>
                   </div>
-                  <p className="text-muted-foreground pt-1 text-[11px]">
+                  <p className="pt-1 text-[11px] text-muted-foreground">
                     Automatically screen against official and consolidated sanctions
                     lists.
                   </p>
@@ -236,7 +240,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                    <History className="text-primary h-4 w-4" />
+                    <History className="h-4 w-4 text-primary" />
                     Audit history
                   </CardTitle>
                   <CardDescription className="text-xs">
@@ -253,7 +257,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               {logs.length === 0 ? (
-                <div className="text-muted-foreground py-8 text-center text-xs">
+                <div className="py-8 text-center text-xs text-muted-foreground">
                   No activity to show, or you do not have permission to view it.
                 </div>
               ) : (
@@ -270,7 +274,7 @@ export default function SettingsPage() {
                   <TableBody>
                     {logs.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
+                        <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                           {new Date(log.createdAt).toLocaleString("en-MZ")}
                         </TableCell>
                         <TableCell className="text-xs font-semibold">
@@ -281,10 +285,10 @@ export default function SettingsPage() {
                             {getUserRoleLabel(log.actor?.role || "")}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-foreground font-mono text-xs font-medium">
+                        <TableCell className="font-mono text-xs font-medium text-foreground">
                           {getAuditActionLabel(log.action)}
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
+                        <TableCell className="text-xs text-muted-foreground">
                           {getResourceTypeLabel(log.entity)}{" "}
                           {log.entityId ? `(${log.entityId.substring(0, 8)}...)` : ""}
                         </TableCell>

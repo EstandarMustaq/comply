@@ -40,6 +40,12 @@ function initialsOf(name: string) {
     .toUpperCase()
 }
 
+/**
+ * Select from supplied Organizations, searching names and IDs without case sensitivity.
+ * value controls selection; otherwise defaultValue or the first initial entry
+ * seeds local selection. onValueChange receives the selected ID, including
+ * reselection; synchronous callback errors propagate before the menu closes.
+ */
 export function OrganizationSelector({
   organizations,
   value,
@@ -85,9 +91,9 @@ export function OrganizationSelector({
         <button
           type="button"
           disabled={loading}
-          className="text-foreground hover:bg-background/60 focus-visible:ring-ring flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:opacity-50"
+          className="flex h-8 items-center gap-2 rounded-md px-2 text-sm text-foreground transition-colors hover:bg-background/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
         >
-          <span className="shadow-2xs border-border/80 bg-background text-foreground dark:border-muted-foreground/30 dark:bg-muted-foreground/10 flex size-5 shrink-0 items-center justify-center rounded border text-[10px] font-semibold">
+          <span className="shadow-2xs flex size-5 shrink-0 items-center justify-center rounded border border-border/80 bg-background text-[10px] font-semibold text-foreground dark:border-muted-foreground/30 dark:bg-muted-foreground/10">
             {selected?.icon ??
               selected?.short ??
               (selected ? initialsOf(selected.name) : "—")}
@@ -95,7 +101,7 @@ export function OrganizationSelector({
           <span className="truncate" style={{ maxWidth }}>
             {selected?.name ?? placeholder}
           </span>
-          <ChevronDown className="text-muted-foreground size-3.5 shrink-0" />
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
 
@@ -105,15 +111,15 @@ export function OrganizationSelector({
         className="w-64 overflow-hidden p-0"
       >
         <div className="p-1.5 pb-1">
-          <div className="border-border/80 bg-muted/60 flex items-center gap-2 rounded-md border px-2.5 transition-colors">
-            <Search className="text-muted-foreground size-3.5 shrink-0" />
+          <div className="flex items-center gap-2 rounded-md border border-border/80 bg-muted/60 px-2.5 transition-colors">
+            <Search className="size-3.5 shrink-0 text-muted-foreground" />
             <input
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.stopPropagation()}
               placeholder={searchPlaceholder}
-              className="text-foreground placeholder:text-muted-foreground h-8 flex-1 bg-transparent text-xs outline-none"
+              className="h-8 flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -121,7 +127,7 @@ export function OrganizationSelector({
         <ScrollArea className="max-h-64">
           <div className="p-1.5">
             {filtered.length === 0 && (
-              <p className="text-muted-foreground px-2 py-6 text-center text-xs">
+              <p className="px-2 py-6 text-center text-xs text-muted-foreground">
                 {emptySearchText}
               </p>
             )}
@@ -140,7 +146,7 @@ export function OrganizationSelector({
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
-                  <span className="shadow-2xs border-border/80 bg-background text-foreground dark:border-muted-foreground/25 dark:bg-muted-foreground/10 flex size-5 shrink-0 items-center justify-center rounded border text-[10px] font-semibold">
+                  <span className="shadow-2xs flex size-5 shrink-0 items-center justify-center rounded border border-border/80 bg-background text-[10px] font-semibold text-foreground dark:border-muted-foreground/25 dark:bg-muted-foreground/10">
                     {org.icon ?? org.short ?? initialsOf(org.name)}
                   </span>
                   <span className="flex-1 truncate text-left">{org.name}</span>

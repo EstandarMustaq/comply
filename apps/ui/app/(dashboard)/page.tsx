@@ -34,6 +34,10 @@ import { api } from "@/lib/api-client"
 import { type Flag, type InsightsData } from "@/lib/types"
 import { getFlagTypeLabel } from "@/lib/labels"
 
+/**
+ * Load summary metrics and the first ten pending alerts returned by the API.
+ * Refresh both after alert review; if either request fails, retain prior data.
+ */
 export default function DashboardOverviewPage() {
   const router = useRouter()
   const [insights, setInsights] = useState<InsightsData | null>(null)
@@ -137,7 +141,7 @@ export default function DashboardOverviewPage() {
           </CardHeader>
           <CardContent>
             {pendingFlags.length === 0 ? (
-              <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center text-xs">
+              <div className="flex flex-col items-center gap-2 py-10 text-center text-xs text-muted-foreground">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                 <span>No pending alerts. Everything is up to date.</span>
               </div>
@@ -158,7 +162,7 @@ export default function DashboardOverviewPage() {
                     return (
                       <TableRow
                         key={flag.id}
-                        className="hover:bg-muted/50 cursor-pointer"
+                        className="cursor-pointer hover:bg-muted/50"
                       >
                         <TableCell>
                           <Badge
@@ -170,7 +174,7 @@ export default function DashboardOverviewPage() {
                         </TableCell>
                         <TableCell className="font-medium">
                           {flag.client?.fullName || "—"}
-                          <div className="text-muted-foreground text-[11px]">
+                          <div className="text-[11px] text-muted-foreground">
                             {flag.client?.documentNumber}
                           </div>
                         </TableCell>
@@ -181,7 +185,7 @@ export default function DashboardOverviewPage() {
                           {isSanction ? (
                             getSlaBadge(flag.slaDeadline)
                           ) : (
-                            <span className="text-muted-foreground text-xs">Normal</span>
+                            <span className="text-xs text-muted-foreground">Normal</span>
                           )}
                         </TableCell>
                         <TableCell className="text-right">

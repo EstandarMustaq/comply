@@ -10,6 +10,11 @@ interface SectionCardsProps {
   isLoading?: boolean
 }
 
+/**
+ * Render supplied summary metrics, with placeholders for values and subtitles
+ * while loading. Missing counts and volume default to zero; a missing compliance
+ * score defaults to 100%.
+ */
 export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
   const formatMt = (val?: number) =>
     (val || 0).toLocaleString("en-MZ", {
@@ -70,14 +75,14 @@ export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
         return (
           <Card
             key={card.title}
-            className="backdrop-blur-xs shadow-xs border-border bg-card/50 hover:border-border group relative overflow-hidden rounded-lg border p-5 transition-all duration-200 hover:shadow-sm"
+            className="backdrop-blur-xs shadow-xs group relative overflow-hidden rounded-lg border border-border bg-card/50 p-5 transition-all duration-200 hover:border-border hover:shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="border-border bg-muted/50 text-foreground group-hover:bg-muted flex h-8 w-8 items-center justify-center rounded-lg border transition-colors">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-muted/50 text-foreground transition-colors group-hover:bg-muted">
                   <Icon className={cn("h-4 w-4", card.accentColor)} />
                 </div>
-                <span className="text-muted-foreground text-xs font-medium">
+                <span className="text-xs font-medium text-muted-foreground">
                   {card.title}
                 </span>
               </div>
@@ -85,7 +90,7 @@ export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
                 className={cn(
                   "rounded-full border px-2 py-0.5 text-[10px] font-medium",
                   card.badgeVariant === "destructive"
-                    ? "border-destructive/40 text-destructive bg-transparent font-semibold"
+                    ? "border-destructive/40 bg-transparent font-semibold text-destructive"
                     : "border-border bg-muted/70 text-muted-foreground"
                 )}
               >
@@ -94,16 +99,16 @@ export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
             </div>
 
             <div className="mt-4">
-              <div className="text-foreground text-2xl font-bold tabular-nums tracking-tight">
+              <div className="text-2xl font-bold tabular-nums tracking-tight text-foreground">
                 {isLoading ? (
-                  <span className="bg-muted inline-block h-8 w-24 animate-pulse rounded" />
+                  <span className="inline-block h-8 w-24 animate-pulse rounded bg-muted" />
                 ) : (
                   card.value
                 )}
               </div>
-              <p className="text-muted-foreground/80 mt-1.5 truncate text-xs">
+              <p className="mt-1.5 truncate text-xs text-muted-foreground/80">
                 {isLoading ? (
-                  <span className="bg-muted inline-block h-3.5 w-32 animate-pulse rounded" />
+                  <span className="inline-block h-3.5 w-32 animate-pulse rounded bg-muted" />
                 ) : (
                   card.subtitle
                 )}

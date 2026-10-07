@@ -34,6 +34,12 @@ interface FlagReviewSheetProps {
   onFlagUpdated: () => void
 }
 
+/**
+ * Show an alert and let the user resolve it with nonblank notes or escalate it
+ * to a report. Return null for a missing flag. Successful actions invoke
+ * onFlagUpdated and onClose; escalation then opens the report page.
+ * Request failures and synchronous callback errors appear in the sheet.
+ */
 export function FlagReviewSheet({
   flag,
   isOpen,
@@ -120,7 +126,7 @@ export function FlagReviewSheet({
               ID: {flag.id.substring(0, 8)}...
             </Badge>
           </div>
-          <SheetTitle className="text-foreground mt-2 text-base font-bold">
+          <SheetTitle className="mt-2 text-base font-bold text-foreground">
             Alert review
           </SheetTitle>
           <SheetDescription className="text-xs">
@@ -130,8 +136,8 @@ export function FlagReviewSheet({
 
         {/* Deadline status for restricted-party matches */}
         {isSanctions && (
-          <div className="border-destructive/40 text-destructive my-4 flex items-start gap-2.5 rounded-lg border p-3 text-xs">
-            <Clock className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
+          <div className="my-4 flex items-start gap-2.5 rounded-lg border border-destructive/40 p-3 text-xs text-destructive">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             <div>
               <p className="font-bold">Sanctions match — action required</p>
               <p className="mt-0.5">
@@ -144,13 +150,13 @@ export function FlagReviewSheet({
         <div className="space-y-5 py-4 text-xs">
           {/* Customer details */}
           <div className="space-y-2">
-            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-              <User className="text-primary h-3.5 w-3.5" /> Customer
+            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
+              <User className="h-3.5 w-3.5 text-primary" /> Customer
             </h4>
-            <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
+            <div className="space-y-1.5 rounded-lg border bg-muted/40 p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Name</span>
-                <span className="text-foreground font-semibold">
+                <span className="font-semibold text-foreground">
                   {flag.client?.fullName || "—"}
                 </span>
               </div>
@@ -195,13 +201,13 @@ export function FlagReviewSheet({
           {/* Transaction details */}
           {flag.transaction && (
             <div className="space-y-2">
-              <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-                <CreditCard className="text-primary h-3.5 w-3.5" /> Transaction
+              <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
+                <CreditCard className="h-3.5 w-3.5 text-primary" /> Transaction
               </h4>
-              <div className="bg-muted/40 space-y-1.5 rounded-lg border p-3">
+              <div className="space-y-1.5 rounded-lg border bg-muted/40 p-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Amount</span>
-                  <span className="text-foreground text-base font-bold">
+                  <span className="text-base font-bold text-foreground">
                     {formatMt(flag.transaction.amount)}
                   </span>
                 </div>
@@ -236,10 +242,10 @@ export function FlagReviewSheet({
 
           {/* Match details */}
           <div className="space-y-2">
-            <h4 className="text-muted-foreground flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-              <FileSpreadsheet className="text-primary h-3.5 w-3.5" /> Alert details
+            <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
+              <FileSpreadsheet className="h-3.5 w-3.5 text-primary" /> Alert details
             </h4>
-            <div className="bg-muted/20 break-all rounded-lg border p-3 font-mono text-[11px] leading-relaxed">
+            <div className="break-all rounded-lg border bg-muted/20 p-3 font-mono text-[11px] leading-relaxed">
               {flag.details
                 ? typeof flag.details === "string"
                   ? flag.details
@@ -250,7 +256,7 @@ export function FlagReviewSheet({
 
           {/* Review notes */}
           <div className="space-y-2 pt-2">
-            <Label htmlFor="reviewNotes" className="text-foreground font-semibold">
+            <Label htmlFor="reviewNotes" className="font-semibold text-foreground">
               Review notes <span className="text-destructive">*</span>
             </Label>
             <textarea
@@ -259,10 +265,10 @@ export function FlagReviewSheet({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Explain your review and the reason for your decision…"
-              className="border-input bg-background focus-visible:ring-ring w-full rounded-md border p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1"
+              className="w-full rounded-md border border-input bg-background p-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
             {actionError && (
-              <p className="text-destructive flex items-center gap-1 text-xs font-medium">
+              <p className="flex items-center gap-1 text-xs font-medium text-destructive">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                 {actionError}
               </p>

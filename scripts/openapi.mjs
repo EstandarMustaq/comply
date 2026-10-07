@@ -60,6 +60,14 @@ await Promise.all([
     `${JSON.stringify(document, null, 2)}\n`
   ),
   writeFile(generatedPath, formattedGenerated),
+  // Keep public reference builds independent of the production API's availability.
+  writeFile(
+    resolve(root, "docs/openapi.json"),
+    await prettier.format(JSON.stringify(document), {
+      ...prettierOptions,
+      filepath: resolve(root, "docs/openapi.json"),
+    })
+  ),
 ])
 
 console.log(
