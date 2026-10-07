@@ -1,0 +1,50 @@
+name: Mintlify docs checks
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".node-version"
+      - ".github/workflows/mintlify.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".node-version"
+      - ".github/workflows/mintlify.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mintlify-docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Format, links, and build validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .node-version
+      - name: Install Mintlify CLI
+        run: npm install --global mint@4.2.991
+      - name: Check documentation formatting
+        run: |
+          mint format
+          if [ -n "$(git status --porcelain -- .)" ]; then
+            echo "Documentation is not formatted. Run 'mint format' from docs/ and commit the changes."
+            git status --short -- .
+            exit 1
+          fi
+      - name: Check internal links and anchors
+        run: mint broken-links --check-anchors
+      - name: Validate the Mintlify build and API reference
+        run: mint validate
