@@ -34,6 +34,12 @@ interface FlagReviewSheetProps {
   onFlagUpdated: () => void
 }
 
+/**
+ * Show an alert and let the user resolve it with nonblank notes or escalate it
+ * to a report. Return null for a missing flag. Successful actions invoke
+ * onFlagUpdated and onClose; escalation then opens the report page.
+ * Request failures and synchronous callback errors appear in the sheet.
+ */
 export function FlagReviewSheet({
   flag,
   isOpen,

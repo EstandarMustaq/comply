@@ -10,6 +10,11 @@ interface SectionCardsProps {
   isLoading?: boolean
 }
 
+/**
+ * Render supplied summary metrics, with placeholders for values and subtitles
+ * while loading. Missing counts and volume default to zero; a missing compliance
+ * score defaults to 100%.
+ */
 export function SectionCards({ data, isLoading }: SectionCardsProps = {}) {
   const formatMt = (val?: number) =>
     (val || 0).toLocaleString("en-MZ", {

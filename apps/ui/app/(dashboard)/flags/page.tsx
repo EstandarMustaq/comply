@@ -26,6 +26,11 @@ import { api } from "@/lib/api-client"
 import { type Flag } from "@/lib/types"
 import { getFlagStatusLabel, getFlagTypeLabel } from "@/lib/labels"
 
+/**
+ * Load alerts for the selected status or pending alert category, placing
+ * sanctions matches first, and refresh them after review. Failed loads retain
+ * the previous list.
+ */
 export default function FlagsPage() {
   const [flags, setFlags] = useState<Flag[]>([])
   const [activeTab, setActiveTab] = useState<string>("PENDING")

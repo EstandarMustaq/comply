@@ -17,6 +17,12 @@ interface ClientDetailSheetProps {
   onClose: () => void
 }
 
+/**
+ * Show the supplied customer profile without fetching additional data.
+ * Return null when no customer is selected; forward sheet open-state changes
+ * to onClose. Simplified-regime volumes use fixed 30,000/240,000 MZN limits
+ * for the monthly/annual displays, with progress capped at 100%.
+ */
 export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheetProps) {
   if (!client) return null
 

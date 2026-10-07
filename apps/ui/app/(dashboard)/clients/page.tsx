@@ -42,6 +42,11 @@ import {
 import { api } from "@/lib/api-client"
 import { type Client, type ClientRegime, type ClientRiskRating } from "@/lib/types"
 
+/**
+ * Load and search the first 100 matching customers, filter them by regime,
+ * and provide profile creation and detail views. Load failures retain the
+ * previous list; creation failures appear in the form.
+ */
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([])
   const [searchQuery, setSearchQuery] = useState("")

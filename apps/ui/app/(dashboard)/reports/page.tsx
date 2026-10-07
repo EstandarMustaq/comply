@@ -50,6 +50,11 @@ import {
 } from "@/lib/types"
 import { getReportStatusLabel } from "@/lib/labels"
 
+/**
+ * Load suspicious activity and cash transaction reports and provide filing details.
+ * A matching strId query parameter opens its report dialog after each successful
+ * load. Load failures retain prior lists; submission failures appear in the form.
+ */
 function ReportsContent() {
   const searchParams = useSearchParams()
   const highlightStrId = searchParams.get("strId")

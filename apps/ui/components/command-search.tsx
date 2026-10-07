@@ -49,6 +49,12 @@ function matches(item: CommandSearchItem, query: string) {
   return haystack.includes(query.toLowerCase())
 }
 
+/**
+ * Search supplied item labels and keywords by case-insensitive substring.
+ * Cmd/Ctrl+K toggles the palette even when showTrigger is false. Selecting an
+ * item closes it, then invokes the item callback followed by onSelect;
+ * synchronous callback errors propagate and prevent later callbacks.
+ */
 export function CommandSearch({
   placeholder = "Search...",
   emptyText = "No results.",

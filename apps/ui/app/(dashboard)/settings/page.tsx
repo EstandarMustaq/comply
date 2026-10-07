@@ -30,6 +30,10 @@ import {
   getUserRoleLabel,
 } from "@/lib/labels"
 
+/**
+ * Display monitoring rules or audit history for the selected tab.
+ * Load on tab changes and manual refresh; failed requests retain prior records.
+ */
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<string>("RULES")
   const [rules, setRules] = useState<ThresholdRule[]>([])

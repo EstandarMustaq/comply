@@ -34,6 +34,10 @@ import { api } from "@/lib/api-client"
 import { type Flag, type InsightsData } from "@/lib/types"
 import { getFlagTypeLabel } from "@/lib/labels"
 
+/**
+ * Load summary metrics and the first ten pending alerts returned by the API.
+ * Refresh both after alert review; if either request fails, retain prior data.
+ */
 export default function DashboardOverviewPage() {
   const router = useRouter()
   const [insights, setInsights] = useState<InsightsData | null>(null)

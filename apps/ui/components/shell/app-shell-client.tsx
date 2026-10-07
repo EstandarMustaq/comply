@@ -40,6 +40,10 @@ import { Separator } from "@/components/ui/separator"
 import { api } from "@/lib/api-client"
 import type { InsightsData } from "@/lib/types"
 
+/**
+ * Wrap route content with module navigation, command search, and account controls.
+ * Fetch insights once for navigation badges; a failed request leaves badges absent.
+ */
 export function AppShellClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()

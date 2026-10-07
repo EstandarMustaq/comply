@@ -47,6 +47,12 @@ const REQUIRED_TARGET_FIELDS = [
   { key: "counterpartyDocument", label: "Counterparty document", required: false },
 ]
 
+/**
+ * Upload the first selected or dropped CSV/XLSX file and ask for column mapping.
+ * Invoke onSuccess after the mapping confirmation request succeeds, without
+ * waiting for any promise it returns. Upload/confirmation failures and synchronous
+ * onSuccess errors appear inline; other filename extensions are rejected locally.
+ */
 export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)

@@ -56,6 +56,12 @@ jobs:
               return;
             }
 
+            /**
+             * Create the repository label only when lookup returns 404; leave existing labels unchanged.
+             * color is a six-digit hex value without #, used with description only on creation.
+             * Resolve without a value once found or created. A 422 creation response triggers
+             * another lookup; other API failures and a failed retry propagate to the caller.
+             */
             async function ensureLabel(name, color, description) {
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
@@ -98,6 +104,10 @@ jobs:
               }
             }
 
+            /**
+             * Return a Markdown blockquote, prefixing every line (including empty lines) with >.
+             * Split LF or CRLF input and join with LF; preserve inline Markdown without escaping it.
+             */
             function quote(text) {
               return text.split(/\r?\n/).map((line) => `> ${line}`).join("\n");
             }

@@ -20,6 +20,11 @@ interface NotificationEntry {
   urgent?: boolean
 }
 
+/**
+ * Load insights once and show one notification per nonzero workload category.
+ * The badge counts categories, not individual alerts; a failed request shows
+ * the same empty state as no notifications.
+ */
 export function NotificationsMenu() {
   const [entries, setEntries] = React.useState<NotificationEntry[]>([])
   const [loaded, setLoaded] = React.useState(false)

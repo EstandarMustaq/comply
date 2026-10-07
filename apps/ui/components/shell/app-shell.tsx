@@ -34,6 +34,11 @@ export function useAppShell() {
   return context
 }
 
+/**
+ * Provide shared desktop sidebar and mobile drawer state for shell children.
+ * defaultSidebarOpen seeds desktop state only. Cmd/Ctrl+Backslash toggles the
+ * mobile drawer below 768px and the desktop sidebar at wider viewport widths.
+ */
 export function AppShell({
   defaultSidebarOpen = true,
   children,
@@ -108,6 +113,10 @@ export function AppShell({
   )
 }
 
+/**
+ * Render header slots with a mobile menu toggle; centerContent is hidden below 768px.
+ * @throws {Error} When rendered outside AppShell.
+ */
 export function AppShellNavbar({
   startContent,
   centerContent,
@@ -151,6 +160,11 @@ export function AppShellNavbar({
   )
 }
 
+/**
+ * Render shell children alongside a mobile drawer using registered rail and sidebar
+ * content. Clicking the backdrop closes the drawer.
+ * @throws {Error} When rendered outside AppShell.
+ */
 export function AppShellBody({
   children,
   ...props
@@ -216,6 +230,12 @@ type RailIndicatorContextProps = {
 
 const RailIndicatorContext = React.createContext<RailIndicatorContextProps | null>(null)
 
+/**
+ * Render the desktop module rail and register its children for the mobile drawer.
+ * showSidebarToggle controls the desktop collapse button; unmounting clears the
+ * registered mobile rail content.
+ * @throws {Error} When rendered outside AppShell.
+ */
 export function AppShellRail({
   showSidebarToggle = true,
   children,
@@ -363,6 +383,11 @@ export function AppShellRailItem({
   )
 }
 
+/**
+ * Render the collapsible desktop sidebar and register its children for the mobile
+ * drawer. Unmounting clears the registered mobile sidebar content.
+ * @throws {Error} When rendered outside AppShell.
+ */
 export function AppShellSidebar({
   children,
   ...props
@@ -520,6 +545,10 @@ export function AppShellNavItem({
   )
 }
 
+/**
+ * Render a navigation group whose initial expansion uses defaultOpen, then isActive.
+ * An active group always reopens if collapsed; becoming inactive does not close it.
+ */
 export function AppShellNavItemCollapsible({
   isActive,
   defaultOpen,

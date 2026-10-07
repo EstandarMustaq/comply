@@ -25,6 +25,10 @@ import { api } from "@/lib/api-client"
 import { type ImportBatch } from "@/lib/types"
 import { getImportStatusLabel } from "@/lib/labels"
 
+/**
+ * Show spreadsheet upload and import history, refreshing history on mount,
+ * on request, and after mapping confirmation. Failed loads retain prior history.
+ */
 export default function ImportPage() {
   const [batches, setBatches] = useState<ImportBatch[]>([])
   const [isLoading, setIsLoading] = useState(false)

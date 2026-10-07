@@ -25,6 +25,10 @@ function percent(part: number, total: number) {
   return Math.round((part / total) * 100)
 }
 
+/**
+ * Load workload and customer coverage metrics with links to related workspaces.
+ * A failed insights request ends loading and leaves the default zero counts.
+ */
 export default function InsightsPage() {
   const router = useRouter()
   const [data, setData] = useState<InsightsData | null>(null)

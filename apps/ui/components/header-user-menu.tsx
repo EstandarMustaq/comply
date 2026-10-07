@@ -28,6 +28,12 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
+/**
+ * Load the current user and show account actions; failed user lookup leaves
+ * the loading placeholder visible. Sign-out clears local tokens and redirects
+ * to the configured auth URL or reloads the page. Logout request failures are
+ * ignored by the API client; local storage errors can still reject sign-out.
+ */
 export function HeaderUserMenu() {
   const router = useRouter()
   const [user, setUser] = useState<CurrentUser | null>(null)

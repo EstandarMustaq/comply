@@ -40,6 +40,12 @@ function initialsOf(name: string) {
     .toUpperCase()
 }
 
+/**
+ * Select from supplied Organizations, searching names and IDs without case sensitivity.
+ * value controls selection; otherwise defaultValue or the first initial entry
+ * seeds local selection. onValueChange receives the selected ID, including
+ * reselection; synchronous callback errors propagate before the menu closes.
+ */
 export function OrganizationSelector({
   organizations,
   value,
