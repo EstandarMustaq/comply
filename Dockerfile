@@ -8,7 +8,7 @@ COPY apps/api/build.gradle.kts ./apps/api/build.gradle.kts
 COPY apps/api/src ./apps/api/src
 RUN chmod +x gradlew && ./gradlew --no-daemon :api:bootJar
 
-FROM eclipse-temurin:21-jre-alpine AS api
+FROM eclipse-temurin:25-jre-alpine AS api
 WORKDIR /app
 RUN addgroup -S complyz && adduser -S complyz -G complyz \
     && mkdir -p /var/lib/complyz/imports \
