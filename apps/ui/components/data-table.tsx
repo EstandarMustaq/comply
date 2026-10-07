@@ -21,20 +21,22 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-  type ColumnDef,
   type ColumnFiltersState,
-  type Row,
   type SortingState,
-  type VisibilityState,
+  type ColumnVisibilityState,
   flexRender,
+} from "@tanstack/react-table"
+import {
+  type LegacyColumnDef as ColumnDef,
+  type LegacyRow as Row,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+  useLegacyTable,
+} from "@tanstack/react-table/legacy"
 import {
   CheckCircle2Icon,
   ChevronDownIcon,
@@ -357,7 +359,9 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[] }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>(
+    {}
+  )
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [pagination, setPagination] = React.useState({
@@ -376,8 +380,7 @@ export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[
     [data]
   )
 
-  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table v8 API cannot be memoized by React Compiler
-  const table = useReactTable({
+  const table = useLegacyTable({
     data,
     columns,
     state: {

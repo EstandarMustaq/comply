@@ -51,8 +51,8 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Run UI browser tests
         run: pnpm test:e2e
-      - name: Build the workspace
-        run: pnpm build
+      - name: Build UI and shared packages
+        run: pnpm exec turbo run build
       - name: Upload browser test artifacts
         if: failure()
         uses: actions/upload-artifact@v6
