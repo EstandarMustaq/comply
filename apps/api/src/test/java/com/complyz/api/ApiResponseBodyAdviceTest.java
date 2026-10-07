@@ -21,7 +21,7 @@ class ApiResponseBodyAdviceTest {
 
     @Test
     void wrapsSuccessfulJsonApiResponsesWithDataAndMetadata() {
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest("GET", "/api/clients");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest("GET", "/api/v1/clients");
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         Object result = advice.beforeBodyWrite(
                 Map.of("items", 2),
@@ -42,11 +42,11 @@ class ApiResponseBodyAdviceTest {
 
     @Test
     void convertsJsonErrorBodiesToSafeStructuredErrors() {
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest("POST", "/api/auth/login");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest("POST", "/api/v1/auth/login");
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         servletResponse.setStatus(401);
         Object result = advice.beforeBodyWrite(
-                Map.of("message", "Credenciais inválidas"),
+                Map.of("message", "Email or password is incorrect"),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
                 MappingJackson2HttpMessageConverter.class,
@@ -57,17 +57,17 @@ class ApiResponseBodyAdviceTest {
         assertInstanceOf(ApiErrorEnvelope.class, result);
         ApiErrorEnvelope envelope = (ApiErrorEnvelope) result;
         assertEquals("HTTP_401", envelope.error().code());
-        assertEquals("Credenciais inválidas", envelope.error().message());
+        assertEquals("Email or password is incorrect", envelope.error().message());
         assertEquals(Map.of(), envelope.error().details());
     }
 
     @Test
     void preservesStructuredErrorDetails() {
-        MockHttpServletRequest servletRequest = new MockHttpServletRequest("POST", "/api/import-batches");
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest("POST", "/api/v1/import-batches");
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         servletResponse.setStatus(400);
         Object result = advice.beforeBodyWrite(
-                Map.of("message", "Ficheiro inválido", "fieldErrors", Map.of("amount", "obrigatório")),
+                Map.of("message", "File is invalid", "fieldErrors", Map.of("amount", "is required")),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
                 MappingJackson2HttpMessageConverter.class,
@@ -76,12 +76,12 @@ class ApiResponseBodyAdviceTest {
         );
 
         ApiErrorEnvelope envelope = (ApiErrorEnvelope) result;
-        assertEquals(Map.of("fieldErrors", Map.of("amount", "obrigatório")), envelope.error().details());
+        assertEquals(Map.of("fieldErrors", Map.of("amount", "is required")), envelope.error().details());
     }
 
     @Test
     void leavesNonApiAndBinaryResponsesUnchanged() {
-        MockHttpServletRequest apiRequest = new MockHttpServletRequest("GET", "/api/reports/exports/file.pdf");
+        MockHttpServletRequest apiRequest = new MockHttpServletRequest("GET", "/api/v1/reports/exports/file.pdf");
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
         byte[] content = {1, 2, 3};
         Object binary = advice.beforeBodyWrite(
@@ -93,6 +93,17 @@ class ApiResponseBodyAdviceTest {
                 new ServletServerHttpResponse(servletResponse)
         );
         assertSame(content, binary);
+
+        HttpServletRequest unversionedApiRequest = new MockHttpServletRequest("GET", "/api/clients");
+        Object unversioned = advice.beforeBodyWrite(
+                Map.of("items", 2),
+                (MethodParameter) null,
+                MediaType.APPLICATION_JSON,
+                MappingJackson2HttpMessageConverter.class,
+                new ServletServerHttpRequest(unversionedApiRequest),
+                new ServletServerHttpResponse(servletResponse)
+        );
+        assertEquals(Map.of("items", 2), unversioned);
 
         HttpServletRequest nonApiRequest = new MockHttpServletRequest("GET", "/actuator/health");
         Object unchanged = advice.beforeBodyWrite(

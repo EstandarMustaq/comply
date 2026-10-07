@@ -35,8 +35,8 @@ export function NotificationsMenu() {
         if (data.sanctionsMatchCount) {
           next.push({
             id: "sanctions",
-            title: `${data.sanctionsMatchCount} correspondências de sanções`,
-            description: "Exigem decisão dentro de 24 horas",
+            title: `${data.sanctionsMatchCount} sanctions matches`,
+            description: "Decision due within 24 hours",
             href: "/flags?type=sanctions",
             urgent: true,
           })
@@ -44,16 +44,16 @@ export function NotificationsMenu() {
         if (data.pendingFlagsCount) {
           next.push({
             id: "pending",
-            title: `${data.pendingFlagsCount} alertas por rever`,
-            description: "Aguardam triagem",
+            title: `${data.pendingFlagsCount} alerts need review`,
+            description: "Waiting for screening",
             href: "/flags",
           })
         }
         if (data.overdueSlaCount) {
           next.push({
             id: "sla",
-            title: `${data.overdueSlaCount} casos fora de prazo`,
-            description: "Decisão em atraso",
+            title: `${data.overdueSlaCount} overdue cases`,
+            description: "Decision is overdue",
             href: "/flags",
             urgent: true,
           })
@@ -61,8 +61,8 @@ export function NotificationsMenu() {
         if (data.pepReviewDueCount) {
           next.push({
             id: "pep",
-            title: `${data.pepReviewDueCount} revisões de cliente pendentes`,
-            description: "Revisão periódica vencida",
+            title: `${data.pepReviewDueCount} customer reviews due`,
+            description: "Periodic review is overdue",
             href: "/clients",
           })
         }
@@ -83,7 +83,7 @@ export function NotificationsMenu() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Notificações"
+          aria-label="Notifications"
           className="text-muted-foreground hover:bg-background/60 hover:text-foreground focus-visible:ring-ring relative inline-flex size-8 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1"
         >
           <Bell className="size-4" />
@@ -101,7 +101,7 @@ export function NotificationsMenu() {
 
       <DropdownMenuContent align="end" sideOffset={8} className="w-80 p-0">
         <div className="border-border flex items-center justify-between border-b px-3 py-2.5">
-          <span className="text-foreground text-sm font-medium">Notificações</span>
+          <span className="text-foreground text-sm font-medium">Notifications</span>
           {entries.length > 0 && (
             <span className="text-muted-foreground text-xs">{entries.length}</span>
           )}
@@ -111,13 +111,13 @@ export function NotificationsMenu() {
           <div className="p-1.5">
             {!loaded && (
               <p className="text-muted-foreground px-3 py-6 text-center text-xs">
-                A carregar...
+                Loading...
               </p>
             )}
 
             {loaded && entries.length === 0 && (
               <p className="text-muted-foreground px-3 py-6 text-center text-xs">
-                Nada por rever.
+                Nothing to review.
               </p>
             )}
 
@@ -154,7 +154,7 @@ export function NotificationsMenu() {
             href="/flags"
             className="text-muted-foreground hover:bg-muted/60 hover:text-foreground flex w-full items-center justify-center rounded-lg px-3 py-2 text-xs transition-colors"
           >
-            Ver todos os alertas
+            View all alerts
           </Link>
         </div>
       </DropdownMenuContent>

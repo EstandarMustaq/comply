@@ -1,6 +1,6 @@
 # Repository instructions
 
-Complyz is a multi-tenant financial operations platform for financial institutions. This file is the canonical engineering guidance for AI agents and contributors. Keep instructions in English; product UI and public documentation remain in Mozambican Portuguese (`pt-MZ`).
+Complyz is intelligent financial compliance for finance teams. This file is the canonical engineering guide for AI agents and contributors. Keep all product and documentation language in clear, direct, confident English; use `docs/standards/product-language.md` as the voice source of truth.
 
 ## Workspace
 
@@ -42,8 +42,8 @@ Run one API test class with `./gradlew :api:test --tests 'com.complyz.reporting.
 
 ## Product and UI
 
-- UI copy, API messages shown to users, and public Mintlify documentation use direct, operational `pt-MZ`. Engineering instructions and internal code documentation use English.
-- Keep machine identifiers separate from display labels. Do not expose internal acronyms, implementation details, external citations, or legal deadlines in product-facing text. Follow `docs/standards/product-language.md` and run `pnpm product-language:check` after product-copy changes.
+- UI copy, user-facing API messages, exports and public Mintlify documentation use Complyz's clear, direct, confident English voice. Engineering instructions and internal code documentation use concise technical English.
+- Keep machine identifiers separate from display labels. Do not expose internal acronyms, implementation details or unsupported legal claims in product-facing text. Follow `docs/standards/product-language.md` and the `check-product-language` skill after product-copy changes.
 - Complyz is an operational product: keep workflows clear, explainable, and traceable. Prioritize readable data density, accessible interactions, honest loading/empty/error states, restrained brand and destructive colors, and full-width analytical views.
 - For frontend work, follow `.github/instructions/ui.instructions.md`. It is the baseline for design tokens, brand color, compact density, and shell composition. Consult installed Next.js guides under `apps/ui/node_modules/next/dist/docs/` before framework-specific changes. Next.js agent-file generation is disabled in `apps/ui/next.config.mjs`; do not add app-local agent instruction files.
 - Keep route pages in the App Router, product components outside `components/ui/`, shared primitives in `components/ui/`, shell behavior in `components/shell/`, and API calls in `lib/api-client.ts`.

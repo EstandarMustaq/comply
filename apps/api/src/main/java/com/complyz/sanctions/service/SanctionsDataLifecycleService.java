@@ -30,7 +30,7 @@ public class SanctionsDataLifecycleService {
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 não disponível", e);
+            throw new IllegalStateException("SHA-256 is unavailable", e);
         }
     }
 
@@ -44,10 +44,10 @@ public class SanctionsDataLifecycleService {
     ) {
         if (version == null || version.isBlank() || sourceUri == null || sourceUri.isBlank()
                 || content == null || content.length == 0 || entries == null || entries.isEmpty()) {
-            throw new IllegalArgumentException("Versão, origem, conteúdo e entradas são obrigatórios");
+            throw new IllegalArgumentException("Version, source, content and entries are required.");
         }
         if (versionRepository.findByVersion(version).isPresent()) {
-            throw new IllegalArgumentException("Versão de sanções já registada: " + version);
+            throw new IllegalArgumentException("Sanctions version already exists: " + version);
         }
         String digest = checksum(content);
         SanctionsListVersion manifest = versionRepository.save(
@@ -55,7 +55,7 @@ public class SanctionsDataLifecycleService {
         for (SanctionsListEntry entry : entries) {
             if (entry.getFullName() == null || entry.getFullName().isBlank()
                     || entry.getSourceList() != sourceList) {
-                throw new IllegalArgumentException("Entrada de sanções inválida para a versão");
+                throw new IllegalArgumentException("Sanctions entry is invalid for this version.");
             }
             entry.setVersion(manifest);
             entryRepository.save(entry);
@@ -66,7 +66,7 @@ public class SanctionsDataLifecycleService {
     @Transactional
     public SanctionsListVersion activate(String version) {
         SanctionsListVersion target = versionRepository.findByVersion(version)
-                .orElseThrow(() -> new IllegalArgumentException("Versão de sanções não encontrada: " + version));
+                .orElseThrow(() -> new IllegalArgumentException("Sanctions version not found: " + version));
         for (SanctionsListVersion active : versionRepository.findByStatus(SanctionsVersionStatus.ACTIVE)) {
             if (active.getSourceList() == target.getSourceList() && active != target) {
                 active.setStatus(SanctionsVersionStatus.INACTIVE);
@@ -81,7 +81,7 @@ public class SanctionsDataLifecycleService {
     @Transactional
     public SanctionsListVersion rollback(String version) {
         SanctionsListVersion target = versionRepository.findByVersion(version)
-                .orElseThrow(() -> new IllegalArgumentException("Versão de sanções não encontrada: " + version));
+                .orElseThrow(() -> new IllegalArgumentException("Sanctions version not found: " + version));
         target.setStatus(SanctionsVersionStatus.ROLLED_BACK);
         target.setValidUntil(Instant.now());
         return versionRepository.save(target);

@@ -165,7 +165,11 @@ export function validateBackupEnvironment(env) {
     prefix,
     database: env.POSTGRES_DB ?? "complyz_db",
     user: env.POSTGRES_USER ?? "complyz_app",
-    container: env.POSTGRES_CONTAINER ?? "complyz-postgres",
+    container:
+      env.POSTGRES_CONTAINER ??
+      (env.COMPLYZ_ENVIRONMENT === "production"
+        ? "complyz-postgres"
+        : "complyz-postgres-dev"),
   }
 }
 

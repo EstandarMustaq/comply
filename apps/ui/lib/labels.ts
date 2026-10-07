@@ -1,109 +1,109 @@
 const flagTypeLabels: Record<string, string> = {
-  KYC_INCOMPLETE: "Perfil incompleto",
-  THRESHOLD_VALUE: "Limiar excedido",
-  THRESHOLD_EXCEEDED: "Limiar excedido",
-  STRUCTURING_SUSPECTED: "Fraccionamento suspeito",
-  SANCTIONS_MATCH: "Correspondência em lista de triagem",
-  PEP_REVIEW_DUE: "Revisão periódica vencida",
-  PEP_TRANSACTION: "Operação associada a pessoa exposta politicamente",
-  RAPID_MOVEMENT: "Movimentação rápida",
-  SIMPLIFIED_REGIME_BREACH: "Limite do regime simplificado excedido",
+  KYC_INCOMPLETE: "Customer profile incomplete",
+  THRESHOLD_VALUE: "Threshold exceeded",
+  THRESHOLD_EXCEEDED: "Threshold exceeded",
+  STRUCTURING_SUSPECTED: "Suspicious structuring",
+  SANCTIONS_MATCH: "Restricted-party match",
+  PEP_REVIEW_DUE: "PEP review overdue",
+  PEP_TRANSACTION: "Transaction linked to a politically exposed person",
+  RAPID_MOVEMENT: "Rapid movement",
+  SIMPLIFIED_REGIME_BREACH: "Simplified-regime limit exceeded",
 }
 
 const flagStatusLabels: Record<string, string> = {
-  PENDING: "Pendente",
-  IN_REVIEW: "Em análise",
-  UNDER_REVIEW: "Em análise",
-  ESCALATED: "Escalado",
-  ESCALATED_TO_STR: "Escalado para comunicação",
-  DISMISSED: "Descartado",
-  RESOLVED: "Resolvido",
+  PENDING: "Pending",
+  IN_REVIEW: "In review",
+  UNDER_REVIEW: "In review",
+  ESCALATED: "Escalated",
+  ESCALATED_TO_STR: "Escalated to report",
+  DISMISSED: "Dismissed",
+  RESOLVED: "Resolved",
 }
 
 const importStatusLabels: Record<string, string> = {
-  UPLOADED: "Recebido",
-  MAPPING_CONFIRMED: "Mapeamento confirmado",
-  PROCESSING: "Em processamento",
-  COMPLETED: "Concluído",
-  FAILED: "Falhou",
+  UPLOADED: "Received",
+  MAPPING_CONFIRMED: "Mapping confirmed",
+  PROCESSING: "Processing",
+  COMPLETED: "Complete",
+  FAILED: "Failed",
 }
 
 const reportStatusLabels: Record<string, string> = {
-  DRAFT: "Rascunho",
-  PENDING_SUBMISSION: "Pendente de submissão",
-  SUBMITTED: "Submetido",
-  ARCHIVED: "Arquivado",
+  DRAFT: "Draft",
+  PENDING_SUBMISSION: "Pending submission",
+  SUBMITTED: "Submitted",
+  ARCHIVED: "Archived",
 }
 
 const transactionTypeLabels: Record<string, string> = {
-  DEPOSIT: "Depósito",
-  WITHDRAWAL: "Levantamento",
-  TRANSFER: "Transferência",
-  CREDIT: "Crédito",
+  DEPOSIT: "Deposit",
+  WITHDRAWAL: "Withdrawal",
+  TRANSFER: "Transfer",
+  CREDIT: "Credit",
 }
 
 const userRoleLabels: Record<string, string> = {
-  ADMIN: "Administrador",
-  COMPLIANCE_OFFICER: "Responsável de conformidade",
+  ADMIN: "Administrator",
+  COMPLIANCE_OFFICER: "Compliance officer",
   OCOS: "OCOS",
-  AUDITOR_READONLY: "Auditor (leitura)",
+  AUDITOR_READONLY: "Read-only auditor",
 }
 
 const auditActionLabels: Record<string, string> = {
-  LOGIN: "Início de sessão",
-  LOGOUT: "Fim de sessão",
-  MFA_ENROLLED: "Autenticação multifactor configurada",
-  MFA_VERIFIED: "Autenticação multifactor confirmada",
-  UPLOAD: "Ficheiro importado",
-  FLAG_REVIEWED: "Alerta analisado",
-  STR_SUBMITTED: "Comunicação submetida",
-  CTR_SUBMITTED: "Comunicação de transacções submetida",
-  CLIENT_UPDATED: "Perfil de cliente actualizado",
-  PEP_REVIEWED: "Revisão periódica concluída",
-  SETTINGS_UPDATED: "Definições actualizadas",
-  USER_CREATED: "Utilizador criado",
-  USER_UPDATED: "Utilizador actualizado",
-  REGULATORY_EXPORT: "Relatório exportado",
+  LOGIN: "Signed in",
+  LOGOUT: "Signed out",
+  MFA_ENROLLED: "Multi-factor authentication set up",
+  MFA_VERIFIED: "Multi-factor authentication verified",
+  UPLOAD: "File imported",
+  FLAG_REVIEWED: "Alert reviewed",
+  STR_SUBMITTED: "Report submitted",
+  CTR_SUBMITTED: "Cash transaction report submitted",
+  CLIENT_UPDATED: "Customer profile updated",
+  PEP_REVIEWED: "PEP review completed",
+  SETTINGS_UPDATED: "Settings updated",
+  USER_CREATED: "User created",
+  USER_UPDATED: "User updated",
+  REGULATORY_EXPORT: "Report exported",
 }
 
 const resourceTypeLabels: Record<string, string> = {
-  clients: "Cliente",
-  flags: "Alerta",
-  transactions: "Transacção",
-  users: "Utilizador",
-  organizations: "Instituição",
-  import_batches: "Lote de importação",
-  suspicious_activity_reports: "Comunicação de operação suspeita",
-  currency_transaction_reports: "Comunicação de transacções",
-  system_config: "Definições do sistema",
+  clients: "Customer",
+  flags: "Alert",
+  transactions: "Transaction",
+  users: "User",
+  organizations: "Organization",
+  import_batches: "Import batch",
+  suspicious_activity_reports: "Suspicious activity report",
+  currency_transaction_reports: "Cash transaction report",
+  system_config: "System settings",
 }
 
 const ruleTypeLabels: Record<string, string> = {
-  SINGLE_TRANSACTION_VALUE: "Valor de uma transacção",
-  MONTHLY_AGGREGATE_VALUE: "Volume mensal acumulado",
-  STRUCTURING: "Fraccionamento de transacções",
+  SINGLE_TRANSACTION_VALUE: "Single transaction value",
+  MONTHLY_AGGREGATE_VALUE: "Monthly aggregate value",
+  STRUCTURING: "Structuring",
 }
 
 const regimeLabels: Record<string, string> = {
-  NORMAL: "Normal",
-  SIMPLIFIED: "Simplificado",
-  SIMPLIFICADO: "Simplificado",
-  ALL: "Todos",
-  TODOS: "Todos",
+  NORMAL: "Standard / enhanced",
+  SIMPLIFIED: "Simplified",
+  SIMPLIFICADO: "Simplified",
+  ALL: "All",
+  TODOS: "All",
 }
 
 const clientTypeLabels: Record<string, string> = {
-  INDIVIDUAL: "Pessoa singular",
-  CORPORATE: "Pessoa colectiva",
+  INDIVIDUAL: "Individual",
+  CORPORATE: "Business",
 }
 
 const riskRatingLabels: Record<string, string> = {
-  LOW: "Baixo",
-  BAIXO: "Baixo",
-  MODERATE: "Médio",
-  MEDIO: "Médio",
-  HIGH: "Elevado",
-  ALTO: "Elevado",
+  LOW: "Low",
+  BAIXO: "Low",
+  MODERATE: "Moderate",
+  MEDIO: "Moderate",
+  HIGH: "High",
+  ALTO: "High",
 }
 
 function labelFor(labels: Record<string, string>, value: string, fallback: string) {
@@ -111,26 +111,26 @@ function labelFor(labels: Record<string, string>, value: string, fallback: strin
 }
 
 export const getFlagTypeLabel = (value: string) =>
-  labelFor(flagTypeLabels, value, "Outro alerta")
+  labelFor(flagTypeLabels, value, "Other alert")
 export const getFlagStatusLabel = (value: string) =>
-  labelFor(flagStatusLabels, value, "Estado não reconhecido")
+  labelFor(flagStatusLabels, value, "Unknown status")
 export const getImportStatusLabel = (value: string) =>
-  labelFor(importStatusLabels, value, "Estado não reconhecido")
+  labelFor(importStatusLabels, value, "Unknown status")
 export const getReportStatusLabel = (value: string) =>
-  labelFor(reportStatusLabels, value, "Estado não reconhecido")
+  labelFor(reportStatusLabels, value, "Unknown status")
 export const getTransactionTypeLabel = (value: string) =>
-  labelFor(transactionTypeLabels, value, "Outro tipo")
+  labelFor(transactionTypeLabels, value, "Other type")
 export const getUserRoleLabel = (value: string) =>
-  labelFor(userRoleLabels, value, "Outro perfil")
+  labelFor(userRoleLabels, value, "Other role")
 export const getAuditActionLabel = (value: string) =>
-  labelFor(auditActionLabels, value, "Outra acção")
+  labelFor(auditActionLabels, value, "Other action")
 export const getResourceTypeLabel = (value: string) =>
-  labelFor(resourceTypeLabels, value, "Outro recurso")
+  labelFor(resourceTypeLabels, value, "Other resource")
 export const getRuleTypeLabel = (value: string) =>
-  labelFor(ruleTypeLabels, value, "Outra regra")
+  labelFor(ruleTypeLabels, value, "Other rule")
 export const getRegimeLabel = (value: string) =>
-  labelFor(regimeLabels, value, "Outro regime")
+  labelFor(regimeLabels, value, "Other regime")
 export const getClientTypeLabel = (value: string) =>
-  labelFor(clientTypeLabels, value, "Outro tipo de cliente")
+  labelFor(clientTypeLabels, value, "Other customer type")
 export const getRiskRatingLabel = (value: string) =>
-  labelFor(riskRatingLabels, value, "Não classificado")
+  labelFor(riskRatingLabels, value, "Unrated")

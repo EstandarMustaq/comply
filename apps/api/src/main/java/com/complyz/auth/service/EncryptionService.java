@@ -61,7 +61,7 @@ public class EncryptionService {
 
             return Base64.getEncoder().encodeToString(byteBuffer.array());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao cifrar dados confidenciais", e);
+            throw new RuntimeException("Could not encrypt confidential data.", e);
         }
     }
 
@@ -84,7 +84,7 @@ public class EncryptionService {
             byte[] plainTextBytes = cipher.doFinal(cipherText);
             return new String(plainTextBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao decifrar dados confidenciais", e);
+            throw new RuntimeException("Could not decrypt confidential data.", e);
         }
     }
 }

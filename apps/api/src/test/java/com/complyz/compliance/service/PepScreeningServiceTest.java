@@ -6,6 +6,7 @@ import com.complyz.flags.entity.Flag;
 import com.complyz.flags.entity.FlagStatus;
 import com.complyz.flags.entity.FlagType;
 import com.complyz.flags.repository.FlagRepository;
+import com.complyz.tenancy.entity.Organization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,12 +42,14 @@ class PepScreeningServiceTest {
     void includesPepClientsThatHaveNeverBeenReviewed() {
         Client client = new Client("PEP", "BI", "456");
         client.setId(UUID.randomUUID());
+        client.setOrganization(organization());
         client.setPep(true);
         client.setPepLastReviewedAt(null);
         when(clientRepository.findByPepTrueAndPepLastReviewedAtBeforeOrPepTrueAndPepLastReviewedAtIsNull(
                 any(LocalDate.class))).thenReturn(List.of(client));
-        when(flagRepository.existsByClientIdAndTypeAndStatus(client.getId(), FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING))
-                .thenReturn(false);
+        when(flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                client.getId(), client.getOrganization().getId(), FlagType.PEP_REVIEW_DUE,
+                FlagStatus.PENDING)).thenReturn(0L);
         when(flagRepository.save(any(Flag.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         assertThat(service.checkAndGeneratePepReviewFlags()).isEqualTo(1);
@@ -57,13 +60,21 @@ class PepScreeningServiceTest {
     void doesNotDuplicatePendingPepReviewFlag() {
         Client client = new Client("PEP", "BI", "789");
         client.setId(UUID.randomUUID());
+        client.setOrganization(organization());
         client.setPep(true);
         when(clientRepository.findByPepTrueAndPepLastReviewedAtBeforeOrPepTrueAndPepLastReviewedAtIsNull(
                 any(LocalDate.class))).thenReturn(List.of(client));
-        when(flagRepository.existsByClientIdAndTypeAndStatus(client.getId(), FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING))
-                .thenReturn(true);
+        when(flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                client.getId(), client.getOrganization().getId(), FlagType.PEP_REVIEW_DUE,
+                FlagStatus.PENDING)).thenReturn(1L);
 
         assertThat(service.checkAndGeneratePepReviewFlags()).isZero();
         verify(flagRepository, never()).save(any(Flag.class));
+    }
+
+    private static Organization organization() {
+        Organization organization = new Organization("test-org", "Test Organization");
+        organization.setId(UUID.randomUUID());
+        return organization;
     }
 }

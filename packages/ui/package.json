@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Shared UI test utilities and test suites for Complyz",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "exports": {
     ".": "./src/index.ts",
     "./utils": "./src/utils.ts"

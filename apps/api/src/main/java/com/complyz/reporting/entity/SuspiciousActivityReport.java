@@ -67,10 +67,10 @@ public class SuspiciousActivityReport {
 
     public void markAsSubmitted(String gifimRegNumber) {
         if (submittedAt != null) {
-            throw new IllegalStateException("Relatório STR já foi submetido e não pode ser alterado");
+            throw new IllegalStateException("Filed suspicious activity reports can't be changed.");
         }
         if (gifimRegNumber == null || gifimRegNumber.isBlank()) {
-            throw new IllegalArgumentException("O número de registo GIFiM é obrigatório");
+            throw new IllegalArgumentException("The filing reference is required.");
         }
         this.submittedAt = Instant.now();
         this.gifimRegistrationNumber = gifimRegNumber.trim();

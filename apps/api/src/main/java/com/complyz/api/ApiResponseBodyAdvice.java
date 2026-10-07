@@ -1,5 +1,6 @@
 package com.complyz.api;
 
+import com.complyz.config.ApiVersioningConfiguration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @ControllerAdvice
 public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    private static final String GENERIC_ERROR_MESSAGE = "O pedido não pôde ser concluído.";
+    private static final String GENERIC_ERROR_MESSAGE = "We couldn't complete the request.";
 
     @Override
     public boolean supports(
@@ -41,7 +42,8 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     ) {
         if (!(request instanceof ServletServerHttpRequest servletRequest)
                 || !(response instanceof ServletServerHttpResponse servletResponse)
-                || !servletRequest.getServletRequest().getRequestURI().startsWith("/api/")
+                || !servletRequest.getServletRequest().getRequestURI()
+                        .startsWith(ApiVersioningConfiguration.API_BASE_PATH + "/")
                 || body == null
                 || body instanceof byte[]
                 || body instanceof ApiSuccessEnvelope<?>
@@ -51,7 +53,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         }
 
         HttpServletResponse httpResponse = servletResponse.getServletResponse();
-        ApiResponseMeta meta = new ApiResponseMeta(Instant.now(), UUID.randomUUID().toString());
+        ApiResponseMetadata meta = new ApiResponseMetadata(Instant.now(), UUID.randomUUID().toString());
         httpResponse.setHeader("X-Request-Id", meta.requestId());
 
         if (httpResponse.getStatus() >= 400) {

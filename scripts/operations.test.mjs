@@ -44,7 +44,7 @@ const productionEnvironment = {
   POSTGRES_VOLUME_NAME: "complyz_postgres_prod_data",
   REDIS_VOLUME_NAME: "complyz_redis_prod_data",
   CORS_ALLOWED_ORIGINS: "https://trycomplyz.com",
-  NEXT_PUBLIC_API_URL: "https://api.trycomplyz.com/api",
+  NEXT_PUBLIC_API_URL: "https://api.trycomplyz.com/api/v1",
   COMPLYZ_BOOTSTRAP_ENABLED: "false",
 }
 
@@ -52,10 +52,12 @@ async function main() {
   await mkdir(binaryDirectory)
   await executable(
     "docker",
-    `import { appendFile } from "node:fs/promises";\n` +
+    `import { appendFile, writeFile } from "node:fs/promises";\n` +
       `const args = process.argv.slice(2);\n` +
       `if (args[0] === "exec" && process.env.FAKE_DOCKER_FAIL === "true") process.exit(17);\n` +
       `if (process.env.FAKE_DOCKER_STATE) await appendFile(process.env.FAKE_DOCKER_STATE, JSON.stringify(args) + "\\n");\n` +
+      `if (process.env.FAKE_COMPOSE_PROFILE_STATE) await writeFile(process.env.FAKE_COMPOSE_PROFILE_STATE, JSON.stringify({ args, profiles: process.env.COMPOSE_PROFILES }));\n` +
+      `if (process.env.FAKE_DOCKER_ENV_STATE && args[0] === "compose") await writeFile(process.env.FAKE_DOCKER_ENV_STATE, process.env.COMPOSE_PROFILES ?? "");\n` +
       `if (args[0] === "exec") process.stdout.write("mock database dump");\n` +
       `else if (args[0] === "inspect") process.stdout.write("healthy");\n`
   )
@@ -95,6 +97,16 @@ async function main() {
     BACKUP_ENCRYPTION_PASSPHRASE: "secret-value",
   })
   assert.equal(backupConfig.retentionYears, 10)
+  assert.equal(backupConfig.container, "complyz-postgres-dev")
+  assert.equal(
+    validateBackupEnvironment({
+      S3_BACKUP_BUCKET: "complyz-backups",
+      AWS_REGION: "af-south-1",
+      BACKUP_ENCRYPTION_PASSPHRASE: "secret-value",
+      COMPLYZ_ENVIRONMENT: "production",
+    }).container,
+    "complyz-postgres"
+  )
   assert.match(retentionDate(1), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
 
   assert.throws(() => parseArguments(["--skip-security-check"]), /Unsupported/)
@@ -124,7 +136,43 @@ async function main() {
       }),
     /explicit production origins/
   )
+  assert.throws(
+    () =>
+      validateDeploymentEnvironment({
+        ...productionEnvironment,
+        COMPLYZ_BOOTSTRAP_ENABLED: "TRUE",
+      }),
+    /COMPLYZ_BOOTSTRAP_ENABLED must be false/
+  )
+  assert.throws(
+    () =>
+      validateDeploymentEnvironment({
+        ...productionEnvironment,
+        COMPLYZ_BOOTSTRAP_ENABLED: "",
+      }),
+    /Missing required production settings: COMPLYZ_BOOTSTRAP_ENABLED/
+  )
   assert.doesNotThrow(() => validateDeploymentEnvironment(productionEnvironment))
+  const productionPreflight = run("scripts/production-compose-preflight.mjs", [], {
+    ...productionEnvironment,
+  })
+  assert.equal(productionPreflight.status, 0, productionPreflight.stderr)
+  const insecurePreflight = run("scripts/production-compose-preflight.mjs", [], {
+    ...productionEnvironment,
+    JWT_SECRET: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970",
+  })
+  assert.notEqual(insecurePreflight.status, 0)
+  assert.match(insecurePreflight.stderr, /JWT_SECRET/)
+
+  const composeProfilePath = join(temporaryDirectory, "compose-profile.json")
+  const composeUp = run("scripts/compose.mjs", ["up"], {
+    COMPOSE_PROFILES: "production",
+    FAKE_COMPOSE_PROFILE_STATE: composeProfilePath,
+  })
+  assert.equal(composeUp.status, 0, composeUp.stderr)
+  const composeInvocation = JSON.parse(await readFile(composeProfilePath, "utf8"))
+  assert.ok(composeInvocation.args.includes("app"))
+  assert.equal(composeInvocation.profiles, "app")
 
   const backupEnv = {
     S3_BACKUP_BUCKET: "complyz-backups-test",
@@ -173,13 +221,17 @@ async function main() {
   assert.match(invalidDeployment.stderr, /Missing required production settings/)
 
   const dockerStatePath = join(temporaryDirectory, "docker-state.jsonl")
+  const dockerProfilesPath = join(temporaryDirectory, "docker-profiles.txt")
   const deploymentEnvironment = {
     ...productionEnvironment,
     PATH: `${binaryDirectory}:${process.env.PATH}`,
+    COMPOSE_PROFILES: "app",
+    FAKE_DOCKER_ENV_STATE: dockerProfilesPath,
     FAKE_DOCKER_STATE: dockerStatePath,
   }
   const deployment = run("scripts/deploy-production.mjs", [], deploymentEnvironment)
   assert.equal(deployment.status, 0, deployment.stderr)
+  assert.equal(await readFile(dockerProfilesPath, "utf8"), "production")
   assert.match(deployment.stdout, /Production deployment is healthy/)
   const deploymentCalls = (await readFile(dockerStatePath, "utf8"))
     .trim()

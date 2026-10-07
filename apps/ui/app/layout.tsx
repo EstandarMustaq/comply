@@ -4,9 +4,9 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   applicationName: "Complyz",
-  title: "Complyz | Conformidade financeira",
+  title: "Complyz | Intelligent Financial Compliance",
   description:
-    "Acompanhe transacções, reveja riscos e mantenha cada decisão documentada num só lugar.",
+    "Review customer risk, monitor transactions and keep every decision clear and traceable.",
 }
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-MZ" suppressHydrationWarning>
+    <html lang="en-MZ" suppressHydrationWarning>
       <body className="bg-background text-foreground min-h-screen antialiased">
         <ThemeProvider
           attribute="class"

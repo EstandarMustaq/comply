@@ -7,7 +7,7 @@ function getRequiredPublicEnv(key: string, value: string | undefined): string {
   if (!value) {
     if (typeof window !== "undefined") {
       console.error(
-        `[Complyz Config Error] Variável de ambiente obrigatória ausente: ${key}. Configure em .env.local`
+        `[Complyz config error] Required environment variable ${key} is missing. Set it in .env.local.`
       )
     }
     return ""

@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.time.Year;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/reports")
 public class ReportController {
 
     private final SuspiciousActivityReportRepository strRepository;
@@ -51,16 +51,24 @@ public class ReportController {
     }
 
     @GetMapping("/str")
-    public ResponseEntity<List<SuspiciousActivityReport>> listStrs(@RequestParam(required = false) Boolean submitted) {
+    public ResponseEntity<List<SuspiciousActivityReport>> listStrs(
+            @RequestParam(required = false) Boolean submitted,
+            Authentication authentication
+    ) {
+        UUID organizationId = tenantAccessService.organizationId((User) authentication.getPrincipal());
         if (Boolean.TRUE.equals(submitted)) {
-            return ResponseEntity.ok(strRepository.findBySubmittedAtIsNotNull());
+            return ResponseEntity.ok(strRepository.findSubmittedByOrganizationId(organizationId));
         }
-        return ResponseEntity.ok(strRepository.findAll());
+        if (Boolean.FALSE.equals(submitted)) {
+            return ResponseEntity.ok(strRepository.findDraftsByOrganizationId(organizationId));
+        }
+        return ResponseEntity.ok(strRepository.findAllByOrganizationId(organizationId));
     }
 
     @GetMapping("/str/{id}")
-    public ResponseEntity<?> getStr(@PathVariable UUID id) {
-        return strRepository.findById(id)
+    public ResponseEntity<?> getStr(@PathVariable UUID id, Authentication authentication) {
+        UUID organizationId = tenantAccessService.organizationId((User) authentication.getPrincipal());
+        return strRepository.findByIdAndOrganizationId(id, organizationId)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(404).body(ApiErrorBodies.notFound()));
     }
@@ -83,11 +91,12 @@ public class ReportController {
             @Valid @RequestBody UpdateStrRequest request,
             Authentication authentication
     ) {
-        SuspiciousActivityReport str = strRepository.findById(id).orElse(null);
+        UUID organizationId = tenantAccessService.organizationId((User) authentication.getPrincipal());
+        SuspiciousActivityReport str = strRepository.findByIdAndOrganizationId(id, organizationId).orElse(null);
         if (str == null) return ResponseEntity.status(404).body(ApiErrorBodies.notFound());
 
         if (str.getSubmittedAt() != null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Relatório já submetido não pode ser editado"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Filed reports can't be edited."));
         }
 
         if (request.accountNumber() != null) str.setAccountNumber(request.accountNumber());
@@ -112,7 +121,9 @@ public class ReportController {
             @Valid @RequestBody SubmitStrRequest request,
             Authentication authentication
     ) {
-        SuspiciousActivityReport str = strRepository.findById(id).orElse(null);
+        User actor = (User) authentication.getPrincipal();
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        SuspiciousActivityReport str = strRepository.findByIdAndOrganizationId(id, organizationId).orElse(null);
         if (str == null) return ResponseEntity.status(404).body(ApiErrorBodies.notFound());
 
         try {
@@ -123,7 +134,6 @@ public class ReportController {
         }
         SuspiciousActivityReport saved = strRepository.save(str);
 
-        User actor = (User) authentication.getPrincipal();
         auditService.record(actor, AuditAction.STR_SUBMITTED, "suspicious_activity_reports", str.getId(),
                 "{\"gifimRegistrationNumber\": \"" + request.gifimRegistrationNumber() + "\", \"retentionUntil\": \"" + str.getRetentionUntil() + "\"}");
 
@@ -131,14 +141,17 @@ public class ReportController {
     }
 
     @GetMapping("/ctr")
-    public ResponseEntity<List<CurrencyTransactionReport>> listCtrs() {
-        return ResponseEntity.ok(ctrRepository.findAll());
+    public ResponseEntity<List<CurrencyTransactionReport>> listCtrs(Authentication authentication) {
+        UUID organizationId = tenantAccessService.organizationId((User) authentication.getPrincipal());
+        return ResponseEntity.ok(ctrRepository.findAllByClientOrganizationId(organizationId));
     }
 
     @PostMapping("/ctr/{id}/submit")
     @PreAuthorize("hasRole('OCOS')")
     public ResponseEntity<?> submitCtr(@PathVariable UUID id, Authentication authentication) {
-        CurrencyTransactionReport ctr = ctrRepository.findById(id).orElse(null);
+        User actor = (User) authentication.getPrincipal();
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        CurrencyTransactionReport ctr = ctrRepository.findByIdAndClientOrganizationId(id, organizationId).orElse(null);
         if (ctr == null) return ResponseEntity.status(404).body(ApiErrorBodies.notFound());
 
         try {
@@ -148,7 +161,6 @@ public class ReportController {
         }
         CurrencyTransactionReport saved = ctrRepository.save(ctr);
 
-        User actor = (User) authentication.getPrincipal();
         auditService.record(actor, AuditAction.CTR_SUBMITTED, "currency_transaction_reports", ctr.getId(),
                 "{\"retentionUntil\": \"" + ctr.getRetentionUntil() + "\"}");
 
@@ -162,7 +174,7 @@ public class ReportController {
                 || str.getBusinessRelationshipDescription().isBlank()
                 || str.getReportingInstitution() == null || str.getReportingInstitution().isBlank()
                 || str.getOcosName() == null || str.getOcosName().isBlank()) {
-            throw new IllegalArgumentException("STR incompleto: preencha instituição, titular, descrição da suspeita, relação de negócio e OCOS");
+            throw new IllegalArgumentException("Complete the report's institution, account holder, suspicion details, business relationship and responsible officer fields.");
         }
     }
 
@@ -201,7 +213,7 @@ public class ReportController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"relatorio-bm-" + year + ".xlsx\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"annual-report-" + year + ".xlsx\"")
                 .body(content);
     }
 }

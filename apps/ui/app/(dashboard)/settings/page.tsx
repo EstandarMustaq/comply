@@ -59,7 +59,7 @@ export default function SettingsPage() {
         setLogs(logsData)
       }
     } catch (err) {
-      console.error("Erro ao carregar configurações:", err)
+      console.error("Failed to load settings:", err)
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +73,7 @@ export default function SettingsPage() {
 
   const formatMt = (val?: number) => {
     if (val === undefined || val === null) return "N/D"
-    return new Intl.NumberFormat("pt-MZ", {
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
       maximumFractionDigits: 0,
@@ -83,7 +83,7 @@ export default function SettingsPage() {
   return (
     <div>
       <SiteHeader
-        title="Regras e registo de actividade"
+        title="Rules and activity"
         action={
           <Button
             variant="outline"
@@ -93,7 +93,7 @@ export default function SettingsPage() {
             className="h-8 gap-1.5 text-xs"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
-            <span>Atualizar</span>
+            <span>Refresh</span>
           </Button>
         }
       />
@@ -108,10 +108,10 @@ export default function SettingsPage() {
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="RULES" className="text-xs">
-                Limiares de monitorização
+                Monitoring thresholds
               </TabsTrigger>
               <TabsTrigger value="AUDIT" className="text-xs">
-                Registo de actividade
+                Activity history
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -124,26 +124,26 @@ export default function SettingsPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Scale className="text-primary h-4 w-4" />
-                  Regras de triagem
+                  Screening rules
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Regras automáticas aplicadas na importação para sinalização imediata.
+                  Rules that screen transactions during import.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {rules.length === 0 ? (
                   <div className="text-muted-foreground py-8 text-center text-xs">
-                    {isLoading ? "A carregar regras…" : "Não há regras configuradas."}
+                    {isLoading ? "Loading rules…" : "No rules configured."}
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Regra</TableHead>
-                        <TableHead>Limiar</TableHead>
-                        <TableHead>Janela de agregação</TableHead>
-                        <TableHead>Estado</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Rule</TableHead>
+                        <TableHead>Threshold</TableHead>
+                        <TableHead>Aggregation window</TableHead>
+                        <TableHead>Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -159,20 +159,20 @@ export default function SettingsPage() {
                           </TableCell>
                           <TableCell className="text-foreground text-xs font-bold">
                             {rule.valueThreshold === null
-                              ? "Não aplicável"
+                              ? "Not applicable"
                               : formatMt(rule.valueThreshold)}
                           </TableCell>
                           <TableCell className="text-xs">
                             {rule.aggregationWindowDays && rule.aggregationWindowDays > 0
-                              ? `${rule.aggregationWindowDays} dias`
-                              : "Por transacção"}
+                              ? `${rule.aggregationWindowDays} days`
+                              : "Per transaction"}
                           </TableCell>
                           <TableCell>
                             <Badge
                               variant={rule.active ? "success" : "secondary"}
                               className="text-[10px]"
                             >
-                              {rule.active ? "ACTIVA" : "INACTIVA"}
+                              {rule.active ? "ACTIVE" : "INACTIVE"}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -187,20 +187,22 @@ export default function SettingsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="border-border">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold">Regime simplificado</CardTitle>
+                  <CardTitle className="text-sm font-bold">
+                    Simplified due diligence
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-xs">
                   <div className="flex justify-between border-b pb-1">
-                    <span>Limite mensal por cliente</span>
+                    <span>Monthly limit per customer</span>
                     <span className="font-bold">30.000 MT</span>
                   </div>
                   <div className="flex justify-between border-b pb-1">
-                    <span>Limite anual</span>
+                    <span>Annual limit</span>
                     <span className="font-bold">240.000 MT</span>
                   </div>
                   <p className="text-muted-foreground pt-1 text-[11px]">
-                    Aplica-se a clientes de baixo risco com diligência simplificada.
-                    Ultrapassar o limite exige transição para diligência reforçada.
+                    Applies to low-risk customers under simplified due diligence.
+                    Exceeding the limit requires enhanced due diligence.
                   </p>
                 </CardContent>
               </Card>
@@ -208,21 +210,21 @@ export default function SettingsPage() {
               <Card className="border-destructive/40">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-destructive text-sm font-bold">
-                    Rastreio de sanções
+                    Sanctions screening
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-muted-foreground space-y-2 text-xs">
                   <div className="flex justify-between border-b pb-1">
-                    <span>Janela de decisão</span>
-                    <span className="font-bold text-red-700">24 horas</span>
+                    <span>Decision window</span>
+                    <span className="font-bold text-red-700">24 hours</span>
                   </div>
                   <div className="flex justify-between border-b pb-1">
-                    <span>Acção necessária</span>
-                    <span className="font-bold">Bloquear e escalar</span>
+                    <span>Action required</span>
+                    <span className="font-bold">Block and escalate</span>
                   </div>
                   <p className="text-muted-foreground pt-1 text-[11px]">
-                    Verificação automática contra listas oficiais e consolidadas de
-                    sanções.
+                    Automatically screen against official and consolidated sanctions
+                    lists.
                   </p>
                 </CardContent>
               </Card>
@@ -235,46 +237,44 @@ export default function SettingsPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base font-semibold">
                     <History className="text-primary h-4 w-4" />
-                    Registo de auditoria permanente
+                    Audit history
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Histórico permanente e protegido de todas as acções executadas no
-                    sistema.
+                    A protected record of actions taken in the system.
                   </CardDescription>
                 </div>
                 <Badge
                   variant="outline"
                   className="border-emerald-300 bg-emerald-50 text-[11px] text-emerald-700"
                 >
-                  <Lock className="mr-1 h-3 w-3" /> Registo Permanente
+                  <Lock className="mr-1 h-3 w-3" /> Immutable history
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
               {logs.length === 0 ? (
                 <div className="text-muted-foreground py-8 text-center text-xs">
-                  Nenhum evento de auditoria registado ou sem permissão de acesso
-                  (exclusivo para ADMIN).
+                  No activity to show, or you do not have permission to view it.
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data / Hora</TableHead>
-                      <TableHead>Utilizador</TableHead>
-                      <TableHead>Perfil</TableHead>
-                      <TableHead>Acção realizada</TableHead>
-                      <TableHead>Recurso afectado</TableHead>
+                      <TableHead>Date / time</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Resource</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {logs.map((log) => (
                       <TableRow key={log.id}>
                         <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
-                          {new Date(log.createdAt).toLocaleString("pt-MZ")}
+                          {new Date(log.createdAt).toLocaleString("en-MZ")}
                         </TableCell>
                         <TableCell className="text-xs font-semibold">
-                          {log.actor?.email || "Utilizador desconhecido"}
+                          {log.actor?.email || "Unknown user"}
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="text-[10px]">

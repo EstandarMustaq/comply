@@ -3,32 +3,141 @@ package com.complyz.flags.repository;
 import com.complyz.flags.entity.Flag;
 import com.complyz.flags.entity.FlagStatus;
 import com.complyz.flags.entity.FlagType;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface FlagRepository extends JpaRepository<Flag, UUID>, JpaSpecificationExecutor<Flag> {
+public interface FlagRepository extends JpaRepository<Flag, UUID> {
 
-    List<Flag> findByStatus(FlagStatus status);
+    @Query("SELECT COUNT(flagEntity) FROM Flag flagEntity " +
+            "LEFT JOIN flagEntity.client directClient " +
+            "LEFT JOIN flagEntity.transaction relatedTransaction " +
+            "LEFT JOIN relatedTransaction.client transactionClient " +
+            "WHERE directClient.id = :clientId " +
+            "AND directClient.organization.id = :organizationId " +
+            "AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId) " +
+            "AND flagEntity.type = :type AND flagEntity.status = :status")
+    long countByClientIdAndOrganizationIdAndTypeAndStatus(
+            @Param("clientId") UUID clientId,
+            @Param("organizationId") UUID organizationId,
+            @Param("type") FlagType type,
+            @Param("status") FlagStatus status
+    );
 
-    List<Flag> findByStatusOrderBySlaDeadlineAsc(FlagStatus status);
+    @Query("SELECT COUNT(flagEntity) FROM Flag flagEntity " +
+            "LEFT JOIN flagEntity.client directClient " +
+            "LEFT JOIN flagEntity.transaction relatedTransaction " +
+            "LEFT JOIN relatedTransaction.client transactionClient " +
+            "WHERE relatedTransaction.id = :transactionId " +
+            "AND transactionClient.organization.id = :organizationId " +
+            "AND (directClient IS NULL OR directClient.organization.id = :organizationId) " +
+            "AND flagEntity.type = :type")
+    long countByTransactionIdAndOrganizationIdAndType(
+            @Param("transactionId") UUID transactionId,
+            @Param("organizationId") UUID organizationId,
+            @Param("type") FlagType type
+    );
 
-    List<Flag> findByTypeAndStatus(FlagType type, FlagStatus status);
+    @Query("""
+            SELECT flagEntity FROM Flag flagEntity
+            LEFT JOIN flagEntity.client directClient
+            LEFT JOIN flagEntity.transaction relatedTransaction
+            LEFT JOIN relatedTransaction.client transactionClient
+            LEFT JOIN flagEntity.reviewedBy reviewer
+            WHERE (
+                (directClient IS NOT NULL AND directClient.organization.id = :organizationId
+                    AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId))
+                OR (directClient IS NULL AND relatedTransaction IS NOT NULL
+                    AND transactionClient.organization.id = :organizationId)
+            )
+              AND (reviewer IS NULL OR reviewer.organization.id = :organizationId)
+              AND (:status IS NULL OR flagEntity.status = :status)
+              AND (:type IS NULL OR flagEntity.type = :type)
+            """)
+    List<Flag> findAllByOrganizationId(
+            @Param("organizationId") UUID organizationId,
+            @Param("status") FlagStatus status,
+            @Param("type") FlagType type,
+            Sort sort
+    );
 
-    boolean existsByClientIdAndTypeAndStatus(UUID clientId, FlagType type, FlagStatus status);
+    @Query("""
+            SELECT flagEntity FROM Flag flagEntity
+            LEFT JOIN flagEntity.client directClient
+            LEFT JOIN flagEntity.transaction relatedTransaction
+            LEFT JOIN relatedTransaction.client transactionClient
+            LEFT JOIN flagEntity.reviewedBy reviewer
+            WHERE flagEntity.id = :flagId AND (
+                (directClient IS NOT NULL AND directClient.organization.id = :organizationId
+                    AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId))
+                OR (directClient IS NULL AND relatedTransaction IS NOT NULL
+                    AND transactionClient.organization.id = :organizationId)
+            )
+              AND (reviewer IS NULL OR reviewer.organization.id = :organizationId)
+            """)
+    Optional<Flag> findByIdAndOrganizationId(
+            @Param("flagId") UUID flagId,
+            @Param("organizationId") UUID organizationId
+    );
 
-    boolean existsByTransactionIdAndType(UUID transactionId, FlagType type);
+    @Query("""
+            SELECT COUNT(flagEntity) FROM Flag flagEntity
+            LEFT JOIN flagEntity.client directClient
+            LEFT JOIN flagEntity.transaction relatedTransaction
+            LEFT JOIN relatedTransaction.client transactionClient
+            WHERE (
+                (directClient IS NOT NULL AND directClient.organization.id = :organizationId
+                    AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId))
+                OR (directClient IS NULL AND relatedTransaction IS NOT NULL
+                    AND transactionClient.organization.id = :organizationId)
+            ) AND flagEntity.status = :status
+            """)
+    long countByOrganizationIdAndStatus(
+            @Param("organizationId") UUID organizationId,
+            @Param("status") FlagStatus status
+    );
 
-    long countByStatus(FlagStatus status);
+    @Query("""
+            SELECT COUNT(flagEntity) FROM Flag flagEntity
+            LEFT JOIN flagEntity.client directClient
+            LEFT JOIN flagEntity.transaction relatedTransaction
+            LEFT JOIN relatedTransaction.client transactionClient
+            WHERE (
+                (directClient IS NOT NULL AND directClient.organization.id = :organizationId
+                    AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId))
+                OR (directClient IS NULL AND relatedTransaction IS NOT NULL
+                    AND transactionClient.organization.id = :organizationId)
+            ) AND flagEntity.type = :type
+            """)
+    long countByOrganizationIdAndType(
+            @Param("organizationId") UUID organizationId,
+            @Param("type") FlagType type
+    );
 
-    long countByType(FlagType type);
-
-    @Query("SELECT COUNT(f) FROM Flag f WHERE f.status = 'PENDING' AND f.slaDeadline IS NOT NULL AND f.slaDeadline < :now")
-    long countOverdueSla(Instant now);
+    @Query("""
+            SELECT COUNT(flagEntity) FROM Flag flagEntity
+            LEFT JOIN flagEntity.client directClient
+            LEFT JOIN flagEntity.transaction relatedTransaction
+            LEFT JOIN relatedTransaction.client transactionClient
+            WHERE (
+                (directClient IS NOT NULL AND directClient.organization.id = :organizationId
+                    AND (relatedTransaction IS NULL OR transactionClient.organization.id = :organizationId))
+                OR (directClient IS NULL AND relatedTransaction IS NOT NULL
+                    AND transactionClient.organization.id = :organizationId)
+            ) AND flagEntity.status = :status
+              AND flagEntity.slaDeadline IS NOT NULL AND flagEntity.slaDeadline < :now
+            """)
+    long countOverdueSlaByOrganizationId(
+            @Param("organizationId") UUID organizationId,
+            @Param("status") FlagStatus status,
+            @Param("now") Instant now
+    );
 }

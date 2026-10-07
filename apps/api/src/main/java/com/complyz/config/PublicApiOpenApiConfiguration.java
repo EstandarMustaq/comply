@@ -22,37 +22,38 @@ import java.util.Map;
 public class PublicApiOpenApiConfiguration {
 
     private static final String API_KEY = "bearerAuth";
-    private static final String META_SCHEMA = "ApiResponseMeta";
+    private static final String META_SCHEMA = "ApiResponseMetadata";
     private static final String ERROR_SCHEMA = "ApiError";
     private static final String ERROR_ENVELOPE_SCHEMA = "ApiErrorEnvelope";
+    private static final String API_BASE_PATH = ApiVersioningConfiguration.API_BASE_PATH;
     private static final Map<String, String> RESOURCE_TAGS = Map.of(
-            "/api/auth", "Autenticação",
-            "/api/clients", "Clientes",
-            "/api/flags", "Alertas",
-            "/api/import-batches", "Importações",
-            "/api/insights", "Indicadores",
-            "/api/reports", "Relatórios",
-            "/api/settings/users", "Utilizadores",
-            "/api/settings", "Definições",
-            "/api/audit-log", "Histórico de actividade"
+            "/auth", "Authentication",
+            "/clients", "Customers",
+            "/flags", "Alerts",
+            "/import-batches", "Imports",
+            "/insights", "Insights",
+            "/reports", "Reports",
+            "/settings/users", "Users",
+            "/settings", "Settings",
+            "/audit-log", "Activity history"
     );
 
     @Bean
     public OpenAPI complyzOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API Complyz")
+                        .title("Complyz API")
                         .version("1.0")
-                        .description("API para integração com a plataforma Complyz."))
+                        .description("API for Complyz's financial compliance workspace."))
                 .servers(List.of(new Server()
                         .url("https://api.trycomplyz.com")
-                        .description("Produção")))
+                        .description("Production")))
                 .components(new Components()
                         .addSecuritySchemes(API_KEY, new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT"))
-                        .addSchemas(META_SCHEMA, metaSchema())
+                        .addSchemas(META_SCHEMA, metadataSchema())
                         .addSchemas(ERROR_SCHEMA, errorSchema())
                         .addSchemas(ERROR_ENVELOPE_SCHEMA, errorEnvelopeSchema()))
                 .addSecurityItem(new SecurityRequirement().addList(API_KEY));
@@ -61,21 +62,23 @@ public class PublicApiOpenApiConfiguration {
     @Bean
     public OpenApiCustomizer publicApiResponseEnvelopeCustomizer() {
         return openApi -> {
+            ensureEnvelopeSchemas(openApi);
             if (openApi.getPaths() == null) {
                 return;
             }
             openApi.getPaths().forEach((path, pathItem) -> {
-                if (!path.startsWith("/api/")) {
+                if (!path.startsWith(API_BASE_PATH + "/")) {
                     return;
                 }
+                String resourcePath = path.substring(API_BASE_PATH.length());
                 pathItem.readOperations().forEach(operation -> {
-                    boolean publicAuthenticationOperation = path.matches(
-                            "^/api/auth/(login|mfa/verify|mfa/enroll|mfa/confirm|refresh)$"
+                    boolean publicAuthenticationOperation = resourcePath.matches(
+                            "^/auth/(login|mfa/verify|mfa/enroll|mfa/confirm|refresh)$"
                     );
                     if (publicAuthenticationOperation) {
                         operation.setSecurity(List.of());
                     }
-                    operation.setTags(List.of(resourceTag(path)));
+                    operation.setTags(List.of(resourceTag(resourcePath)));
                     operation.getResponses().forEach((status, response) -> {
                         if (isSuccess(status)) {
                             wrapSuccessResponse(response);
@@ -137,7 +140,7 @@ public class PublicApiOpenApiConfiguration {
         responses.addApiResponse(
                 "default",
                 new ApiResponse()
-                        .description("Erro devolvido pelo serviço.")
+                        .description("The service returned an error.")
                         .content(new io.swagger.v3.oas.models.media.Content().addMediaType(
                                 "application/json",
                                 new io.swagger.v3.oas.models.media.MediaType()
@@ -158,7 +161,17 @@ public class PublicApiOpenApiConfiguration {
         json.setSchema(new Schema<>().$ref("#/components/schemas/" + ERROR_ENVELOPE_SCHEMA));
     }
 
-    private Schema<?> metaSchema() {
+    private void ensureEnvelopeSchemas(OpenAPI openApi) {
+        if (openApi.getComponents() == null) {
+            openApi.setComponents(new Components());
+        }
+        Components components = openApi.getComponents();
+        components.addSchemas(META_SCHEMA, metadataSchema());
+        components.addSchemas(ERROR_SCHEMA, errorSchema());
+        components.addSchemas(ERROR_ENVELOPE_SCHEMA, errorEnvelopeSchema());
+    }
+
+    private Schema<?> metadataSchema() {
         ObjectSchema schema = new ObjectSchema();
         schema.addProperties("timestamp", new StringSchema().format("date-time"));
         schema.addProperties("requestId", new StringSchema().format("uuid"));

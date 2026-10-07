@@ -130,6 +130,18 @@ public class ImportService {
             Map<String, String> suggestedMapping
     ) {}
 
+    @Transactional(readOnly = true)
+    public List<ImportBatch> listBatches(User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        return importBatchRepository.findAllByOrganizationId(organizationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ImportBatch> findBatch(UUID batchId, User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        return importBatchRepository.findByIdAndOrganizationId(batchId, organizationId);
+    }
+
     public UploadPreviewResponse createUploadBatch(MultipartFile file, User user) throws IOException {
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "extrato";
         ImportFormat format = originalFilename.toLowerCase().endsWith(".xlsx") ? ImportFormat.XLSX : ImportFormat.CSV;
@@ -177,22 +189,19 @@ public class ImportService {
     }
 
     private Map<String, Object> confirmAndProcessLocked(UUID batchId, Map<String, String> columnMapping, User user) throws Exception {
-        ImportBatch batch = importBatchRepository.findById(batchId)
-                .orElseThrow(() -> new IllegalArgumentException("Lote de importação não encontrado: " + batchId));
+        UUID organizationId = tenantAccessService.organizationId(user);
+        ImportBatch batch = importBatchRepository.findByIdAndOrganizationId(batchId, organizationId)
+                .orElseThrow(() -> new IllegalArgumentException("Import batch not found: " + batchId));
 
-        if (batch.getImportedBy() != null && user != null && !batch.getImportedBy().getId().equals(user.getId())) {
-            throw new SecurityException("O lote de importação pertence a outro utilizador");
-        }
-        if (user != null && (batch.getOrganization() == null
-                || !batch.getOrganization().getId().equals(tenantAccessService.organizationId(user)))) {
-            throw new SecurityException("O lote de importação pertence a outra organização");
+        if (batch.getImportedBy() != null && !batch.getImportedBy().getId().equals(user.getId())) {
+            throw new SecurityException("This import batch belongs to another user.");
         }
         if (batch.getSourceFilePath() == null || batch.getSourceFilePath().isBlank()) {
-            throw new IllegalStateException("Arquivo do lote não encontrado ou já processado");
+            throw new IllegalStateException("The batch file was not found or was already processed.");
         }
         Path storedFile = Path.of(batch.getSourceFilePath()).normalize();
         if (!storedFile.startsWith(storageDirectory())) {
-            throw new IllegalStateException("Localização do arquivo de importação inválida");
+            throw new IllegalStateException("The import file path is invalid.");
         }
         byte[] bytes = Files.readAllBytes(storedFile);
 
@@ -226,14 +235,14 @@ public class ImportService {
             List<String> row = rows.get(i);
             try {
                 String docNumber = docIdx >= 0 && docIdx < row.size() ? row.get(docIdx).trim() : null;
-                String clientName = nameIdx >= 0 && nameIdx < row.size() ? row.get(nameIdx).trim() : "Cliente Desconhecido";
+                String clientName = nameIdx >= 0 && nameIdx < row.size() ? row.get(nameIdx).trim() : "Unknown customer";
                 String dateStr = dateIdx >= 0 && dateIdx < row.size() ? row.get(dateIdx).trim() : null;
                 String amountStr = amountIdx >= 0 && amountIdx < row.size() ? row.get(amountIdx).trim() : null;
                 String typeStr = typeIdx >= 0 && typeIdx < row.size() ? row.get(typeIdx).trim() : null;
                 String accountStr = accountIdx >= 0 && accountIdx < row.size() ? row.get(accountIdx).trim() : null;
 
                 if (docNumber == null || docNumber.isBlank() || amountStr == null || amountStr.isBlank()) {
-                    throw new IllegalArgumentException("Documento ou montante ausente na linha");
+                    throw new IllegalArgumentException("A document number or amount is missing from this row.");
                 }
 
                 // Validate the complete row before creating or mutating any client data.
@@ -255,7 +264,7 @@ public class ImportService {
 
                 if (client.isSanctionsFrozen()) {
                     throw new IllegalStateException(
-                            "Operação bloqueada: cliente congelado por correspondência em lista de sanções"
+                            "This transaction is blocked because the customer matched a sanctions list."
                     );
                 }
 
@@ -317,7 +326,7 @@ public class ImportService {
                     importBatchRepository.save(batch);
                 }
             } catch (IOException exception) {
-                log.warn("Não foi possível limpar arquivo de importação expirado {}", batch.getSourceFilePath(), exception);
+                log.warn("Could not remove expired import file {}", batch.getSourceFilePath(), exception);
             }
         }
     }
@@ -328,7 +337,7 @@ public class ImportService {
             Files.createDirectories(directory);
             return directory;
         } catch (IOException exception) {
-            throw new IllegalStateException("Não foi possível preparar o armazenamento de importações", exception);
+            throw new IllegalStateException("Could not prepare import storage.", exception);
         }
     }
 
@@ -343,7 +352,7 @@ public class ImportService {
 
     LocalDate parseDate(String dateStr) {
         if (dateStr == null || dateStr.isBlank()) {
-            throw new IllegalArgumentException("Data da transação ausente");
+            throw new IllegalArgumentException("Transaction date is required.");
         }
         String normalizedDate = dateStr.trim();
         List<DateTimeFormatter> formatters = List.of(
@@ -356,23 +365,23 @@ public class ImportService {
             try {
                 LocalDate parsed = LocalDate.parse(normalizedDate, dtf);
                 if (parsed.isAfter(LocalDate.now())) {
-                    throw new IllegalArgumentException("Data da transação não pode estar no futuro: " + dateStr);
+                    throw new IllegalArgumentException("Transaction date can't be in the future: " + dateStr);
                 }
                 return parsed;
             } catch (java.time.format.DateTimeParseException ignored) {
                 // Try the next supported format.
             }
         }
-        throw new IllegalArgumentException("Data da transação inválida: " + dateStr);
+        throw new IllegalArgumentException("Transaction date is invalid: " + dateStr);
     }
 
     BigDecimal parseAmount(String amountStr) {
         if (amountStr == null || amountStr.isBlank()) {
-            throw new IllegalArgumentException("Montante da transação ausente");
+            throw new IllegalArgumentException("Transaction amount is required.");
         }
         String clean = amountStr.replaceAll("[^0-9,.-]", "").trim();
         if (clean.isBlank() || clean.equals("-") || clean.equals(".") || clean.equals(",")) {
-            throw new IllegalArgumentException("Montante da transação inválido: " + amountStr);
+            throw new IllegalArgumentException("Transaction amount is invalid: " + amountStr);
         }
         if (clean.contains(",") && clean.contains(".")) {
             if (clean.lastIndexOf(",") > clean.lastIndexOf(".")) {
@@ -386,17 +395,17 @@ public class ImportService {
         try {
             BigDecimal amount = new BigDecimal(clean);
             if (amount.signum() <= 0) {
-                throw new IllegalArgumentException("Montante da transação deve ser positivo");
+                throw new IllegalArgumentException("Transaction amount must be positive.");
             }
             return amount;
         } catch (NumberFormatException exception) {
-            throw new IllegalArgumentException("Montante da transação inválido: " + amountStr, exception);
+            throw new IllegalArgumentException("Transaction amount is invalid: " + amountStr, exception);
         }
     }
 
     TransactionType parseTransactionType(String typeStr) {
         if (typeStr == null || typeStr.isBlank()) {
-            throw new IllegalArgumentException("Tipo de transação ausente");
+            throw new IllegalArgumentException("Transaction type is required.");
         }
         String upper = typeStr.trim().toUpperCase(Locale.ROOT);
         if (upper.contains("LEV") || upper.contains("SAQ") || upper.contains("WITHDRAW")) return TransactionType.WITHDRAWAL;
@@ -405,6 +414,6 @@ public class ImportService {
         if (upper.contains("DEP") || upper.contains("DEPÓSITO") || upper.contains("DEPOSITO")) {
             return TransactionType.DEPOSIT;
         }
-        throw new IllegalArgumentException("Tipo de transação inválido: " + typeStr);
+        throw new IllegalArgumentException("Transaction type is invalid: " + typeStr);
     }
 }

@@ -79,7 +79,7 @@ public class XlsxParser {
 
             return new XlsxParsedData(headers, rows);
         } catch (Exception e) {
-            throw new IOException("Falha ao analisar planilha Excel (.xlsx): " + e.getMessage(), e);
+            throw new IOException("Could not parse Excel file (.xlsx): " + e.getMessage(), e);
         }
     }
 

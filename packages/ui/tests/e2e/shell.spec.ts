@@ -24,7 +24,7 @@ async function fulfillApi(route: Route) {
     : pathname.endsWith("/auth/me")
       ? {
           id: "user-1",
-          fullName: "Oficial de Conformidade",
+          fullName: "Compliance Officer",
           email: "oficial@complyz.test",
           role: "COMPLIANCE_OFFICER",
           mfaEnabled: true,
@@ -47,38 +47,40 @@ async function fulfillApi(route: Route) {
 }
 
 async function openDashboard(page: Page) {
-  await page.route("**/api/**", fulfillApi)
+  await page.route("**/api/v1/**", fulfillApi)
   await page.addInitScript(() => {
     localStorage.setItem("complyz_token", "e2e-token")
   })
   await page.goto("/", { waitUntil: "domcontentloaded" })
-  await expect(page.getByRole("heading", { name: "Visão geral" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible()
 }
 
-test("navega pelo shell, comandos e atalhos de teclado", async ({ page }, testInfo) => {
+test("navigates the shell with search and keyboard shortcuts", async ({
+  page,
+}, testInfo) => {
   test.skip(
     testInfo.project.name !== "desktop",
     "keyboard shell flow is covered on desktop"
   )
   await openDashboard(page)
 
-  await page.getByRole("button", { name: /Pesquisar/ }).click()
-  await expect(page.getByRole("dialog", { name: "Pesquisar" })).toBeVisible()
-  await page.getByPlaceholder("Pesquisar...").fill("Indicadores")
-  await page.getByRole("button", { name: "Indicadores" }).click()
+  await page.getByRole("button", { name: /Search/ }).click()
+  await expect(page.getByRole("dialog", { name: "Search" })).toBeVisible()
+  await page.getByPlaceholder("Search...").fill("Insights")
+  await page.getByRole("button", { name: "Insights" }).click()
   await expect(page).toHaveURL(/\/insights$/)
-  await expect(page.getByRole("heading", { name: "Indicadores" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Insights" })).toBeVisible()
 
   await page.keyboard.press("Control+\\")
-  await expect(page.getByLabel("Expandir sidebar")).toBeVisible()
+  await expect(page.getByLabel("Expand sidebar")).toBeVisible()
   await page.keyboard.press("Control+\\")
-  await expect(page.getByLabel("Colapsar sidebar")).toBeVisible()
+  await expect(page.getByLabel("Collapse sidebar")).toBeVisible()
 })
 
-test("respeita a estrutura acessível e o estado visual desktop", async ({
+test("keeps the desktop shell accessible and visually stable", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop", "snapshot desktop only")
+  test.skip(testInfo.project.name !== "desktop", "desktop snapshot only")
   test.slow()
   await openDashboard(page)
 
@@ -94,14 +96,14 @@ test("respeita a estrutura acessível e o estado visual desktop", async ({
   })
 })
 
-test("abre a navegação móvel e mantém a interface enquadrada", async ({
+test("opens mobile navigation without horizontal overflow", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile", "snapshot mobile only")
+  test.skip(testInfo.project.name !== "mobile", "mobile snapshot only")
   await openDashboard(page)
-  await page.getByLabel("Abrir menu").click()
+  await page.getByLabel("Open menu").click()
   await expect(
-    page.getByRole("navigation").getByText("Monitorização", { exact: true })
+    page.getByRole("navigation").getByText("Monitoring", { exact: true })
   ).toBeVisible()
   await expect(page).toHaveScreenshot("dashboard-mobile-menu.png", {
     fullPage: true,

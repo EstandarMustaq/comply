@@ -61,7 +61,7 @@ public class CurrencyTransactionReport {
 
     public void markAsSubmitted() {
         if (submittedAt != null) {
-            throw new IllegalStateException("Relatório CTR já foi submetido e não pode ser alterado");
+            throw new IllegalStateException("Filed cash transaction reports can't be changed.");
         }
         this.submittedAt = Instant.now();
         this.retentionUntil = LocalDate.ofInstant(this.submittedAt, ZoneId.systemDefault()).plusYears(10);

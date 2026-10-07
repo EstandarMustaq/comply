@@ -62,7 +62,7 @@ export default function FlagsPage() {
 
       setFlags(sorted)
     } catch (err) {
-      console.error("Erro ao carregar flags:", err)
+      console.error("Failed to load alerts:", err)
     } finally {
       setIsLoading(false)
     }
@@ -100,8 +100,8 @@ export default function FlagsPage() {
   }
 
   const formatMt = (val?: number) => {
-    if (!val) return "N/D"
-    return new Intl.NumberFormat("pt-MZ", {
+    if (!val) return "—"
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
     }).format(val)
@@ -120,7 +120,7 @@ export default function FlagsPage() {
             className="h-8 gap-1.5 text-xs"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
-            <span>Actualizar</span>
+            <span>Refresh</span>
           </Button>
         }
       />
@@ -134,19 +134,19 @@ export default function FlagsPage() {
           >
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="PENDING" className="text-xs">
-                Pendentes
+                Pending
               </TabsTrigger>
               <TabsTrigger
                 value="SANCTIONS"
                 className="text-xs font-semibold text-red-600"
               >
-                Sanções
+                Sanctions
               </TabsTrigger>
               <TabsTrigger value="STRUCTURING" className="text-xs">
-                Fraccionamento
+                Structuring
               </TabsTrigger>
               <TabsTrigger value="RESOLVED" className="text-xs">
-                Resolvidos
+                Resolved
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -157,29 +157,29 @@ export default function FlagsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
               <ShieldAlert className="h-4 w-4 text-amber-500" />
-              Alertas em aberto ({flags.length})
+              Open alerts ({flags.length})
             </CardTitle>
             <CardDescription className="text-xs">
-              Clique em qualquer linha para analisar e registar uma decisão
+              Select an alert to review it and record a decision.
             </CardDescription>
           </CardHeader>
           <CardContent>
             {flags.length === 0 ? (
               <div className="text-muted-foreground flex flex-col items-center gap-2 py-12 text-center text-xs">
                 <CheckCircle2 className="h-7 w-7 text-emerald-500" />
-                <span>Nenhum alerta nesta categoria.</span>
+                <span>No alerts in this category.</span>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[160px]">Tipo</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Montante</TableHead>
-                    <TableHead>Regra activada</TableHead>
-                    <TableHead>Prazo</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Acção</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Triggered rule</TableHead>
+                    <TableHead>Due</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -235,7 +235,7 @@ export default function FlagsPage() {
                             onClick={() => openReview(flag)}
                             className="h-7 px-2.5 text-xs"
                           >
-                            Analisar
+                            Review
                           </Button>
                         </TableCell>
                       </TableRow>

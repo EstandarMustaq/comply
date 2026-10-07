@@ -91,7 +91,7 @@ public class MfaEnrollmentService {
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar QR Code para MFA", e);
+            throw new RuntimeException("Could not generate the MFA QR code.", e);
         }
     }
 }

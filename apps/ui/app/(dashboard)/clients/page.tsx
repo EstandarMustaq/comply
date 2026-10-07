@@ -69,7 +69,7 @@ export default function ClientsPage() {
       const data = await api.getClients(0, 100, searchQuery)
       setClients(data)
     } catch (err) {
-      console.error("Erro ao carregar clientes:", err)
+      console.error("Failed to load customers:", err)
     } finally {
       setIsLoading(false)
     }
@@ -84,7 +84,7 @@ export default function ClientsPage() {
   const handleCreateClient = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newClientName || !newClientDoc) {
-      setModalError("Nome e Documento são de preenchimento obrigatório.")
+      setModalError("Enter a name and document number.")
       return
     }
 
@@ -109,7 +109,9 @@ export default function ClientsPage() {
       setIsNewClientOpen(false)
       loadClients()
     } catch (err: unknown) {
-      setModalError(err instanceof Error ? err.message : "Erro ao cadastrar cliente.")
+      setModalError(
+        err instanceof Error ? err.message : "Could not create the customer profile."
+      )
     } finally {
       setIsCreating(false)
     }
@@ -126,8 +128,8 @@ export default function ClientsPage() {
   })
 
   const formatMt = (val?: number) => {
-    if (val === undefined || val === null) return "0 MT"
-    return new Intl.NumberFormat("pt-MZ", {
+    if (val === undefined || val === null) return "MZN 0"
+    return new Intl.NumberFormat("en-MZ", {
       style: "currency",
       currency: "MZN",
       maximumFractionDigits: 0,
@@ -137,7 +139,7 @@ export default function ClientsPage() {
   return (
     <div>
       <SiteHeader
-        title="Clientes"
+        title="Customers"
         action={
           <Button
             size="sm"
@@ -145,7 +147,7 @@ export default function ClientsPage() {
             className="gap-1.5 text-xs shadow-sm"
           >
             <UserPlus className="h-3.5 w-3.5" />
-            <span>Adicionar cliente</span>
+            <span>Add customer</span>
           </Button>
         }
       />
@@ -157,7 +159,7 @@ export default function ClientsPage() {
             <Search className="text-muted-foreground absolute left-3 top-2.5 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Pesquisar por nome, documento ou NUIB..."
+              placeholder="Search by name, document or NUIB..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 text-xs"
@@ -167,12 +169,12 @@ export default function ClientsPage() {
           <div className="flex w-full items-center gap-3 sm:w-auto">
             <Select value={regimeFilter} onValueChange={setRegimeFilter}>
               <SelectTrigger className="h-9 w-[180px] text-xs">
-                <SelectValue placeholder="Filtrar por Regime" />
+                <SelectValue placeholder="Filter by due diligence" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">Todos os Regimes</SelectItem>
-                <SelectItem value="SIMPLIFICADO">Regime Simplificado</SelectItem>
-                <SelectItem value="NORMAL">Regime Normal</SelectItem>
+                <SelectItem value="ALL">All regimes</SelectItem>
+                <SelectItem value="SIMPLIFICADO">Simplified</SelectItem>
+                <SelectItem value="NORMAL">Standard</SelectItem>
               </SelectContent>
             </Select>
 
@@ -184,7 +186,7 @@ export default function ClientsPage() {
               className="h-9 gap-1.5 text-xs"
             >
               <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
-              <span>Atualizar</span>
+              <span>Refresh</span>
             </Button>
           </div>
         </div>
@@ -194,29 +196,28 @@ export default function ClientsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
               <Users className="text-primary h-4 w-4" />
-              Clientes ({filteredClients.length})
+              Customers ({filteredClients.length})
             </CardTitle>
             <CardDescription className="text-xs">
-              Clique em qualquer cliente para ver o perfil, nível de risco e detalhes de
-              conta
+              Select a customer to review their profile, risk rating and account details.
             </CardDescription>
           </CardHeader>
           <CardContent>
             {filteredClients.length === 0 ? (
               <div className="text-muted-foreground py-12 text-center text-xs">
-                Nenhum cliente corresponde aos filtros seleccionados.
+                No customers match these filters.
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Documento</TableHead>
-                    <TableHead>Diligência</TableHead>
-                    <TableHead>Nível de risco</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Document</TableHead>
+                    <TableHead>Due diligence</TableHead>
+                    <TableHead>Risk rating</TableHead>
                     <TableHead>PEP</TableHead>
-                    <TableHead>Volume mensal</TableHead>
-                    <TableHead className="text-right">Acção</TableHead>
+                    <TableHead>Monthly volume</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -229,9 +230,7 @@ export default function ClientsPage() {
                       <TableCell className="text-xs font-semibold">
                         {client.fullName}
                         <div className="text-muted-foreground text-[10px] font-normal">
-                          {client.clientType === "INDIVIDUAL"
-                            ? "Particular"
-                            : "Pessoa colectiva"}
+                          {client.clientType === "INDIVIDUAL" ? "Individual" : "Business"}
                         </div>
                       </TableCell>
                       <TableCell className="font-mono text-xs">
@@ -284,7 +283,7 @@ export default function ClientsPage() {
                           onClick={() => openClientDetail(client)}
                           className="h-7 px-2.5 text-xs"
                         >
-                          Ver
+                          View
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -312,10 +311,10 @@ export default function ClientsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="text-primary h-5 w-5" />
-              Adicionar cliente
+              Add customer
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Criar perfil de cliente e executar verificação imediata de triagem.
+              Create a customer profile and run screening now.
             </DialogDescription>
           </DialogHeader>
 
@@ -329,13 +328,13 @@ export default function ClientsPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="clientName" className="font-semibold">
-                Nome Completo / Denominação Social <span className="text-red-500">*</span>
+                Full name / business name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="clientName"
                 value={newClientName}
                 onChange={(e) => setNewClientName(e.target.value)}
-                placeholder="Ex: Bernardo Silva ou Cooperativa Agrícola"
+                placeholder="e.g. Jordan Smith or Acme Cooperative"
                 className="text-xs"
                 required
               />
@@ -344,7 +343,8 @@ export default function ClientsPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="clientDoc" className="font-semibold">
-                  Documento (BI / DIRE / NUIT) <span className="text-red-500">*</span>
+                  Document (ID / residence permit / NUIT){" "}
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="clientDoc"
@@ -358,7 +358,7 @@ export default function ClientsPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="clientNuib" className="font-semibold">
-                  NUIB (Identificador Bancário)
+                  NUIB (bank identifier)
                 </Label>
                 <Input
                   id="clientNuib"
@@ -372,7 +372,7 @@ export default function ClientsPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="font-semibold">Regime de Diligência</Label>
+                <Label className="font-semibold">Due diligence</Label>
                 <Select
                   value={newClientRegime}
                   onValueChange={(val: ClientRegime) => setNewClientRegime(val)}
@@ -382,13 +382,13 @@ export default function ClientsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="SIMPLIFICADO">Simplificado</SelectItem>
-                    <SelectItem value="NORMAL">Normal / Reforçado</SelectItem>
+                    <SelectItem value="NORMAL">Standard / enhanced</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-1.5">
-                <Label className="font-semibold">Classificação de Risco Inicial</Label>
+                <Label className="font-semibold">Initial risk rating</Label>
                 <Select
                   value={newClientRisk}
                   onValueChange={(val: ClientRiskRating) => setNewClientRisk(val)}
@@ -397,9 +397,9 @@ export default function ClientsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="BAIXO">Baixo Risco</SelectItem>
-                    <SelectItem value="MEDIO">Médio Risco</SelectItem>
-                    <SelectItem value="ALTO">Alto Risco</SelectItem>
+                    <SelectItem value="BAIXO">Low</SelectItem>
+                    <SelectItem value="MEDIO">Moderate</SelectItem>
+                    <SelectItem value="ALTO">High</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -415,20 +415,20 @@ export default function ClientsPage() {
                   className="border-input text-primary focus:ring-primary h-4 w-4 rounded"
                 />
                 <span className="text-foreground font-semibold">
-                  Pessoa com exposição política
+                  Politically exposed person
                 </span>
               </label>
 
               {newClientIsPep && (
                 <div className="space-y-1.5 pt-2">
                   <Label htmlFor="pepCategory" className="text-muted-foreground">
-                    Cargo / Função Pública / Categoria
+                    Public office / category
                   </Label>
                   <Input
                     id="pepCategory"
                     value={newClientPepCategory}
                     onChange={(e) => setNewClientPepCategory(e.target.value)}
-                    placeholder="Ex: Membro do Governo, Deputado, Dirigente de Empresa Pública"
+                    placeholder="e.g. Minister, legislator, public company director"
                     className="text-xs"
                   />
                 </div>
@@ -443,11 +443,11 @@ export default function ClientsPage() {
                 onClick={() => setIsNewClientOpen(false)}
                 disabled={isCreating}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" size="sm" disabled={isCreating} className="gap-1.5">
                 {isCreating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Registar e verificar
+                Create and screen
               </Button>
             </DialogFooter>
           </form>

@@ -45,9 +45,9 @@ export function OrganizationSelector({
   value,
   defaultValue,
   onValueChange,
-  placeholder = "Seleccionar instituição",
-  searchPlaceholder = "Procurar instituição...",
-  emptySearchText = "Nenhuma instituição encontrada.",
+  placeholder = "Select Organization",
+  searchPlaceholder = "Search Organizations...",
+  emptySearchText = "No Organizations found.",
   loading = false,
   maxWidth = "160px",
 }: OrganizationSelectorProps) {

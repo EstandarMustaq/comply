@@ -36,15 +36,15 @@ interface UploadDropzoneProps {
 }
 
 const REQUIRED_TARGET_FIELDS = [
-  { key: "clientDocument", label: "Documento / NUIB / NUIT", required: true },
-  { key: "clientName", label: "Nome do Cliente", required: true },
-  { key: "accountNumber", label: "Número de Conta", required: true },
-  { key: "transactionType", label: "Tipo (DEPÓSITO, LEVANTAMENTO...)", required: true },
-  { key: "amount", label: "Montante / Valor (MT)", required: true },
-  { key: "transactionDate", label: "Data da Transação", required: true },
-  { key: "channel", label: "Canal (BALCÃO, ATM, POS...)", required: false },
-  { key: "counterpartyName", label: "Contraparte (Nome)", required: false },
-  { key: "counterpartyDocument", label: "Contraparte (Documento)", required: false },
+  { key: "clientDocument", label: "Document / NUIB / NUIT", required: true },
+  { key: "clientName", label: "Customer name", required: true },
+  { key: "accountNumber", label: "Account number", required: true },
+  { key: "transactionType", label: "Type (DEPOSIT, WITHDRAWAL...)", required: true },
+  { key: "amount", label: "Amount (MZN)", required: true },
+  { key: "transactionDate", label: "Transaction date", required: true },
+  { key: "channel", label: "Channel (BRANCH, ATM, POS...)", required: false },
+  { key: "counterpartyName", label: "Counterparty name", required: false },
+  { key: "counterpartyDocument", label: "Counterparty document", required: false },
 ]
 
 export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
@@ -89,7 +89,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
 
     const ext = file.name.split(".").pop()?.toLowerCase()
     if (ext !== "csv" && ext !== "xlsx") {
-      setError("Apenas ficheiros nos formatos CSV e XLSX são suportados.")
+      setError("Upload a CSV or XLSX file.")
       return
     }
 
@@ -104,7 +104,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       }
       setIsMappingModalOpen(true)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Não foi possível enviar o ficheiro.")
+      setError(err instanceof Error ? err.message : "Could not upload the file.")
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -119,15 +119,11 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       const result = await api.confirmMapping(currentBatch.id, columnMapping)
       setIsMappingModalOpen(false)
       setSuccessResult(
-        `Importação concluída — ${result.processedRows || result.totalRows || 0} transacções processadas e verificadas.`
+        `Import complete — ${result.processedRows || result.totalRows || 0} transactions processed and screened.`
       )
       if (onSuccess) onSuccess()
     } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Não foi possível processar as transacções do lote."
-      )
+      setError(err instanceof Error ? err.message : "Could not process this import.")
     } finally {
       setIsProcessing(false)
     }
@@ -165,22 +161,21 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
           <div className="space-y-1">
             <h3 className="text-base font-semibold">
               {isUploading
-                ? "A carregar e a analisar cabeçalhos..."
-                : "Clique ou arraste a folha de cálculo aqui"}
+                ? "Uploading and reading headers..."
+                : "Choose or drop a spreadsheet here"}
             </h3>
             <p className="text-muted-foreground max-w-md text-xs">
-              Compatível com extratos operacionais de instituições de microfinança e
-              microcrédito (CSV ou XLSX). Detetação automática de delimitadores, encodings
-              e linhas de cabeçalho.
+              Upload operational statements as CSV or XLSX. Complyz detects delimiters,
+              encoding and header rows.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
-              <FileSpreadsheet className="mr-1 h-3 w-3" /> Ficheiros CSV (.csv)
+              <FileSpreadsheet className="mr-1 h-3 w-3" /> CSV files (.csv)
             </Badge>
             <Badge variant="secondary" className="text-xs">
-              <FileSpreadsheet className="mr-1 h-3 w-3" /> Folhas de cálculo (.xlsx)
+              <FileSpreadsheet className="mr-1 h-3 w-3" /> Spreadsheets (.xlsx)
             </Badge>
           </div>
         </CardContent>
@@ -208,19 +203,18 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileSpreadsheet className="text-primary h-5 w-5" />
-              Confirmação de Mapeamento de Colunas
+              Confirm column mapping
             </DialogTitle>
             <DialogDescription className="text-xs">
-              Arquivo: <strong>{currentBatch?.fileName}</strong>. Confirme a
-              correspondência dos cabeçalhos do extrato com os campos de conformidade do
-              Complyz.
+              File: <strong>{currentBatch?.fileName}</strong>. Match each statement header
+              to a Complyz field.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-3">
             <div className="text-muted-foreground grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase">
-              <div>Campo do Complyz</div>
-              <div>Coluna identificada</div>
+              <div>Complyz field</div>
+              <div>Detected column</div>
             </div>
 
             {REQUIRED_TARGET_FIELDS.map((target) => {
@@ -242,10 +236,10 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                       }
                     >
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Selecione a coluna correspondente" />
+                        <SelectValue placeholder="Select a matching column" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="NOT_MAPPED">-- Não mapear --</SelectItem>
+                        <SelectItem value="NOT_MAPPED">-- Do not map --</SelectItem>
                         {currentBatch?.detectedHeaders?.map((header) => (
                           <SelectItem key={header} value={header}>
                             {header}
@@ -266,7 +260,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
               onClick={() => setIsMappingModalOpen(false)}
               disabled={isProcessing}
             >
-              Cancelar
+              Cancel
             </Button>
             <Button
               size="sm"
@@ -277,11 +271,11 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>A processar regras e sanções...</span>
+                  <span>Screening transactions...</span>
                 </>
               ) : (
                 <>
-                  <span>Confirmar e Processar Lote</span>
+                  <span>Confirm and process import</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}

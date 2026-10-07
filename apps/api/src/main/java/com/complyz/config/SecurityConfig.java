@@ -2,7 +2,7 @@ package com.complyz.config;
 
 import com.complyz.api.ApiError;
 import com.complyz.api.ApiErrorEnvelope;
-import com.complyz.api.ApiResponseMeta;
+import com.complyz.api.ApiResponseMetadata;
 import com.complyz.auth.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +35,8 @@ import java.util.UUID;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String API_BASE_PATH = ApiVersioningConfiguration.API_BASE_PATH;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
 
@@ -60,21 +62,27 @@ public class SecurityConfig {
                     writeApiError(
                             response,
                             HttpServletResponse.SC_UNAUTHORIZED,
-                            "Não autorizado: credenciais ausentes ou inválidas"
+                            "Authentication required. Provide valid credentials."
                     );
                 })
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                writeApiError(response, HttpServletResponse.SC_FORBIDDEN, "Acesso não permitido."))
+                                writeApiError(response, HttpServletResponse.SC_FORBIDDEN, "You don't have access to this resource."))
                 )
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/api/auth/login", "/api/auth/mfa/verify", "/api/auth/mfa/enroll", "/api/auth/mfa/confirm", "/api/auth/refresh").permitAll()
+                            .requestMatchers(
+                                    API_BASE_PATH + "/auth/login",
+                                    API_BASE_PATH + "/auth/mfa/verify",
+                                    API_BASE_PATH + "/auth/mfa/enroll",
+                                    API_BASE_PATH + "/auth/mfa/confirm",
+                                    API_BASE_PATH + "/auth/refresh"
+                            ).permitAll()
                             .requestMatchers("/actuator/**", "/error").permitAll();
                     if (apiDocsEnabled) {
                         auth.requestMatchers("/v3/api-docs/**").permitAll();
                     }
-                    auth.requestMatchers("/api/settings/users/**").hasRole("ADMIN")
-                            .requestMatchers("/api/audit-log/**").hasRole("ADMIN")
+                    auth.requestMatchers(API_BASE_PATH + "/settings/users/**").hasRole("ADMIN")
+                            .requestMatchers(API_BASE_PATH + "/audit-log/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -114,7 +122,7 @@ public class SecurityConfig {
                 response.getOutputStream(),
                 new ApiErrorEnvelope(
                         new ApiError("HTTP_" + status, message, Map.of()),
-                        new ApiResponseMeta(Instant.now(), requestId)
+                        new ApiResponseMetadata(Instant.now(), requestId)
                 )
         );
     }

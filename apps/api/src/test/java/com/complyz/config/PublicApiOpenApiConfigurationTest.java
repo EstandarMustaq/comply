@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
@@ -23,21 +24,22 @@ class PublicApiOpenApiConfigurationTest {
         assertEquals("https://api.trycomplyz.com", openAPI.getServers().getFirst().getUrl());
         assertNotNull(openAPI.getComponents().getSecuritySchemes().get("bearerAuth"));
         assertNotNull(openAPI.getComponents().getSchemas().get("ApiErrorEnvelope"));
-        assertNotNull(openAPI.getComponents().getSchemas().get("ApiResponseMeta"));
+        assertNotNull(openAPI.getComponents().getSchemas().get("ApiResponseMetadata"));
+        assertNull(openAPI.getComponents().getSchemas().get("ApiResponseMeta"));
     }
 
     @Test
     void documentsEnvelopesAndPublicLoginSecurity() {
         OpenAPI openAPI = configuration.complyzOpenAPI();
-        Operation login = operationWithJsonResponse("/api/auth/login", 200, 401);
-        Operation secured = operationWithJsonResponse("/api/clients", 200);
+        Operation login = operationWithJsonResponse("/api/v1/auth/login", 200, 401);
+        Operation secured = operationWithJsonResponse("/api/v1/clients", 200);
         secured.getResponses().get("200").getContent().remove("application/json");
         secured.getResponses().get("200").getContent().addMediaType(
                 "*/*",
                 new MediaType().schema(new StringSchema())
         );
-        openAPI.path("/api/auth/login", new PathItem().post(login));
-        openAPI.path("/api/clients", new PathItem().get(secured));
+        openAPI.path("/api/v1/auth/login", new PathItem().post(login));
+        openAPI.path("/api/v1/clients", new PathItem().get(secured));
         configuration.publicApiResponseEnvelopeCustomizer().customise(openAPI);
 
         var loginSchema = login.getResponses().get("200").getContent().get("application/json").getSchema();
@@ -53,7 +55,27 @@ class PublicApiOpenApiConfigurationTest {
         assertFalse(secured.getResponses().get("200").getContent().containsKey("*/*"));
         assertTrue(secured.getResponses().get("200").getContent().get("application/json")
                 .getSchema().getProperties().containsKey("data"));
-        assertEquals("Clientes", secured.getTags().getFirst());
+        assertEquals("Customers", secured.getTags().getFirst());
+    }
+
+    @Test
+    void keepsEnvelopeReferenceTargetsInOpenApiComponents() {
+        OpenAPI openAPI = new OpenAPI();
+        Operation login = operationWithJsonResponse("/api/v1/auth/login", 200, 401);
+        openAPI.path("/api/v1/auth/login", new PathItem().post(login));
+
+        configuration.publicApiResponseEnvelopeCustomizer().customise(openAPI);
+
+        var schemas = openAPI.getComponents().getSchemas();
+        assertNotNull(schemas.get("ApiResponseMetadata"));
+        assertNotNull(schemas.get("ApiError"));
+        assertNotNull(schemas.get("ApiErrorEnvelope"));
+        assertEquals("#/components/schemas/ApiResponseMetadata",
+                ((Schema<?>) login.getResponses().get("200").getContent().get("application/json")
+                        .getSchema().getProperties().get("meta")).get$ref());
+        assertEquals("#/components/schemas/ApiErrorEnvelope",
+                login.getResponses().get("401").getContent().get("application/json")
+                        .getSchema().get$ref());
     }
 
     private Operation operationWithJsonResponse(String path, int... statuses) {

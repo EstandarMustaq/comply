@@ -2,7 +2,6 @@ package com.complyz.ingest.controller;
 
 import com.complyz.api.ApiErrorBodies;
 import com.complyz.ingest.entity.ImportBatch;
-import com.complyz.ingest.repository.ImportBatchRepository;
 import com.complyz.ingest.service.ImportService;
 import com.complyz.users.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping("/api/import-batches")
+@RequestMapping("/import-batches")
 public class ImportController {
 
     private static final Logger logger = LoggerFactory.getLogger(ImportController.class);
     private final ImportService importService;
-    private final ImportBatchRepository importBatchRepository;
-
-    public ImportController(ImportService importService, ImportBatchRepository importBatchRepository) {
+    public ImportController(ImportService importService) {
         this.importService = importService;
-        this.importBatchRepository = importBatchRepository;
     }
 
     @PostMapping
@@ -39,7 +35,7 @@ public class ImportController {
             return ResponseEntity.ok(preview);
         } catch (Exception e) {
             logger.warn("Could not prepare uploaded import file: {}", e.getClass().getSimpleName());
-            return ResponseEntity.badRequest().body(Map.of("message", "Não foi possível preparar o ficheiro. Verifique o formato e os dados."));
+            return ResponseEntity.badRequest().body(Map.of("message", "We couldn't prepare this file. Check its format and data."));
         }
     }
 
@@ -56,18 +52,20 @@ public class ImportController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.warn("Could not process confirmed import mapping: {}", e.getClass().getSimpleName());
-            return ResponseEntity.badRequest().body(Map.of("message", "Não foi possível processar a importação. Reveja os dados e tente novamente."));
+            return ResponseEntity.badRequest().body(Map.of("message", "We couldn't process this import. Review the data and try again."));
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<ImportBatch>> listBatches() {
-        return ResponseEntity.ok(importBatchRepository.findAll());
+    public ResponseEntity<List<ImportBatch>> listBatches(Authentication authentication) {
+        User actor = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(importService.listBatches(actor));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBatch(@PathVariable UUID id) {
-        return importBatchRepository.findById(id)
+    public ResponseEntity<?> getBatch(@PathVariable UUID id, Authentication authentication) {
+        User actor = (User) authentication.getPrincipal();
+        return importService.findBatch(id, actor)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(404).body(ApiErrorBodies.notFound()));
     }

@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Configurações ESLint partilhadas do Complyz",
-  "license": "UNLICENSED",
+  "description": "Shared ESLint configuration for Complyz",
+  "license": "AGPL-3.0-only",
   "exports": {
     "./base": "./base.mjs",
     "./next": "./next.mjs",

@@ -1,6 +1,6 @@
 # Engineering workflow
 
-This guide documents the repository's supported checks for contributors. Product-facing UI and public docs remain in Mozambican Portuguese; engineering materials use English.
+This guide documents the repository's supported checks for contributors. Product UI and public documentation use Complyz's clear, direct, confident English voice. Engineering materials use concise technical English.
 
 ## Toolchain and workspace
 
@@ -39,9 +39,9 @@ pnpm operations:test
 
 The installer configures only that worktree's `core.hooksPath` to `.githooks` and is safe to repeat. CI skips local hook installation. `pnpm hooks:test` exercises hook behavior inside a disposable temporary Git repository. Hooks do not stage or rewrite files.
 
-- `pre-commit` checks staged whitespace, rejects environment/private-key files and high-confidence credential patterns, prevents edits to existing Flyway migrations, checks new migration version numbers, and runs the product-language check when product surfaces change.
+- `pre-commit` checks staged whitespace, rejects environment/private-key files and high-confidence credential patterns, and prevents edits to existing Flyway migrations or reuse of migration version numbers.
 - `commit-msg` enforces Conventional Commit subjects such as `fix(api): scope reports by organization`.
-- `pre-push` determines changed paths from pushed refs and runs API tests, workspace checks/unit tests, product-language validation, and Compose validation as applicable. Central build/workflow/script changes trigger both API and web checks.
+- `pre-push` determines changed paths from pushed refs and runs API tests, workspace checks/unit tests, and Compose validation as applicable. Central build/workflow/script changes trigger both API and web checks.
 
 If a check fails, fix the underlying issue and rerun it; do not bypass the hook. Use the same root scripts locally and in CI.
 
@@ -54,4 +54,4 @@ AWS, Docker, or production services.
 - Keep customer data scoped to the authenticated `Organization`; test cross-organization access denial, including related records, aggregation and exports.
 - Add Flyway migrations as new versions only. Existing migration files are immutable after they may have been applied.
 - For API contract changes, regenerate OpenAPI-derived client types with `pnpm api:openapi`, update UI types/client and contract assertions, and run the relevant API and UI tests.
-- Keep product copy in direct Mozambican Portuguese and run `pnpm product-language:check` for product-facing text changes.
+- Keep product copy in clear, direct, confident English. Use the `check-product-language` skill and review changes against `docs/standards/product-language.md`.

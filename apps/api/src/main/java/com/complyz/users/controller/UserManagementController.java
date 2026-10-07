@@ -1,6 +1,7 @@
 package com.complyz.users.controller;
 
 import com.complyz.api.ApiErrorBodies;
+import com.complyz.api.ApiErrorEnvelope;
 import com.complyz.audit.entity.AuditAction;
 import com.complyz.audit.service.AuditService;
 import com.complyz.users.entity.Role;
@@ -11,31 +12,31 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/settings/users")
+@RequestMapping("/settings/users")
 @PreAuthorize("hasRole('ADMIN')")
 public class UserManagementController {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
     private final TenantAccessService tenantAccessService;
 
-    public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuditService auditService,
+    public UserManagementController(UserRepository userRepository, AuditService auditService,
                                     TenantAccessService tenantAccessService) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.auditService = auditService;
         this.tenantAccessService = tenantAccessService;
     }
@@ -44,17 +45,16 @@ public class UserManagementController {
     public ResponseEntity<List<Map<String, Object>>> listUsers(Authentication authentication) {
         User actor = (User) authentication.getPrincipal();
         UUID organizationId = tenantAccessService.organizationId(actor);
-        List<Map<String, Object>> users = userRepository.findAll().stream()
-                .filter(u -> u.getOrganization() != null && organizationId.equals(u.getOrganization().getId()))
+        List<Map<String, Object>> users = userRepository.findAllByOrganizationId(organizationId).stream()
                 .map(u -> Map.<String, Object>of(
-                "id", u.getId(),
-                "fullName", u.getFullName(),
-                "email", u.getEmail(),
-                "role", u.getRole(),
-                "mfaEnabled", u.isMfaEnabled(),
-                "createdAt", u.getCreatedAt(),
-                "lastLoginAt", u.getLastLoginAt() != null ? u.getLastLoginAt() : ""
-        )).collect(Collectors.toList());
+                        "id", u.getId(),
+                        "fullName", u.getFullName(),
+                        "email", u.getEmail(),
+                        "role", u.getRole(),
+                        "mfaEnabled", u.isMfaEnabled(),
+                        "createdAt", u.getCreatedAt(),
+                        "lastLoginAt", u.getLastLoginAt() != null ? u.getLastLoginAt() : ""
+                )).toList();
 
         return ResponseEntity.ok(users);
     }
@@ -67,39 +67,21 @@ public class UserManagementController {
     ) {}
 
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request, Authentication authentication) {
-        if (userRepository.existsByEmail(request.email())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email já cadastrado no sistema"));
-        }
-
-        User newUser = new User(
-                request.fullName(),
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                request.role()
-        );
-        newUser.setOrganization(tenantAccessService.requireOrganization((User) authentication.getPrincipal()));
-
-        User saved = userRepository.save(newUser);
-
-        User actor = (User) authentication.getPrincipal();
-        auditService.record(actor, AuditAction.USER_CREATED, "users", saved.getId(),
-                "{\"email\": \"" + saved.getEmail() + "\", \"role\": \"" + saved.getRole() + "\"}");
-
-        return ResponseEntity.ok(Map.of(
-                "id", saved.getId(),
-                "fullName", saved.getFullName(),
-                "email", saved.getEmail(),
-                "role", saved.getRole(),
-                "mfaEnabled", saved.isMfaEnabled()
-        ));
+    @ApiResponse(
+            responseCode = "501",
+            description = "Direct user creation is not available.",
+            content = @Content(schema = @Schema(implementation = ApiErrorEnvelope.class))
+    )
+    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .body(Map.of("message", "Direct user creation is not available."));
     }
 
     @PatchMapping("/{id}/reset-mfa")
     public ResponseEntity<?> resetMfa(@PathVariable UUID id, Authentication authentication) {
         User actor = (User) authentication.getPrincipal();
-        User user = userRepository.findById(id).filter(u -> u.getOrganization() != null
-                && u.getOrganization().getId().equals(tenantAccessService.organizationId(actor))).orElse(null);
+        User user = userRepository.findByIdAndOrganizationId(id, tenantAccessService.organizationId(actor))
+                .orElse(null);
         if (user == null) {
             return ResponseEntity.status(404).body(ApiErrorBodies.notFound());
         }
@@ -111,6 +93,6 @@ public class UserManagementController {
 
         auditService.record(actor, AuditAction.USER_UPDATED, "users", user.getId(), "{\"action\": \"RESET_MFA\"}");
 
-        return ResponseEntity.ok(Map.of("message", "MFA redefinido com sucesso para " + user.getEmail()));
+        return ResponseEntity.ok(Map.of("message", "MFA was reset for " + user.getEmail()));
     }
 }

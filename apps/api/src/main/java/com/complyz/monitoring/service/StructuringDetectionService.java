@@ -44,6 +44,10 @@ public class StructuringDetectionService {
         if (!CASH_TRANSACTION_TYPES.contains(currentTx.getType())) return Optional.empty();
 
         Client client = currentTx.getClient();
+        if (client.getOrganization() == null || client.getOrganization().getId() == null) {
+            throw new IllegalStateException("The customer's Organization is required to assess this transaction.");
+        }
+        var organizationId = client.getOrganization().getId();
         List<ThresholdRule> structuringRules = ruleRepository.findByTypeAndActiveTrue(ThresholdRuleType.STRUCTURING);
         if (structuringRules.isEmpty()) return Optional.empty();
 
@@ -52,22 +56,23 @@ public class StructuringDetectionService {
         LocalDate startDate = currentTx.getTransactionDate().minusDays(Math.max(windowDays - 1, 0));
         LocalDate endDate = currentTx.getTransactionDate();
 
-        List<Transaction> windowTransactions = transactionRepository.findByClientAndDateBetweenAndTypeIn(
-                client.getId(), startDate, endDate, CASH_TRANSACTION_TYPES);
+        List<Transaction> windowTransactions = transactionRepository.findByClientAndOrganizationAndDateBetweenAndTypeIn(
+                client.getId(), organizationId, startDate, endDate, CASH_TRANSACTION_TYPES);
 
         // Require at least three transactions in the configured window.
         boolean allBelowThreshold = rule.getValueThreshold() != null && windowTransactions.stream()
                 .allMatch(transaction -> transaction.getAmount().compareTo(rule.getValueThreshold()) < 0);
         if (windowTransactions.size() >= 3 && allBelowThreshold
-                && !flagRepository.existsByTransactionIdAndType(currentTx.getId(), FlagType.STRUCTURING_SUSPECTED)) {
+                && flagRepository.countByTransactionIdAndOrganizationIdAndType(
+                        currentTx.getId(), organizationId, FlagType.STRUCTURING_SUSPECTED) == 0) {
             BigDecimal sum = windowTransactions.stream()
                     .map(Transaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             if (rule.getValueThreshold() != null && sum.compareTo(rule.getValueThreshold()) >= 0) {
                 String reason = String.format(
-                        "Suspeita de fraccionamento de operações (structuring): identificadas %d operações no período de %d dias " +
-                        "com montante cumulativo de %.2f MT (limiar de detecção: %.2f MT).",
+                        "Possible transaction structuring: %d transactions found over %d days " +
+                        "with a combined amount of %.2f MT (detection limit: %.2f MT).",
                         windowTransactions.size(), windowDays, sum, rule.getValueThreshold()
                 );
 

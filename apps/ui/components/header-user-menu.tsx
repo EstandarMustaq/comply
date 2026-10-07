@@ -63,7 +63,7 @@ export function HeaderUserMenu() {
       <DropdownMenuTrigger asChild>
         <button
           className="focus-visible:ring-ring rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-1"
-          aria-label="Conta"
+          aria-label="Account menu"
         >
           <Avatar className="border-border h-7 w-7 rounded-full border">
             <AvatarFallback className="bg-nav-teal-bg text-nav-teal-text rounded-full text-[11px] font-semibold">
@@ -93,7 +93,7 @@ export function HeaderUserMenu() {
             onClick={() => router.push("/settings")}
           >
             <Settings className="text-muted-foreground h-3.5 w-3.5" />
-            Definições
+            Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
@@ -104,7 +104,7 @@ export function HeaderUserMenu() {
           onClick={handleLogout}
         >
           <LogOut className="h-3.5 w-3.5" />
-          Sair
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

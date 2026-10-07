@@ -1,5 +1,5 @@
 export interface paths {
-  "/api/settings/threshold-rules/{id}": {
+  "/api/v1/settings/threshold-rules/{id}": {
     parameters: {
       query?: never
       header?: never
@@ -15,7 +15,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/settings/system-config/{key}": {
+  "/api/v1/settings/system-config/{key}": {
     parameters: {
       query?: never
       header?: never
@@ -31,7 +31,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/str/{id}": {
+  "/api/v1/reports/str/{id}": {
     parameters: {
       query?: never
       header?: never
@@ -47,7 +47,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/settings/users": {
+  "/api/v1/settings/users": {
     parameters: {
       query?: never
       header?: never
@@ -63,7 +63,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/str/{id}/submit": {
+  "/api/v1/reports/str/{id}/submit": {
     parameters: {
       query?: never
       header?: never
@@ -79,7 +79,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/ctr/{id}/submit": {
+  "/api/v1/reports/ctr/{id}/submit": {
     parameters: {
       query?: never
       header?: never
@@ -95,7 +95,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/import-batches": {
+  "/api/v1/import-batches": {
     parameters: {
       query?: never
       header?: never
@@ -111,7 +111,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/import-batches/{id}/confirm-mapping": {
+  "/api/v1/import-batches/{id}/confirm-mapping": {
     parameters: {
       query?: never
       header?: never
@@ -127,7 +127,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/flags/{id}/escalate-to-str": {
+  "/api/v1/flags/{id}/escalate-to-str": {
     parameters: {
       query?: never
       header?: never
@@ -143,7 +143,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clients": {
+  "/api/v1/clients": {
     parameters: {
       query?: never
       header?: never
@@ -159,7 +159,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clients/{clientId}/kyc/recalculate": {
+  "/api/v1/clients/{clientId}/kyc/recalculate": {
     parameters: {
       query?: never
       header?: never
@@ -175,7 +175,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clients/{clientId}/beneficial-owners": {
+  "/api/v1/clients/{clientId}/beneficial-owners": {
     parameters: {
       query?: never
       header?: never
@@ -191,7 +191,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clients/beneficial-owners/{ownerId}/verify": {
+  "/api/v1/clients/beneficial-owners/{ownerId}/verify": {
     parameters: {
       query?: never
       header?: never
@@ -207,7 +207,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/refresh": {
+  "/api/v1/auth/refresh": {
     parameters: {
       query?: never
       header?: never
@@ -223,7 +223,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/mfa/verify": {
+  "/api/v1/auth/mfa/verify": {
     parameters: {
       query?: never
       header?: never
@@ -239,7 +239,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/mfa/enroll": {
+  "/api/v1/auth/mfa/enroll": {
     parameters: {
       query?: never
       header?: never
@@ -255,7 +255,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/mfa/confirm": {
+  "/api/v1/auth/mfa/confirm": {
     parameters: {
       query?: never
       header?: never
@@ -271,7 +271,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/logout": {
+  "/api/v1/auth/logout": {
     parameters: {
       query?: never
       header?: never
@@ -287,7 +287,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/login": {
+  "/api/v1/auth/login": {
     parameters: {
       query?: never
       header?: never
@@ -303,7 +303,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/settings/users/{id}/reset-mfa": {
+  "/api/v1/settings/users/{id}/reset-mfa": {
     parameters: {
       query?: never
       header?: never
@@ -319,7 +319,7 @@ export interface paths {
     patch: operations["resetMfa"]
     trace?: never
   }
-  "/api/flags/{id}/review": {
+  "/api/v1/flags/{id}/review": {
     parameters: {
       query?: never
       header?: never
@@ -335,7 +335,7 @@ export interface paths {
     patch: operations["reviewFlag"]
     trace?: never
   }
-  "/api/clients/{id}/risk-rating": {
+  "/api/v1/clients/{id}/risk-rating": {
     parameters: {
       query?: never
       header?: never
@@ -351,7 +351,7 @@ export interface paths {
     patch: operations["updateRiskRating"]
     trace?: never
   }
-  "/api/clients/{id}/pep-review": {
+  "/api/v1/clients/{id}/pep-review": {
     parameters: {
       query?: never
       header?: never
@@ -367,7 +367,7 @@ export interface paths {
     patch: operations["registerPepReview"]
     trace?: never
   }
-  "/api/settings/threshold-rules": {
+  "/api/v1/settings/threshold-rules": {
     parameters: {
       query?: never
       header?: never
@@ -383,7 +383,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/settings/system-config": {
+  "/api/v1/settings/system-config": {
     parameters: {
       query?: never
       header?: never
@@ -399,7 +399,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/str": {
+  "/api/v1/reports/str": {
     parameters: {
       query?: never
       header?: never
@@ -415,7 +415,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/exports/str/{id}.pdf": {
+  "/api/v1/reports/exports/str/{id}.pdf": {
     parameters: {
       query?: never
       header?: never
@@ -431,7 +431,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/exports/annual/{year}.xlsx": {
+  "/api/v1/reports/exports/annual/{year}.xlsx": {
     parameters: {
       query?: never
       header?: never
@@ -447,7 +447,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/reports/ctr": {
+  "/api/v1/reports/ctr": {
     parameters: {
       query?: never
       header?: never
@@ -463,7 +463,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/insights/summary": {
+  "/api/v1/insights/summary": {
     parameters: {
       query?: never
       header?: never
@@ -479,7 +479,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/import-batches/{id}": {
+  "/api/v1/import-batches/{id}": {
     parameters: {
       query?: never
       header?: never
@@ -495,7 +495,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/flags": {
+  "/api/v1/flags": {
     parameters: {
       query?: never
       header?: never
@@ -511,7 +511,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/clients/{id}": {
+  "/api/v1/clients/{id}": {
     parameters: {
       query?: never
       header?: never
@@ -527,7 +527,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/auth/me": {
+  "/api/v1/auth/me": {
     parameters: {
       query?: never
       header?: never
@@ -543,7 +543,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/audit-log": {
+  "/api/v1/audit-log": {
     parameters: {
       query?: never
       header?: never
@@ -563,6 +563,23 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    ApiResponseMetadata: {
+      /** Format: date-time */
+      timestamp: string
+      /** Format: uuid */
+      requestId: string
+    }
+    ApiError: {
+      code: string
+      message: string
+      details: {
+        [key: string]: unknown
+      }
+    }
+    ApiErrorEnvelope: {
+      error: components["schemas"]["ApiError"]
+      meta: components["schemas"]["ApiResponseMetadata"]
+    }
     UpdateThresholdRuleRequest: {
       valueThreshold?: number
       /** Format: int32 */
@@ -651,34 +668,11 @@ export interface components {
       aggregationWindowDays?: number
       active?: boolean
     }
-    Organization: {
-      /** Format: uuid */
-      id?: string
-      slug?: string
-      name?: string
-      /** Format: date-time */
-      createdAt?: string
-    }
-    SystemConfig: {
+    SystemConfigResponse: {
       key?: string
       value?: string
-      updatedBy?: components["schemas"]["User"]
       /** Format: date-time */
       updatedAt?: string
-    }
-    User: {
-      /** Format: uuid */
-      id?: string
-      fullName?: string
-      email?: string
-      /** @enum {string} */
-      role?: "ADMIN" | "COMPLIANCE_OFFICER" | "OCOS" | "AUDITOR_READONLY"
-      mfaEnabled?: boolean
-      /** Format: date-time */
-      createdAt?: string
-      /** Format: date-time */
-      lastLoginAt?: string
-      organization?: components["schemas"]["Organization"]
     }
     Flag: {
       /** Format: uuid */
@@ -770,6 +764,14 @@ export interface components {
       retentionUntil?: string
       submitted?: boolean
     }
+    Organization: {
+      /** Format: uuid */
+      id?: string
+      slug?: string
+      name?: string
+      /** Format: date-time */
+      createdAt?: string
+    }
     InsightsSummaryResponse: {
       /** Format: int64 */
       totalClients?: number
@@ -810,6 +812,20 @@ export interface components {
       organization?: components["schemas"]["Organization"]
       /** Format: date-time */
       importedAt?: string
+    }
+    User: {
+      /** Format: uuid */
+      id?: string
+      fullName?: string
+      email?: string
+      /** @enum {string} */
+      role?: "ADMIN" | "COMPLIANCE_OFFICER" | "OCOS" | "AUDITOR_READONLY"
+      mfaEnabled?: boolean
+      /** Format: date-time */
+      createdAt?: string
+      /** Format: date-time */
+      lastLoginAt?: string
+      organization?: components["schemas"]["Organization"]
     }
     Pageable: {
       /** Format: int32 */
@@ -938,7 +954,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -964,7 +992,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -986,7 +1026,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["SuspiciousActivityReport"]
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1012,7 +1064,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1032,9 +1096,21 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": {
-            [key: string]: unknown
-          }[]
+          "application/json": {
+            data: {
+              [key: string]: unknown
+            }[]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1052,13 +1128,23 @@ export interface operations {
       }
     }
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Direct user creation is not available. */
+      501: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "*/*": components["schemas"]["ApiErrorEnvelope"]
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1084,7 +1170,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1106,7 +1204,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1126,7 +1236,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ImportBatch"][]
+          "application/json": {
+            data: components["schemas"]["ImportBatch"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1153,7 +1275,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1181,7 +1315,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1203,7 +1349,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1229,7 +1387,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["PageClient"]
+          "application/json": {
+            data: components["schemas"]["PageClient"]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1253,7 +1423,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1275,7 +1457,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1297,7 +1491,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["BeneficialOwner"][]
+          "application/json": {
+            data: components["schemas"]["BeneficialOwner"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1323,7 +1529,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1345,7 +1563,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1369,7 +1599,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1393,7 +1635,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1419,7 +1673,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1443,7 +1709,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1463,7 +1741,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1487,7 +1777,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1509,7 +1811,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1535,7 +1849,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1561,7 +1887,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1583,7 +1921,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1603,7 +1953,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ThresholdRule"][]
+          "application/json": {
+            data: components["schemas"]["ThresholdRule"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1623,7 +1985,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["SystemConfig"][]
+          "application/json": {
+            data: components["schemas"]["SystemConfigResponse"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1645,7 +2019,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["SuspiciousActivityReport"][]
+          "application/json": {
+            data: components["schemas"]["SuspiciousActivityReport"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1667,7 +2053,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": string
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1689,7 +2087,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": string
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1709,7 +2119,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["CurrencyTransactionReport"][]
+          "application/json": {
+            data: components["schemas"]["CurrencyTransactionReport"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1729,7 +2151,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["InsightsSummaryResponse"]
+          "application/json": {
+            data: components["schemas"]["InsightsSummaryResponse"]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1751,7 +2185,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["ImportBatch"]
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1779,7 +2225,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["Flag"][]
+          "application/json": {
+            data: components["schemas"]["Flag"][]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1801,7 +2259,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["Client"]
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1821,7 +2291,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": Record<string, never>
+          "application/json": {
+            data: Record<string, never>
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }
@@ -1858,7 +2340,19 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          "*/*": components["schemas"]["PageAuditLog"]
+          "application/json": {
+            data: components["schemas"]["PageAuditLog"]
+            meta: components["schemas"]["ApiResponseMetadata"]
+          }
+        }
+      }
+      /** @description The service returned an error. */
+      default: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApiErrorEnvelope"]
         }
       }
     }

@@ -32,7 +32,7 @@ public class PepScreeningService {
         this.flagRepository = flagRepository;
     }
 
-    @Scheduled(cron = "0 0 2 * * ?") // Todos os dias às 02:00
+    @Scheduled(cron = "0 0 2 * * ?") // Runs daily at 02:00
     @Transactional
     public int checkAndGeneratePepReviewFlags() {
         LocalDate cutoffDate = LocalDate.now().minusDays(maxReviewIntervalDays);
@@ -41,15 +41,19 @@ public class PepScreeningService {
 
         int count = 0;
         for (Client client : overduePeps) {
-            boolean hasPendingFlag = flagRepository.existsByClientIdAndTypeAndStatus(
-                    client.getId(), FlagType.PEP_REVIEW_DUE, FlagStatus.PENDING
-            );
+            if (client.getOrganization() == null || client.getOrganization().getId() == null) {
+                log.warn("Skipping PEP review flag for client without an organization");
+                continue;
+            }
+            boolean hasPendingFlag = flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                    client.getId(), client.getOrganization().getId(), FlagType.PEP_REVIEW_DUE,
+                    FlagStatus.PENDING) > 0;
 
             if (!hasPendingFlag) {
                 String reason = String.format(
-                        "Revisão periódica de PEP vencida há mais de 12 meses (última revisão: %s). " +
-                        "Atualize a revisão e a avaliação da relação.",
-                        client.getPepLastReviewedAt() != null ? client.getPepLastReviewedAt().toString() : "Nunca realizada"
+                        "The politically exposed person review is overdue by more than 12 months (last review: %s). " +
+                        "Update the review and relationship assessment.",
+                        client.getPepLastReviewedAt() != null ? client.getPepLastReviewedAt().toString() : "Never reviewed"
                 );
 
                 Flag flag = new Flag(client, null, FlagType.PEP_REVIEW_DUE, reason, null);
@@ -59,7 +63,7 @@ public class PepScreeningService {
         }
 
         if (count > 0) {
-            log.info("Geradas {} flags de revisão de PEP pendentes de regularização", count);
+            log.info("Created {} overdue politically exposed person review alerts", count);
         }
         return count;
     }

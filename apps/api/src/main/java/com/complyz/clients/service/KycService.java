@@ -10,6 +10,8 @@ import com.complyz.flags.entity.Flag;
 import com.complyz.flags.entity.FlagStatus;
 import com.complyz.flags.entity.FlagType;
 import com.complyz.flags.repository.FlagRepository;
+import com.complyz.tenancy.service.TenantAccessService;
+import com.complyz.users.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +26,18 @@ public class KycService {
     private final ClientRepository clientRepository;
     private final BeneficialOwnerRepository beneficialOwnerRepository;
     private final FlagRepository flagRepository;
+    private final TenantAccessService tenantAccessService;
 
     public KycService(
             ClientRepository clientRepository,
             BeneficialOwnerRepository beneficialOwnerRepository,
-            FlagRepository flagRepository
+            FlagRepository flagRepository,
+            TenantAccessService tenantAccessService
     ) {
         this.clientRepository = clientRepository;
         this.beneficialOwnerRepository = beneficialOwnerRepository;
         this.flagRepository = flagRepository;
+        this.tenantAccessService = tenantAccessService;
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +48,12 @@ public class KycService {
             return false;
         }
 
-        List<BeneficialOwner> owners = beneficialOwnerRepository.findByClientId(client.getId());
+        UUID organizationId = client.getOrganization() == null ? null : client.getOrganization().getId();
+        if (organizationId == null) {
+            return false;
+        }
+        List<BeneficialOwner> owners = beneficialOwnerRepository.findByClientIdAndClientOrganizationId(
+                client.getId(), organizationId);
         if (isCorporate(client)) {
             return !owners.isEmpty() && owners.stream().allMatch(this::isValidOwner)
                     && owners.stream().anyMatch(owner ->
@@ -54,40 +64,62 @@ public class KycService {
     }
 
     @Transactional
-    public Client recalculateAndPersist(UUID clientId) {
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clientId));
+    public Client recalculateAndPersist(UUID clientId, User actor) {
+        Client client = findClient(clientId, actor);
         boolean complete = isComplete(client);
         client.setKycComplete(complete);
         Client saved = clientRepository.save(client);
 
-        if (!complete && !flagRepository.existsByClientIdAndTypeAndStatus(
-                clientId, FlagType.KYC_INCOMPLETE, FlagStatus.PENDING)) {
+        if (!complete && flagRepository.countByClientIdAndOrganizationIdAndTypeAndStatus(
+                clientId, client.getOrganization().getId(), FlagType.KYC_INCOMPLETE, FlagStatus.PENDING) == 0) {
             flagRepository.save(new Flag(client, null, FlagType.KYC_INCOMPLETE,
-                    "KYC incompleto: identificação obrigatória ou beneficiários efetivos pendentes.",
+                    "Customer review is incomplete: identification or beneficial owner details are missing.",
                     null));
         }
         return saved;
     }
 
     @Transactional
+    public List<BeneficialOwner> listOwners(UUID clientId, User actor) {
+        UUID organizationId = requireOrganizationId(actor);
+        return beneficialOwnerRepository.findByClientIdAndClientOrganizationId(clientId, organizationId);
+    }
+
+    @Transactional
     public BeneficialOwner addOwner(UUID clientId, String fullName, BeneficialOwnerRole role,
-                                    BigDecimal ownershipPercentage) {
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clientId));
+                                    BigDecimal ownershipPercentage, User actor) {
+        Client client = findClient(clientId, actor);
         validateOwner(fullName, role, ownershipPercentage);
         BeneficialOwner owner = new BeneficialOwner(client, fullName.trim(), role, ownershipPercentage);
         return beneficialOwnerRepository.save(owner);
     }
 
     @Transactional
-    public BeneficialOwner verifyOwner(UUID ownerId) {
-        BeneficialOwner owner = beneficialOwnerRepository.findById(ownerId)
-                .orElseThrow(() -> new IllegalArgumentException("Beneficiário efetivo não encontrado: " + ownerId));
+    public BeneficialOwner verifyOwner(UUID ownerId, User actor) {
+        UUID organizationId = requireOrganizationId(actor);
+        BeneficialOwner owner = beneficialOwnerRepository.findByIdAndClientOrganizationId(ownerId, organizationId)
+                .orElseThrow(() -> new IllegalArgumentException("Beneficial owner not found: " + ownerId));
         owner.setVerifiedAt(LocalDate.now());
         BeneficialOwner saved = beneficialOwnerRepository.save(owner);
-        recalculateAndPersist(owner.getClient().getId());
+        recalculateAndPersist(owner.getClient().getId(), actor);
         return saved;
+    }
+
+    private Client findClient(UUID clientId, User actor) {
+        var organization = tenantAccessService.requireOrganization(actor);
+        if (organization.getId() == null) {
+            throw new IllegalStateException("The user's Organization is required.");
+        }
+        return clientRepository.findByIdAndOrganization(clientId, organization)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + clientId));
+    }
+
+    private UUID requireOrganizationId(User actor) {
+        UUID organizationId = tenantAccessService.organizationId(actor);
+        if (organizationId == null) {
+            throw new IllegalStateException("The user's Organization is required.");
+        }
+        return organizationId;
     }
 
     private boolean isCorporate(Client client) {
@@ -105,11 +137,11 @@ public class KycService {
 
     private void validateOwner(String fullName, BeneficialOwnerRole role, BigDecimal percentage) {
         if (isBlank(fullName) || role == null) {
-            throw new IllegalArgumentException("Nome e função do beneficiário efetivo são obrigatórios");
+            throw new IllegalArgumentException("Beneficial owner name and role are required.");
         }
         if (percentage != null && (percentage.compareTo(BigDecimal.ZERO) < 0
                 || percentage.compareTo(new BigDecimal("100")) > 0)) {
-            throw new IllegalArgumentException("Percentagem de participação deve estar entre 0 e 100");
+            throw new IllegalArgumentException("Ownership percentage must be between 0 and 100.");
         }
     }
 

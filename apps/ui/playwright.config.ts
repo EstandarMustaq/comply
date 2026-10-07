@@ -17,7 +17,7 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     colorScheme: "light",
-    locale: "pt-MZ",
+    locale: "en-MZ",
     launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
       : undefined,
@@ -32,7 +32,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      NEXT_PUBLIC_API_URL: "/api",
+      NEXT_PUBLIC_API_URL: "/api/v1",
       NEXT_PUBLIC_APP_NAME: "Complyz",
     },
   },

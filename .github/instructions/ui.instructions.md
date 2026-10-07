@@ -25,7 +25,7 @@ applyTo: "apps/ui/**"
 ## Interaction, copy, and contracts
 
 - Preserve keyboard and screen-reader access, responsive behavior, and truthful loading, empty, error, and success states. Keep focus visible and status meaning available without color.
-- Write user-facing copy in direct, operational Mozambican Portuguese (`pt-MZ`). Keep machine enum values stable and resolve display text through localized label helpers. Do not expose internal acronyms, implementation details, legal citations, or legal deadlines in product copy.
+- Write user-facing copy in clear, direct, confident English. Keep API and machine enum values stable; resolve display text through label helpers. Do not expose internal acronyms, implementation details or unsupported legal claims in product copy.
 - Coordinate endpoint or DTO changes with `packages/api-clients`, `lib/types.ts`, `lib/api-client.ts`, and contract tests.
 - Before UI work, load the matching skills listed in root `AGENTS.md`: `ui-implementation` for implementation; `impeccable` and `ui-ux-pro-max` for visual or UX decisions; `vercel-composition-patterns` for component API architecture; `vercel-react-best-practices` for React/Next.js implementation and performance; and `web-design-guidelines` for interface/accessibility reviews. These skills inform the work but do not override the existing Complyz design system or the user's brief.
 - For Next.js-specific behavior, consult installed guides under `apps/ui/node_modules/next/dist/docs/`. Validate UI changes with `pnpm --filter @complyz/web run check` and the relevant Vitest or Playwright selector; use `pnpm check` for workspace-wide changes.

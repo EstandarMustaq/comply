@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/flags")
+@RequestMapping("/flags")
 public class FlagController {
 
     private final FlagService flagService;
@@ -34,9 +34,11 @@ public class FlagController {
     @GetMapping
     public ResponseEntity<List<Flag>> listFlags(
             @RequestParam(required = false) FlagStatus status,
-            @RequestParam(required = false) FlagType type
+            @RequestParam(required = false) FlagType type,
+            Authentication authentication
     ) {
-        List<Flag> flags = flagService.listFlags(status, type);
+        User actor = (User) authentication.getPrincipal();
+        List<Flag> flags = flagService.listFlags(actor, status, type);
         return ResponseEntity.ok(flags);
     }
 
@@ -63,7 +65,7 @@ public class FlagController {
         User ocos = (User) authentication.getPrincipal();
         SuspiciousActivityReport report = flagService.escalateToStr(id, ocos, institutionName);
         return ResponseEntity.ok(Map.of(
-                "message", "Sinal escalado com sucesso para investigação",
+                "message", "Alert escalated for investigation.",
                 "strId", report.getId()
         ));
     }

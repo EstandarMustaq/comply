@@ -48,7 +48,9 @@ if (routes.length === 0) {
 const generated = astToString(await openapiTS(document))
 const clientDirectory = resolve(root, "packages/api-clients")
 const generatedPath = resolve(clientDirectory, "src/generated.ts")
+const prettierOptions = (await prettier.resolveConfig(generatedPath)) ?? {}
 const formattedGenerated = await prettier.format(`${generated}\n`, {
+  ...prettierOptions,
   filepath: generatedPath,
 })
 

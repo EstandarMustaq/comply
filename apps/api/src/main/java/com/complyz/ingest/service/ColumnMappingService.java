@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -16,17 +17,31 @@ public class ColumnMappingService {
         for (String header : detectedHeaders) {
             String norm = normalize(header);
 
-            if (matches(norm, "doc", "nuit", "bi", "passaporte", "identificacao", "documento", "nr_doc")) {
+            if (matches(norm,
+                    "document", "document_number", "id_number", "tax_id", "doc", "nuit",
+                    "bi", "passaporte", "identificacao", "documento", "nr_doc")) {
                 suggestions.putIfAbsent("clientDocument", header);
-            } else if (matches(norm, "nome", "cliente", "titular", "mutuario", "razao_social", "nome_cliente")) {
+            } else if (matches(norm,
+                    "name", "full_name", "customer_name", "client_name", "account_holder",
+                    "holder", "borrower", "company_name", "nome", "cliente", "titular",
+                    "mutuario", "razao_social", "nome_cliente")) {
                 suggestions.putIfAbsent("clientName", header);
-            } else if (matches(norm, "data", "data_operacao", "data_transaccao", "dt_operacao", "dt", "data_movimento")) {
+            } else if (matches(norm,
+                    "date", "transaction_date", "operation_date", "data", "data_operacao",
+                    "data_transaccao", "dt_operacao", "dt", "data_movimento")) {
                 suggestions.putIfAbsent("transactionDate", header);
-            } else if (matches(norm, "valor", "montante", "total", "quantia", "valor_operacao", "deposito", "saldo")) {
+            } else if (matches(norm,
+                    "amount", "value", "total", "transaction_amount", "operation_value",
+                    "balance", "valor", "montante", "quantia", "valor_operacao", "deposito",
+                    "saldo")) {
                 suggestions.putIfAbsent("amount", header);
-            } else if (matches(norm, "tipo", "operacao", "natureza", "tipo_operacao", "tipo_movimento", "credito_debito")) {
+            } else if (matches(norm,
+                    "type", "transaction_type", "operation_type", "kind", "tipo", "operacao",
+                    "natureza", "tipo_operacao", "tipo_movimento", "credito_debito")) {
                 suggestions.putIfAbsent("transactionType", header);
-            } else if (matches(norm, "conta", "numero_conta", "no_conta", "nr_conta", "nuib", "iban")) {
+            } else if (matches(norm,
+                    "account", "account_number", "account_no", "acct", "conta", "numero_conta",
+                    "no_conta", "nr_conta", "nuib", "iban")) {
                 suggestions.putIfAbsent("accountNumber", header);
             }
         }
@@ -35,8 +50,9 @@ public class ColumnMappingService {
     }
 
     private boolean matches(String target, String... candidates) {
+        String paddedTarget = "_" + target + "_";
         for (String candidate : candidates) {
-            if (target.equals(candidate) || target.contains(candidate)) {
+            if (paddedTarget.contains("_" + candidate + "_")) {
                 return true;
             }
         }
@@ -47,7 +63,7 @@ public class ColumnMappingService {
         if (str == null) return "";
         return Normalizer.normalize(str, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
-                .toLowerCase()
+                .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]", "_")
                 .replaceAll("_+", "_")
                 .replaceAll("^_|_$", "");

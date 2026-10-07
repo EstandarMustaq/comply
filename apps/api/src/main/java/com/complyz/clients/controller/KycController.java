@@ -5,7 +5,6 @@ import com.complyz.audit.entity.AuditAction;
 import com.complyz.audit.service.AuditService;
 import com.complyz.clients.entity.BeneficialOwner;
 import com.complyz.clients.entity.BeneficialOwnerRole;
-import com.complyz.clients.repository.BeneficialOwnerRepository;
 import com.complyz.clients.service.KycService;
 import com.complyz.users.entity.User;
 import jakarta.validation.Valid;
@@ -22,23 +21,24 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/clients")
+@RequestMapping("/clients")
 public class KycController {
 
     private final KycService kycService;
-    private final BeneficialOwnerRepository beneficialOwnerRepository;
     private final AuditService auditService;
 
-    public KycController(KycService kycService, BeneficialOwnerRepository beneficialOwnerRepository,
-                         AuditService auditService) {
+    public KycController(KycService kycService, AuditService auditService) {
         this.kycService = kycService;
-        this.beneficialOwnerRepository = beneficialOwnerRepository;
         this.auditService = auditService;
     }
 
     @GetMapping("/{clientId}/beneficial-owners")
-    public ResponseEntity<List<BeneficialOwner>> listOwners(@PathVariable UUID clientId) {
-        return ResponseEntity.ok(beneficialOwnerRepository.findByClientId(clientId));
+    public ResponseEntity<List<BeneficialOwner>> listOwners(
+            @PathVariable UUID clientId,
+            Authentication authentication
+    ) {
+        User actor = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(kycService.listOwners(clientId, actor));
     }
 
     public record BeneficialOwnerRequest(
@@ -54,7 +54,8 @@ public class KycController {
                                       Authentication authentication) {
         try {
             BeneficialOwner owner = kycService.addOwner(
-                    clientId, request.fullName(), request.role(), request.ownershipPercentage());
+                    clientId, request.fullName(), request.role(), request.ownershipPercentage(),
+                    (User) authentication.getPrincipal());
             audit(authentication, AuditAction.CLIENT_UPDATED, clientId,
                     "{\"action\":\"BENEFICIAL_OWNER_ADDED\"}");
             return ResponseEntity.ok(owner);
@@ -67,7 +68,7 @@ public class KycController {
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> verifyOwner(@PathVariable UUID ownerId, Authentication authentication) {
         try {
-            BeneficialOwner owner = kycService.verifyOwner(ownerId);
+            BeneficialOwner owner = kycService.verifyOwner(ownerId, (User) authentication.getPrincipal());
             audit(authentication, AuditAction.CLIENT_UPDATED, owner.getClient().getId(),
                     "{\"action\":\"BENEFICIAL_OWNER_VERIFIED\"}");
             return ResponseEntity.ok(owner);
@@ -80,7 +81,7 @@ public class KycController {
     @PreAuthorize("hasAnyRole('ADMIN', 'COMPLIANCE_OFFICER', 'OCOS')")
     public ResponseEntity<?> recalculate(@PathVariable UUID clientId, Authentication authentication) {
         try {
-            var client = kycService.recalculateAndPersist(clientId);
+            var client = kycService.recalculateAndPersist(clientId, (User) authentication.getPrincipal());
             audit(authentication, AuditAction.CLIENT_UPDATED, clientId,
                     "{\"action\":\"KYC_RECALCULATED\",\"complete\":" + client.isKycComplete() + "}");
             return ResponseEntity.ok(Map.of("clientId", clientId, "kycComplete", client.isKycComplete()));

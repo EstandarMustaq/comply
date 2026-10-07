@@ -35,7 +35,7 @@ export default function ImportPage() {
       const data = await api.getBatches()
       setBatches(data)
     } catch (err) {
-      console.error("Erro ao carregar lotes de importação:", err)
+      console.error("Failed to load import batches:", err)
     } finally {
       setIsLoading(false)
     }
@@ -52,13 +52,13 @@ export default function ImportPage() {
       case "COMPLETED":
         return (
           <Badge variant="success" className="text-[10px]">
-            Concluído
+            Complete
           </Badge>
         )
       case "PROCESSING":
         return (
           <Badge variant="warning" className="text-[10px]">
-            A Processar
+            Processing
           </Badge>
         )
       case "FAILED":
@@ -78,7 +78,7 @@ export default function ImportPage() {
 
   return (
     <div>
-      <SiteHeader title="Importar transacções" />
+      <SiteHeader title="Import transactions" />
 
       <div className="space-y-6">
         {/* File upload area */}
@@ -90,10 +90,10 @@ export default function ImportPage() {
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <FileSpreadsheet className="text-primary h-4 w-4" />
-                Histórico de Lotes Importados
+                Import history
               </CardTitle>
               <CardDescription className="text-xs">
-                Histórico e estado de processamento dos ficheiros carregados.
+                Track uploaded files and their processing status.
               </CardDescription>
             </div>
             <Button
@@ -104,26 +104,25 @@ export default function ImportPage() {
               className="h-8 gap-1.5 text-xs"
             >
               <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
-              <span>Atualizar Histórico</span>
+              <span>Refresh history</span>
             </Button>
           </CardHeader>
           <CardContent>
             {batches.length === 0 ? (
               <div className="text-muted-foreground py-8 text-center text-xs">
-                Nenhum lote importado ainda. Arraste uma folha de cálculo acima para
-                iniciar.
+                No imports yet. Drop a spreadsheet above to get started.
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Nome do Ficheiro</TableHead>
-                    <TableHead>Formato</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-center">Total Linhas</TableHead>
-                    <TableHead className="text-center">Processadas</TableHead>
-                    <TableHead className="text-center">Erros</TableHead>
-                    <TableHead className="text-right">Data de Envio</TableHead>
+                    <TableHead>File name</TableHead>
+                    <TableHead>Format</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-center">Total rows</TableHead>
+                    <TableHead className="text-center">Processed</TableHead>
+                    <TableHead className="text-center">Errors</TableHead>
+                    <TableHead className="text-right">Uploaded</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -144,7 +143,7 @@ export default function ImportPage() {
                         {b.errorRows}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-right text-xs">
-                        {new Date(b.createdAt).toLocaleString("pt-MZ")}
+                        {new Date(b.createdAt).toLocaleString("en-MZ")}
                       </TableCell>
                     </TableRow>
                   ))}

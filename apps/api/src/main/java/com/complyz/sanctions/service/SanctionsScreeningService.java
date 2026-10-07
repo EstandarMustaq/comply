@@ -63,7 +63,7 @@ public class SanctionsScreeningService {
             if (isFuzzyMatch(normalizedClientName, normalizedSanctionName)) {
                 Instant deadline = Instant.now().plus(slaHours, ChronoUnit.HOURS);
                 String reason = String.format(
-                        "Correspondência em lista de triagem: '%s'. Revisão prioritária em até %d horas.",
+                        "Sanctions screening match: '%s'. Review this alert within %d hours.",
                         entry.getFullName(), slaHours
                 );
 

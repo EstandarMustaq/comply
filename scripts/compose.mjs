@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 const root = fileURLToPath(new URL("../", import.meta.url))
 const command = process.argv[2] ?? "up"
 const allowedCommands = new Set(["config", "up", "down", "logs", "ps", "pull", "build"])
+let environment = process.env
 
 if (!allowedCommands.has(command)) {
   console.error(`Unsupported compose command: ${command}`)
@@ -16,10 +17,15 @@ if (command === "config") {
 } else {
   if (command === "up" && !process.argv.slice(3).includes("--profile")) {
     args.push("--profile", "app")
+    environment = { ...process.env, COMPOSE_PROFILES: "app" }
   }
   args.push(command, ...process.argv.slice(3))
 }
 
-const result = spawnSync("docker", args, { cwd: root, stdio: "inherit" })
+const result = spawnSync("docker", args, {
+  cwd: root,
+  stdio: "inherit",
+  env: environment,
+})
 if (result.error) throw result.error
 process.exit(result.status ?? 1)

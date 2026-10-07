@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/settings")
+@RequestMapping("/settings")
 public class SettingsController {
 
     private final ThresholdRuleRepository thresholdRuleRepository;
@@ -51,7 +51,7 @@ public class SettingsController {
     ) {}
 
     @PutMapping("/threshold-rules/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OCOS')")
+    @PreAuthorize("denyAll()")
     public ResponseEntity<?> updateThresholdRule(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateThresholdRuleRequest request,
@@ -74,14 +74,23 @@ public class SettingsController {
     }
 
     @GetMapping("/system-config")
-    public ResponseEntity<List<SystemConfig>> listSystemConfigs() {
-        return ResponseEntity.ok(systemConfigRepository.findAll());
+    public ResponseEntity<List<SystemConfigResponse>> listSystemConfigs() {
+        List<SystemConfigResponse> configs = systemConfigRepository.findAll().stream()
+                .map(SettingsController::toResponse)
+                .toList();
+        return ResponseEntity.ok(configs);
+    }
+
+    public record SystemConfigResponse(String key, String value, Instant updatedAt) {}
+
+    private static SystemConfigResponse toResponse(SystemConfig config) {
+        return new SystemConfigResponse(config.getKey(), config.getValue(), config.getUpdatedAt());
     }
 
     public record UpdateSystemConfigRequest(@NotNull String jsonValue) {}
 
     @PutMapping("/system-config/{key}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("denyAll()")
     public ResponseEntity<?> updateSystemConfig(
             @PathVariable String key,
             @Valid @RequestBody UpdateSystemConfigRequest request,
@@ -103,6 +112,6 @@ public class SettingsController {
         auditService.record(actor, AuditAction.SETTINGS_UPDATED, "system_config", UUID.randomUUID(),
                 "{\"key\": \"" + key + "\"}");
 
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(toResponse(saved));
     }
 }

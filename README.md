@@ -2,7 +2,7 @@
 
 <h1 align="center">Complyz</h1>
 
-<p align="center">Customer risk, transaction monitoring, and investigations in one workspace.</p>
+<p align="center"><strong>Intelligent Financial Compliance</strong></p>
 
 <p align="center">
   <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml/badge.svg?branch=main" alt="Quality gates"></a>
@@ -16,31 +16,36 @@
 
 </div>
 
-Complyz helps financial teams understand customer risk, review unusual
-transactions, and keep decisions clear and traceable. One workspace brings
-customer records, transaction alerts, investigations, reports, and activity
-history together.
+Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
 
-## What teams can do
+## What Complyz does today
 
-- Keep customer information, ownership details, and risk assessments in one
-  place.
-- Review transaction and restricted-party alerts with the context needed to
-  decide what happens next.
-- Import transaction files and check the results before processing them.
-- Prepare reports, follow each case through review, and retain a record of
-  important decisions.
-- See current workload and activity without switching between separate tools.
+- Keep customer profiles, ownership details and risk assessments together.
+- Review transaction and sanctions alerts with the context to decide what comes next.
+- Import transaction files and check the data before processing it.
+- Prepare reports, move each case through review and keep a clear record of decisions.
+- See workload and activity without switching tools.
 
-## Try Complyz
+## Designed to grow
+
+The longer-term design aims to support external-tool integrations, advanced precision mechanisms, compliance-analysis algorithms, transaction-fragmentation detection and native AI within compliance models. These are design goals, not claims that every capability is available today.
+
+## Security alignment
+
+Aligning security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria is a roadmap objective, not an implemented program. Complyz does not claim ISO certification or a SOC 2 Type II report.
+
+## Licensing and trademarks
+
+Source code is licensed under [AGPL-3.0-only](LICENSE-AGPL-3.0). Documentation is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0). The Complyz™ name, logo and trademarks are reserved. These licenses do not grant trademark rights.
+
+## Explore Complyz
 
 Visit [trycomplyz.com](https://trycomplyz.com) to learn more about the product.
 
 ## Run the workspace locally
 
-The repository contains the web app, API, shared packages, and local service
-configuration. To run the application for development, install Node.js 26.5.0,
-pnpm 12.8.1, Java 21, and Docker Compose v2, then run:
+The repository includes the web app, API, shared packages and local services.
+Install Node.js 26.5.0, pnpm 12.8.1, Java 21 and Docker Compose v2, then run:
 
 ```bash
 corepack enable
@@ -52,7 +57,7 @@ pnpm dev
 The web app is available at `http://localhost:3000`; the API is available at
 `http://localhost:8080`. See the [web app guide](apps/ui/README.md),
 [API guide](apps/api/README.md), and [documentation index](docs/index.mdx) for
-more.
+setup details.
 
 To enable the repository's local commit and push checks, run
 `pnpm hooks:install` once in your worktree. The hooks validate staged changes,

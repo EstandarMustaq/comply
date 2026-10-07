@@ -40,31 +40,31 @@ public class ReportExportService {
 
     public byte[] exportStrPdf(SuspiciousActivityReport report) {
         String text = String.join("\n",
-                "RELATORIO DE OPERACAO SUSPEITA - GIFiM",
-                "Referencia: " + report.getId(),
-                "Instituicao: " + report.getReportingInstitution(),
-                "Titular: " + report.getAccountHolder(),
-                "Conta: " + value(report.getAccountNumber()),
-                "Executor: " + value(report.getTransactionExecutor()),
-                "Valor: " + value(report.getMonetaryValue()),
-                "Suspeita: " + report.getSuspicionDescription(),
-                "Relacao de negocio: " + report.getBusinessRelationshipDescription(),
-                "Funcionario envolvido: " + report.isInternalEmployeeInvolved(),
-                "Declaracao: " + value(report.getVoluntaryStatement()),
-                "OCOS: " + report.getOcosName(),
-                "Registo GIFiM: " + value(report.getGifimRegistrationNumber()),
-                "Submetido em: " + value(report.getSubmittedAt()),
-                "Retencao ate: " + value(report.getRetentionUntil())
+                "Suspicious activity report",
+                "Reference: " + report.getId(),
+                "Institution: " + report.getReportingInstitution(),
+                "Account holder: " + report.getAccountHolder(),
+                "Account: " + value(report.getAccountNumber()),
+                "Transaction executor: " + value(report.getTransactionExecutor()),
+                "Amount: " + value(report.getMonetaryValue()),
+                "Reason for suspicion: " + report.getSuspicionDescription(),
+                "Business relationship: " + report.getBusinessRelationshipDescription(),
+                "Internal employee involved: " + report.isInternalEmployeeInvolved(),
+                "Voluntary statement: " + value(report.getVoluntaryStatement()),
+                "Responsible officer: " + report.getOcosName(),
+                "Filing reference: " + value(report.getGifimRegistrationNumber()),
+                "Filed on: " + value(report.getSubmittedAt()),
+                "Retain until: " + value(report.getRetentionUntil())
         );
         return createPdf(text);
     }
 
     public byte[] exportAnnualExcel(int year, UUID organizationId) throws IOException {
         if (year < 2000 || year > LocalDate.now().getYear() + 1) {
-            throw new IllegalArgumentException("Ano do relatório inválido");
+            throw new IllegalArgumentException("Report year is invalid.");
         }
         if (organizationId == null) {
-            throw new IllegalArgumentException("A organização do utilizador é obrigatória");
+            throw new IllegalArgumentException("The user's Organization is required.");
         }
         LocalDate start = LocalDate.of(year, Month.JANUARY, 1);
         LocalDate end = LocalDate.of(year, Month.DECEMBER, 31);
@@ -76,17 +76,17 @@ public class ReportExportService {
                 organizationId, start, end);
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            Sheet summary = workbook.createSheet("Resumo BM");
-            row(summary, 0, "RELATORIO ANUAL BM", year);
-            row(summary, 1, "Total transacoes",
+            Sheet summary = workbook.createSheet("Summary");
+            row(summary, 0, "ANNUAL REGULATORY REPORT", year);
+            row(summary, 1, "Total transactions",
                     transactionRepository.countByOrganizationAndTransactionDateBetween(organizationId, start, end));
-            row(summary, 2, "Volume total MZN",
+            row(summary, 2, "Total volume (MZN)",
                     transactionRepository.sumAmountByOrganizationAndTransactionDateBetween(organizationId, start, end));
-            row(summary, 3, "STR submetidas", strs.size());
-            row(summary, 4, "CTR gerados", ctrs.size());
+            row(summary, 3, "Suspicious activity reports filed", strs.size());
+            row(summary, 4, "Cash transaction reports created", ctrs.size());
 
             Sheet strSheet = workbook.createSheet("STR");
-            row(strSheet, 0, "ID", "Instituicao", "Titular", "Valor", "GIFiM", "Submetido em");
+            row(strSheet, 0, "ID", "Institution", "Account holder", "Amount", "Filing reference", "Filed on");
             int index = 1;
             for (SuspiciousActivityReport str : strs) {
                 row(strSheet, index++, str.getId(), str.getReportingInstitution(), str.getAccountHolder(),
@@ -94,7 +94,7 @@ public class ReportExportService {
             }
 
             Sheet ctrSheet = workbook.createSheet("CTR");
-            row(ctrSheet, 0, "ID", "Inicio", "Fim", "Valor", "Moeda", "Submetido em");
+            row(ctrSheet, 0, "ID", "Start date", "End date", "Amount", "Currency", "Filed on");
             index = 1;
             for (CurrencyTransactionReport ctr : ctrs) {
                 row(ctrSheet, index++, ctr.getId(), ctr.getAggregationPeriodStart(),
