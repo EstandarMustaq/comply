@@ -61,6 +61,7 @@ export function parseArguments(args) {
   return options
 }
 
+/** Reject unsafe production settings and CORS origins that differ from browser serialization. */
 export function validateDeploymentEnvironment(env) {
   const missing = requiredVariables.filter((name) => !env[name]?.trim())
   if (missing.length) {
@@ -111,7 +112,7 @@ export function validateDeploymentEnvironment(env) {
   const origins = (env.CORS_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((origin) => origin.trim())
-  const normalizedOrigins = origins.map((origin) => {
+  for (const origin of origins) {
     let parsed
     try {
       parsed = new URL(origin)
@@ -121,6 +122,7 @@ export function validateDeploymentEnvironment(env) {
       )
     }
     if (
+      origin !== parsed.origin ||
       !/^https:\/\/[^/?#\\\s]+\/?$/i.test(origin) ||
       parsed.protocol !== "https:" ||
       parsed.hostname === "localhost" ||
@@ -138,9 +140,8 @@ export function validateDeploymentEnvironment(env) {
         "CORS_ALLOWED_ORIGINS must contain only explicit production origins."
       )
     }
-    return parsed.origin
-  })
-  if (!normalizedOrigins.includes("https://trycomplyz.com")) {
+  }
+  if (!origins.some((origin) => origin === "https://trycomplyz.com")) {
     throw new Error("CORS_ALLOWED_ORIGINS must allow https://trycomplyz.com.")
   }
   if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomplyz.com/api/v1") {
