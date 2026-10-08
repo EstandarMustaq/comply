@@ -1,6 +1,6 @@
 # Engineering task briefs
 
-Task briefs capture bounded implementation work that needs explicit ownership, acceptance criteria, or coordination. The Account / Organization / CommercialClient backlog below is planning work only; `draft` and `blocked` do not mean implemented.
+Task briefs capture bounded implementation work that needs explicit ownership, acceptance criteria, or coordination. The Account / Organization / CommercialClient backlog below records implementation status; `draft` and `blocked` do not mean implemented.
 
 ## Workflow
 
@@ -17,13 +17,13 @@ Task briefs capture bounded implementation work that needs explicit ownership, a
 
 ## Account / Organization / CommercialClient roadmap
 
-Authoritative roadmap and full requirement-to-task traceability: [`../ROADMAP.md`](../ROADMAP.md). Briefs were created 2026-10-03 from the reviewed target specification. Task 0001's D1–D7 decisions were approved and closed on 2026-10-04; this closes the decision gate, not implementation or release approval. Task 0002 is the completed immediate containment task, not a production security certification. Remaining implementation tasks stay planning-only until prerequisites and architecture contracts are ready. Execute serially where migrations, event contracts, API contracts, shared auth/UI files or tests overlap.
+Authoritative roadmap and full requirement-to-task traceability: [`../ROADMAP.md`](../ROADMAP.md). Briefs were created 2026-10-03 from the reviewed target specification. Task 0001's D1–D7 decisions were approved and closed on 2026-10-04; this closes the decision gate, not implementation or release approval. Task 0002 is the completed immediate containment task, not a production security certification. Task 0003 completes Account/membership persistence, reviewed CommercialClient reference backfill and separate external identity/factor/session record lifecycles with verified acceptance coverage. Remaining implementation tasks stay planning-only until prerequisites and architecture contracts are ready. Execute serially where migrations, event contracts, API contracts, shared auth/UI files or tests overlap.
 
 | ID   | Task                                                                                                           | Status | Depends on                   |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------- |
 | 0001 | [Ratify Account, Organization and CommercialClient decisions](0001-ratify-account-organization-decisions.md)   | done   | —                            |
 | 0002 | [Contain cross-Organization access](0002-contain-cross-organization-access.md)                                 | done   | —                            |
-| 0003 | [Account and CommercialClient reference persistence/backfill](0003-account-commercial-client-persistence.md)   | draft  | 0001, 0002                   |
+| 0003 | [Account and CommercialClient reference persistence/backfill](0003-account-commercial-client-persistence.md)   | done   | 0001, 0002                   |
 | 0004 | [Explicit policy scopes and security floors](0004-explicit-policy-scopes-and-security-floors.md)               | draft  | 0001, 0003                   |
 | 0005 | [Membership authorization and separation of duties](0005-membership-authorization-and-separation-of-duties.md) | draft  | 0001, 0003, 0004             |
 | 0006 | [OIDC, context tokens and session revocation](0006-oidc-context-tokens-and-session-revocation.md)              | draft  | 0001, 0003, 0004, 0005       |
