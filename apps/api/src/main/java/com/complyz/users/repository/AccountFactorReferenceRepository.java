@@ -10,9 +10,28 @@ import java.util.UUID;
 
 /** Callers derive Account identity from authenticated identity context, not Organization membership. */
 public interface AccountFactorReferenceRepository extends Repository<AccountFactorReference, UUID> {
+    /**
+     * Persists factor metadata; the database enforces ownership by the same Account as its identity.
+     * @param factor non-secret factor metadata to persist
+     * @return the saved entity; use this instance for subsequent changes
+     */
     AccountFactorReference save(AccountFactorReference factor);
+    /**
+     * Finds lifecycle metadata only within the supplied Account, including ended records.
+     * Callers must derive the Account from authenticated identity context.
+     * @param id persistent record UUID
+     * @param accountId Account UUID; repository callers must obtain it from authenticated identity context
+     * @return the matching record, or empty when no record matches the query
+     */
     Optional<AccountFactorReference> findByIdAndAccountId(UUID id, UUID accountId);
 
+    /**
+     * Lists unrevoked factor references registered by the supplied time whose identity link has started and remains linked.
+     * Callers must derive the Account from authenticated identity context.
+     * @param accountId Account UUID; repository callers must obtain it from authenticated identity context
+     * @param at non-null evaluation time
+     * @return matching records, or an empty list
+     */
     @Query("""
             select f from AccountFactorReference f, AccountExternalIdentity i
             where f.externalIdentityId = i.id and f.accountId = i.accountId and f.accountId = :accountId
