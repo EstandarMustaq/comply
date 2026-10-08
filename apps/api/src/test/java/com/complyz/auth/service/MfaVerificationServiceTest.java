@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -61,7 +61,7 @@ class MfaVerificationServiceTest {
         service.registerFailedAttempt("challenge-token", userId, "127.0.0.1");
 
         verify(valueOperations, times(3)).increment(anyString());
-        verify(redisTemplate, times(3)).expire(anyString(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(redisTemplate, times(3)).expire(anyString(), eq(Duration.ofMinutes(5)));
     }
 
     @Test
@@ -69,7 +69,7 @@ class MfaVerificationServiceTest {
         UUID userId = UUID.randomUUID();
         String secret = "JBSWY3DPEHPK3PXP";
         String code = currentTotp(secret);
-        when(valueOperations.setIfAbsent(anyString(), eq("1"), eq(60L), eq(TimeUnit.SECONDS)))
+        when(valueOperations.setIfAbsent(anyString(), eq("1"), eq(Duration.ofSeconds(60))))
                 .thenReturn(false);
 
         assertFalse(service.verifyTotpWithSecret(userId, secret, code));

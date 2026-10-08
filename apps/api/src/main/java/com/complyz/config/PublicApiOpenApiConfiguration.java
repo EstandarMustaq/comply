@@ -126,8 +126,8 @@ public class PublicApiOpenApiConfiguration {
         }
         Schema<?> dataSchema = json.getSchema();
         ObjectSchema envelope = new ObjectSchema();
-        envelope.addProperties("data", dataSchema);
-        envelope.addProperties("meta", new Schema<>().$ref("#/components/schemas/" + META_SCHEMA));
+        envelope.addProperty("data", dataSchema);
+        envelope.addProperty("meta", new Schema<>().$ref("#/components/schemas/" + META_SCHEMA));
         envelope.setRequired(List.of("data", "meta"));
         json.setSchema(envelope);
     }
@@ -173,25 +173,25 @@ public class PublicApiOpenApiConfiguration {
 
     private Schema<?> metadataSchema() {
         ObjectSchema schema = new ObjectSchema();
-        schema.addProperties("timestamp", new StringSchema().format("date-time"));
-        schema.addProperties("requestId", new StringSchema().format("uuid"));
+        schema.addProperty("timestamp", new StringSchema().format("date-time"));
+        schema.addProperty("requestId", new StringSchema().format("uuid"));
         schema.setRequired(List.of("timestamp", "requestId"));
         return schema;
     }
 
     private Schema<?> errorSchema() {
         ObjectSchema schema = new ObjectSchema();
-        schema.addProperties("code", new StringSchema());
-        schema.addProperties("message", new StringSchema());
-        schema.addProperties("details", new ObjectSchema().additionalProperties(true));
+        schema.addProperty("code", new StringSchema());
+        schema.addProperty("message", new StringSchema());
+        schema.addProperty("details", new ObjectSchema().additionalProperties(true));
         schema.setRequired(List.of("code", "message", "details"));
         return schema;
     }
 
     private Schema<?> errorEnvelopeSchema() {
         ObjectSchema schema = new ObjectSchema();
-        schema.addProperties("error", new Schema<>().$ref("#/components/schemas/" + ERROR_SCHEMA));
-        schema.addProperties("meta", new Schema<>().$ref("#/components/schemas/" + META_SCHEMA));
+        schema.addProperty("error", new Schema<>().$ref("#/components/schemas/" + ERROR_SCHEMA));
+        schema.addProperty("meta", new Schema<>().$ref("#/components/schemas/" + META_SCHEMA));
         schema.setRequired(List.of("error", "meta"));
         return schema;
     }

@@ -2,9 +2,8 @@ package com.complyz.auth.service;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+
 
 @Service
 public class TokenBlacklistService {
@@ -22,7 +21,7 @@ public class TokenBlacklistService {
 
     public void blacklistToken(String jti, long remainingMillis) {
         if (jti == null || remainingMillis <= 0) return;
-        redisTemplate.opsForValue().set(BLACKLIST_PREFIX + jti, "revoked", remainingMillis, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(BLACKLIST_PREFIX + jti, "revoked", Duration.ofMillis(remainingMillis));
     }
 
     public boolean isTokenBlacklisted(String jti) {

@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Service
 public class MfaVerificationService {
@@ -47,7 +47,7 @@ public class MfaVerificationService {
 
     public String createChallengeToken(UUID userId) {
         String token = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(CHALLENGE_PREFIX + token, userId.toString(), 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(CHALLENGE_PREFIX + token, userId.toString(), Duration.ofMinutes(5));
         return token;
     }
 
@@ -110,7 +110,7 @@ public class MfaVerificationService {
             if (generateCodeForStep(base32Secret, step).equals(code)) {
                 // SET NX makes replay protection atomic across concurrent requests and instances.
                 Boolean claimed = redisTemplate.opsForValue()
-                        .setIfAbsent(replayKey, "1", CLAIM_TTL_SECONDS, TimeUnit.SECONDS);
+                        .setIfAbsent(replayKey, "1", Duration.ofSeconds(CLAIM_TTL_SECONDS));
                 return Boolean.TRUE.equals(claimed);
             }
         }
@@ -149,7 +149,7 @@ public class MfaVerificationService {
 
         String claimKey = BACKUP_CLAIM_PREFIX + user.getId() + ":" + codeHash;
         Boolean claimed = redisTemplate.opsForValue()
-                .setIfAbsent(claimKey, "1", CLAIM_TTL_SECONDS, TimeUnit.SECONDS);
+                .setIfAbsent(claimKey, "1", Duration.ofSeconds(CLAIM_TTL_SECONDS));
         if (!Boolean.TRUE.equals(claimed)) {
             return false;
         }
@@ -171,7 +171,7 @@ public class MfaVerificationService {
         String key = attemptKey(scope);
         Long attempts = redisTemplate.opsForValue().increment(key);
         if (attempts != null && attempts == 1) {
-            redisTemplate.expire(key, ATTEMPT_WINDOW_MINUTES, TimeUnit.MINUTES);
+            redisTemplate.expire(key, Duration.ofMinutes(ATTEMPT_WINDOW_MINUTES));
         }
     }
 

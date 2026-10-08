@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Service
 public class MfaEnrollmentService {
@@ -33,7 +33,7 @@ public class MfaEnrollmentService {
 
     public String createEnrollmentToken(UUID userId) {
         String token = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(ENROLLMENT_TOKEN_PREFIX + token, userId.toString(), 15, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(ENROLLMENT_TOKEN_PREFIX + token, userId.toString(), Duration.ofMinutes(15));
         return token;
     }
 
@@ -58,7 +58,7 @@ public class MfaEnrollmentService {
 
         // Store the pending secret in Redis for ten minutes.
         String redisKey = ENROLLMENT_PREFIX + user.getId().toString();
-        redisTemplate.opsForValue().set(redisKey, secretKey, 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(redisKey, secretKey, Duration.ofMinutes(10));
 
         // Build an otpauth URL for authenticator applications.
         String encodedIssuer = URLEncoder.encode("Complyz", StandardCharsets.UTF_8);
