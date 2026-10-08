@@ -154,6 +154,7 @@ input; the review reference identifies that approval, not an authentication cred
    For example, replacing the path with the reviewed local file:
 
    ```sql
+   \set ON_ERROR_STOP on
    BEGIN;
    \copy platform_backoffice.commercial_reference_backfill (organization_id, commercial_client_id, name, contract_reference, status, review_reference, reviewed_at) FROM '/secure/reviewed-commercial-mapping.csv' WITH (FORMAT csv, HEADER true)
    COMMIT;
@@ -168,6 +169,7 @@ input; the review reference identifies that approval, not an authentication cred
    transaction using the same implemented function:
 
    ```sql
+   \set ON_ERROR_STOP on
    BEGIN;
    SELECT * FROM public.apply_commercial_reference_backfill();
    SELECT * FROM platform_backoffice.unresolved_commercial_references ORDER BY organization_id;
