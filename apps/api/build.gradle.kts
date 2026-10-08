@@ -22,9 +22,10 @@ extra["opencsvVersion"] = "5.12.0"
 extra["tomcatVersion"] = "11.0.25"
 extra["springdocVersion"] = "3.1.1"
 
-// Keep both Jackson families aligned with the security fixes beyond Spring Boot 4.1.1's BOM.
+// Keep both Jackson families and Apache Commons Lang aligned with security fixes.
 extra["jackson-2-bom.version"] = "2.21.7"
 extra["jackson-bom.version"] = "3.1.7"
+extra["commons-lang3.version"] = "3.20.0"
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -35,6 +36,12 @@ configurations.configureEach {
 }
 
 dependencies {
+    constraints {
+        implementation("org.apache.commons:commons-lang3:${property("commons-lang3.version")}")
+        implementation("tools.jackson.core:jackson-core:${property("jackson-bom.version")}")
+        implementation("tools.jackson.core:jackson-databind:${property("jackson-bom.version")}")
+    }
+
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-jackson2")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
