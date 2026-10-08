@@ -22,6 +22,10 @@ extra["opencsvVersion"] = "5.12.0"
 extra["tomcatVersion"] = "11.0.25"
 extra["springdocVersion"] = "3.1.1"
 
+// Keep both Jackson families aligned with the security fixes beyond Spring Boot 4.1.1's BOM.
+extra["jackson-2-bom.version"] = "2.21.7"
+extra["jackson-bom.version"] = "3.1.7"
+
 configurations.configureEach {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.apache.tomcat.embed") {
