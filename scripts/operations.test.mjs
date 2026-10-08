@@ -48,6 +48,7 @@ const productionEnvironment = {
   COMPLYZ_BOOTSTRAP_ENABLED: "false",
 }
 
+/** Exercise deployment and backup safety with isolated command fixtures. */
 async function main() {
   await mkdir(binaryDirectory)
   await executable(
@@ -154,8 +155,8 @@ async function main() {
   )
   assert.doesNotThrow(() => validateDeploymentEnvironment(productionEnvironment))
   for (const origins of [
-    " https://trycomplyz.com/ , https://portal.example.com:8443 ",
-    "https://TRYCOMPLYZ.com:443",
+    " https://trycomplyz.com , https://portal.example.com:8443 ",
+    "https://portal.example.com,https://trycomplyz.com",
   ]) {
     assert.doesNotThrow(() =>
       validateDeploymentEnvironment({
@@ -163,6 +164,27 @@ async function main() {
         CORS_ALLOWED_ORIGINS: origins,
       })
     )
+  }
+  for (const origin of [
+    "https://TRYCOMPLYZ.com:443",
+    "https://TRYCOMPLYZ.com",
+    "HTTPS://trycomplyz.com",
+    "https://trycomplyz.com:443",
+    "https://trycomplyz.com/",
+    "https://%74rycomplyz.com",
+    "https://trycomplyz.com:0443",
+  ]) {
+    for (const origins of [origin, `https://trycomplyz.com,${origin}`]) {
+      assert.throws(
+        () =>
+          validateDeploymentEnvironment({
+            ...productionEnvironment,
+            CORS_ALLOWED_ORIGINS: origins,
+          }),
+        /explicit production origins/,
+        `Must reject a non-canonical origin: ${JSON.stringify(origins)}`
+      )
+    }
   }
   for (const origin of [
     "",
@@ -210,6 +232,8 @@ async function main() {
   }
   for (const origin of [
     "https://trycomplyz.com.attacker.example",
+    "https://attacker-trycomplyz.com",
+    "https://trycomplyz.com:8443",
     "https://attacker.example",
   ]) {
     assert.throws(
