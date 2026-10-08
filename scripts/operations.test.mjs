@@ -153,6 +153,75 @@ async function main() {
     /Missing required production settings: COMPLYZ_BOOTSTRAP_ENABLED/
   )
   assert.doesNotThrow(() => validateDeploymentEnvironment(productionEnvironment))
+  for (const origins of [
+    " https://trycomplyz.com/ , https://portal.example.com:8443 ",
+    "https://TRYCOMPLYZ.com:443",
+  ]) {
+    assert.doesNotThrow(() =>
+      validateDeploymentEnvironment({
+        ...productionEnvironment,
+        CORS_ALLOWED_ORIGINS: origins,
+      })
+    )
+  }
+  for (const origin of [
+    "",
+    " ",
+    "not-a-url",
+    "http://example.com",
+    "https://localhost",
+    "https://app.localhost",
+    "https://127.1",
+    "https://127.0.0.2",
+    "https://[::1]",
+    "https://*.example.com",
+    "https://example.com/path",
+    "https://example.com/..",
+    "https://example.com?",
+    "https://example.com#",
+    "https://example.com?q=1",
+    "https://example.com#fragment",
+    "https://user:password@example.com",
+    "https://example.com\\path",
+    "https://exa\tmple.com",
+  ]) {
+    assert.throws(
+      () =>
+        validateDeploymentEnvironment({
+          ...productionEnvironment,
+          CORS_ALLOWED_ORIGINS: `https://trycomplyz.com,${origin}`,
+        }),
+      /explicit production origins/,
+      `Must reject an invalid origin even alongside the required origin: ${JSON.stringify(origin)}`
+    )
+  }
+  for (const origins of [
+    ",https://trycomplyz.com",
+    "https://trycomplyz.com,,https://example.com",
+  ]) {
+    assert.throws(
+      () =>
+        validateDeploymentEnvironment({
+          ...productionEnvironment,
+          CORS_ALLOWED_ORIGINS: origins,
+        }),
+      /explicit production origins/
+    )
+  }
+  for (const origin of [
+    "https://trycomplyz.com.attacker.example",
+    "https://attacker.example",
+  ]) {
+    assert.throws(
+      () =>
+        validateDeploymentEnvironment({
+          ...productionEnvironment,
+          CORS_ALLOWED_ORIGINS: origin,
+        }),
+      /must allow https:\/\/trycomplyz\.com/
+    )
+  }
+
   const productionPreflight = run("scripts/production-compose-preflight.mjs", [], {
     ...productionEnvironment,
   })

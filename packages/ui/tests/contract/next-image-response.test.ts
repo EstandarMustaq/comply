@@ -18,17 +18,19 @@ function svg({
   title = "",
   rootAttributes = {},
   groupAttributes = {},
+  rectangleAttributes = {},
   fill = "green",
 }: {
   title?: string | number
   rootAttributes?: Record<string, unknown>
   groupAttributes?: Record<string, unknown>
+  rectangleAttributes?: Record<string, unknown>
   fill?: string
 } = {}) {
   return createElement(
     "svg",
     { width, height, viewBox: `0 0 ${width} ${height}`, ...rootAttributes },
-    createElement("rect", { width: 16, height, fill }),
+    createElement("rect", { width: 16, height, fill, ...rectangleAttributes }),
     createElement("title", { style: { display: "none" } }, title),
     createElement("g", groupAttributes, createElement("title", null, ""))
   )
@@ -139,4 +141,33 @@ describe("Next.js ImageResponse SVG serialization (GHSA-vcvr-r3jv-pc5j)", () => 
       baseline
     )
   })
+  it.each(["", 'double " quote', "single ' quote", "A & B", "<tag>", "&#34;"])(
+    "keeps the rectangle attribute value %j as data",
+    async (label) => {
+      expect(await render(svg({ rectangleAttributes: { "data-label": label } }))).toEqual(
+        baseline
+      )
+    }
+  )
+
+  it.each(["attribute", "style"])(
+    "prevents a rectangle %s value from injecting an SVG element",
+    async (location) => {
+      const payload = `"/>${injectedRectangle}<rect data-label="`
+      const rectangleAttributes =
+        location === "attribute"
+          ? { "data-label": payload }
+          : { style: { fontFamily: payload } }
+      expect(await render(svg({ rectangleAttributes }))).toEqual(baseline)
+    }
+  )
+
+  it.each(["data invalid", 'data"', "data>"])(
+    "rejects malformed rectangle attribute %j",
+    async (name) => {
+      await expect(
+        render(svg({ rectangleAttributes: { [name]: "value" } }))
+      ).rejects.toThrow(/Invalid XML attribute name/)
+    }
+  )
 })
