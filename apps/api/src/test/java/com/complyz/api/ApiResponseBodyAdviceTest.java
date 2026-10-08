@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -27,7 +27,7 @@ class ApiResponseBodyAdviceTest {
                 Map.of("items", 2),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
-                MappingJackson2HttpMessageConverter.class,
+                JacksonJsonHttpMessageConverter.class,
                 new ServletServerHttpRequest(servletRequest),
                 new ServletServerHttpResponse(servletResponse)
         );
@@ -49,7 +49,7 @@ class ApiResponseBodyAdviceTest {
                 Map.of("message", "Email or password is incorrect"),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
-                MappingJackson2HttpMessageConverter.class,
+                JacksonJsonHttpMessageConverter.class,
                 new ServletServerHttpRequest(servletRequest),
                 new ServletServerHttpResponse(servletResponse)
         );
@@ -70,7 +70,7 @@ class ApiResponseBodyAdviceTest {
                 Map.of("message", "File is invalid", "fieldErrors", Map.of("amount", "is required")),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
-                MappingJackson2HttpMessageConverter.class,
+                JacksonJsonHttpMessageConverter.class,
                 new ServletServerHttpRequest(servletRequest),
                 new ServletServerHttpResponse(servletResponse)
         );
@@ -99,7 +99,7 @@ class ApiResponseBodyAdviceTest {
                 Map.of("items", 2),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
-                MappingJackson2HttpMessageConverter.class,
+                JacksonJsonHttpMessageConverter.class,
                 new ServletServerHttpRequest(unversionedApiRequest),
                 new ServletServerHttpResponse(servletResponse)
         );
@@ -110,7 +110,7 @@ class ApiResponseBodyAdviceTest {
                 Map.of("status", "UP"),
                 (MethodParameter) null,
                 MediaType.APPLICATION_JSON,
-                MappingJackson2HttpMessageConverter.class,
+                JacksonJsonHttpMessageConverter.class,
                 new ServletServerHttpRequest(nonApiRequest),
                 new ServletServerHttpResponse(servletResponse)
         );
