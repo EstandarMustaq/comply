@@ -19,15 +19,6 @@
 
 </div>
 
-Maintainer setup: add the repository Actions secret `DEPENDABOT_ALERTS_TOKEN` with read-only Dependabot alerts and metadata access. The workflow uses `GITHUB_TOKEN` to open issues.
-
-Documentation uses the checked-in `docs/openapi.json`, generated from Springdoc by
-`pnpm api:openapi`. Run the API locally with OpenAPI enabled and regenerate this file
-after API changes. Mintlify checks use Node 24 LTS and do not require
-`api.trycomplyz.com` to be online. CodeRabbit reviews on fork pull requests are
-reconciled hourly from the default branch; maintainers can also run the workflow
-manually. The workflows become active after merging them into the default branch.
-
 Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
 
 ## What Complyz does today
