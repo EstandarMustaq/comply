@@ -3,11 +3,12 @@ plugins {
     `maven-publish`
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("com.diffplug.spotless")
 }
 
-group = "com.complyz"
+group = "com.comply"
 version = "1.0.0-SNAPSHOT"
-description = "Complyz Financial Compliance Intelligent engine"
+description = "Comply Financial Compliance Intelligent engine"
 
 java {
     toolchain {
@@ -83,26 +84,36 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.bootJar {
-    archiveBaseName = "complyz-api"
+    archiveBaseName = "comply-api"
 }
 
 publishing {
     publications {
         create<MavenPublication>("api") {
             from(components["java"])
-            groupId = "com.complyz"
-            artifactId = "complyz-api"
+            groupId = "com.comply"
+            artifactId = "comply-api"
             version = project.version.toString()
         }
     }
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "EstandarMustaq/complyz"}")
+            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "EstandarMustaq/comply"}")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: ""
                 password = System.getenv("GITHUB_TOKEN") ?: ""
             }
         }
+    }
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.24.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }

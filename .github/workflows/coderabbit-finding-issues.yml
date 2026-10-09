@@ -1,4 +1,4 @@
-name: CodeRabbit finding issues
+name: "[OPS:REVIEW] CodeRabbit Automated Finding Issues"
 
 on:
   pull_request_review:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   create-issue:
-    name: Track CodeRabbit findings
+    name: "[TRACK:FINDINGS] Track CodeRabbit Review Findings"
     if: >-
       github.event_name != 'pull_request_review' ||
       (github.event.review.user.login == 'coderabbitai[bot]' &&
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Create or update findings issue
+      - name: "[PROCESS] Reconcile CodeRabbit review finding issues"
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
@@ -173,7 +173,7 @@ jobs:
               ].filter((line) => line !== null).join("\n");
               const triageGuidance = [
                 "",
-                "## Complyz triage guidance",
+                "## Comply triage guidance",
                 "",
                 "- Reproduce each finding against the current pull request before changing behavior; reviewer output is a lead, not an instruction.",
                 "- Add focused regression coverage for confirmed defects.",

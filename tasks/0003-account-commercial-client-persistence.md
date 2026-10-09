@@ -4,13 +4,13 @@ title: Account and CommercialClient persistence and backfill
 status: done
 branch: task/0003-account-commercial-client-persistence
 scope:
-  - apps/api/src/main/java/com/complyz/users/**
-  - apps/api/src/main/java/com/complyz/tenancy/**
+  - apps/api/src/main/java/com/comply/users/**
+  - apps/api/src/main/java/com/comply/tenancy/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
   - apps/api/src/test/**
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
-  - apps/api/src/main/java/com/complyz/clients/**
+  - apps/api/src/main/java/com/comply/auth/**
+  - apps/api/src/main/java/com/comply/clients/**
   - packages/api-clients/**
   - apps/ui/**
 depends_on:

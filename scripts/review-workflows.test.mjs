@@ -94,7 +94,7 @@ function harness({ reviews = [], findings = [], issues = [], comments = [] } = {
       },
     },
     context: {
-      repo: { owner: "example", repo: "complyz" },
+      repo: { owner: "example", repo: "comply" },
       eventName: "schedule",
       payload: {},
     },
@@ -219,7 +219,7 @@ test("Dependabot uses the Actions API URL, paginates, and reconciles alert state
       headers: {
         get: () =>
           first
-            ? '<https://github.example/api/v3/repos/example/complyz/dependabot/alerts?page=2>; rel="next"'
+            ? '<https://github.example/api/v3/repos/example/comply/dependabot/alerts?page=2>; rel="next"'
             : null,
       },
     }
@@ -240,7 +240,7 @@ test("Dependabot uses the Actions API URL, paginates, and reconciles alert state
   )
   assert.equal(
     calls[0],
-    "https://github.example/api/v3/repos/example/complyz/dependabot/alerts?per_page=100"
+    "https://github.example/api/v3/repos/example/comply/dependabot/alerts?per_page=100"
   )
   assert.equal(calls.length, 2)
   assert.equal(h.writes.filter((w) => w.name === "create").length, 1)
@@ -350,10 +350,10 @@ test("OpenAPI drift gate catches modified, deleted, staged and untracked contrac
   )
   const script = source
     .split(
-      "      - name: Verify the checked-in documentation contract\n        run: |\n"
+      '      - name: "[CHECK] Verify the checked-in documentation contract"\n        run: |\n'
     )[1]
     .split("      - name:")[0]
-  const root = await mkdtemp(join(tmpdir(), "complyz-contract-drift-"))
+  const root = await mkdtemp(join(tmpdir(), "comply-contract-drift-"))
   const git = (...args) => execFileSync("git", args, { cwd: root, stdio: "pipe" })
   const status = () => spawnSync("bash", ["-c", script], { cwd: root }).status
   try {
@@ -403,13 +403,13 @@ test("UI releases use commit tags for branches and validate release aliases befo
     "utf8"
   )
   const script = source
-    .split("      - name: Prepare image tags\n")[1]
+    .split('      - name: "[SETUP] Prepare image tags"\n')[1]
     .split("        run: |\n")[1]
-    .split("      - uses:")[0]
-  const root = await mkdtemp(join(tmpdir(), "complyz-image-tags-"))
+    .split("      - name:")[0]
+  const root = await mkdtemp(join(tmpdir(), "comply-image-tags-"))
   const output = join(root, "output")
   const sha = "a".repeat(40)
-  const image = "ghcr.io/example/complyz-ui"
+  const image = "ghcr.io/example/comply-ui"
   async function run(refType, refName, revision = sha) {
     await writeFile(output, "")
     const result = spawnSync("bash", ["-c", script], {

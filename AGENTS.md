@@ -1,6 +1,6 @@
 # Repository instructions
 
-Complyz is intelligent financial compliance for finance teams. This file is the canonical engineering guide for AI agents and contributors. Keep all product and documentation language in clear, direct, confident English; use `docs/standards/product-language.md` as the voice source of truth.
+Comply is intelligent financial compliance for finance teams. This file is the canonical engineering guide for AI agents and contributors. Keep all product and documentation language in clear, direct, confident English; use `docs/standards/product-language.md` as the voice source of truth.
 
 ## Workspace
 
@@ -30,7 +30,7 @@ pnpm hooks:test
 pnpm operations:test
 ```
 
-Run one API test class with `./gradlew :api:test --tests 'com.complyz.reporting.service.ReportExportServiceTest'`. Run one UI unit test with `pnpm --filter @complyz/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts`. Run one browser test with `pnpm --filter @complyz/ui exec playwright test --config ../../apps/ui/playwright.config.ts --project desktop tests/e2e/shell.spec.ts`.
+Run one API test class with `./gradlew :api:test --tests 'com.comply.reporting.service.ReportExportServiceTest'`. Run one UI unit test with `pnpm --filter @comply/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts`. Run one browser test with `pnpm --filter @comply/ui exec playwright test --config ../../apps/ui/playwright.config.ts --project desktop tests/e2e/shell.spec.ts`.
 
 ## Architecture and boundaries
 
@@ -42,9 +42,9 @@ Run one API test class with `./gradlew :api:test --tests 'com.complyz.reporting.
 
 ## Product and UI
 
-- UI copy, user-facing API messages, exports and public Mintlify documentation use Complyz's clear, direct, confident English voice. Engineering instructions and internal code documentation use concise technical English.
+- UI copy, user-facing API messages, exports and public Mintlify documentation use Comply's clear, direct, confident English voice. Engineering instructions and internal code documentation use concise technical English.
 - Keep machine identifiers separate from display labels. Do not expose internal acronyms, implementation details or unsupported legal claims in product-facing text. Follow `docs/standards/product-language.md` and the `check-product-language` skill after product-copy changes.
-- Complyz is an operational product: keep workflows clear, explainable, and traceable. Prioritize readable data density, accessible interactions, honest loading/empty/error states, restrained brand and destructive colors, and full-width analytical views.
+- Comply is an operational product: keep workflows clear, explainable, and traceable. Prioritize readable data density, accessible interactions, honest loading/empty/error states, restrained brand and destructive colors, and full-width analytical views.
 - For frontend work, follow `.github/instructions/ui.instructions.md`. It is the baseline for design tokens, brand color, compact density, and shell composition. Consult installed Next.js guides under `apps/ui/node_modules/next/dist/docs/` before framework-specific changes. Next.js agent-file generation is disabled in `apps/ui/next.config.mjs`; do not add app-local agent instruction files.
 - Keep route pages in the App Router, product components outside `components/ui/`, shared primitives in `components/ui/`, shell behavior in `components/shell/`, and API calls in `lib/api-client.ts`.
 - Preserve the established high-density operations layout, neutral structural palette, restrained sage and red usage, accessible loading/empty/error states, and full-width data views. Use server components by default; add client boundaries only for interaction/state.
@@ -52,7 +52,7 @@ Run one API test class with `./gradlew :api:test --tests 'com.complyz.reporting.
 
 ## Automatic skill routing
 
-Load the matching project skill before work without waiting for the user to name it. Load only applicable skills; combine them when a change crosses boundaries. Complyz instructions and the existing product design take precedence over generic external recommendations.
+Load the matching project skill before work without waiting for the user to name it. Load only applicable skills; combine them when a change crosses boundaries. Comply instructions and the existing product design take precedence over generic external recommendations.
 
 - Any customer-facing product change—including UI, data, integrations, jobs, and customer workflows: `.agents/skills/product-quality/SKILL.md`.
 - Spring endpoint work: `.agents/skills/add-api-endpoint/SKILL.md`; contract or DTO changes also load `.agents/skills/sync-api-contract/SKILL.md`. Flyway changes: `.agents/skills/add-flyway-migration/SKILL.md`.
@@ -66,7 +66,7 @@ Load the matching project skill before work without waiting for the user to name
 - Explicit session handoff requests: `.agents/skills/handoff/SKILL.md`. Requests to prepare an async discovery questionnaire: `.agents/skills/to-questionnaire/SKILL.md`.
 - Explicit branch, diff, or pull-request review requests: `.agents/skills/code-review/SKILL.md`. For security reviews, also load the global `review-security` skill. Invoke CodeRabbit, Bugbot, or another hosted reviewer only when the user explicitly requests and authorizes it; follow `product-quality` for the data-sharing guardrail.
 - Creating or editing agent instructions or skills: `.agents/skills/writing-for-agents/SKILL.md`; use its `SKILL-MECHANICS.md` when changing skill invocation or routing.
-- When available, use the global `frontend-design` skill for greenfield visual direction and `tailwind-design-system` for token/theme system changes. Keep both subordinate to the established Complyz UI baseline.
+- When available, use the global `frontend-design` skill for greenfield visual direction and `tailwind-design-system` for token/theme system changes. Keep both subordinate to the established Comply UI baseline.
 
 ## Agent entry points
 

@@ -11,4 +11,4 @@ applyTo: "apps/api/**"
 - Record sensitive state changes through the audit service. Do not put credentials, tokens, MFA material, or unnecessary personal data in logs or audit details.
 - Add a new Flyway version for every schema/data migration; never change an existing version. Ensure JPA constraints, migration SQL, and null behavior agree.
 - For API surface changes, update/generate `packages/api-clients`, coordinate UI types/client and contract assertions, then run API and contract tests.
-- Run an individual class with `./gradlew :api:test --tests 'com.complyz.<module>.<ClassName>'`; run the full API suite with `pnpm api:test`.
+- Run an individual class with `./gradlew :api:test --tests 'com.comply.<module>.<ClassName>'`; run the full API suite with `pnpm api:test`.

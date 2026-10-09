@@ -1,6 +1,6 @@
 ---
 name: check-product-language
-description: Use when creating, reviewing, or changing Complyz UI copy, user-facing API messages, exports, or public documentation. Apply the product voice, domain vocabulary, accessibility, and claim boundaries.
+description: Use when creating, reviewing, or changing Comply UI copy, user-facing API messages, exports, or public documentation. Apply the product voice, domain vocabulary, accessibility, and claim boundaries.
 ---
 
 # Check product language

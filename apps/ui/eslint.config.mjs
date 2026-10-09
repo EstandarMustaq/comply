@@ -1,4 +1,4 @@
-import { config } from "@complyz/config-eslint/next"
+import { config } from "@comply/config-eslint/next"
 
 /** @type {import("eslint").Linter.Config[]} */
 export default config

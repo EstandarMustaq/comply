@@ -5,13 +5,13 @@ import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const sourceRoot = fileURLToPath(new URL("../", import.meta.url))
-const sandbox = await mkdtemp(join(tmpdir(), "complyz-git-hooks-"))
+const sandbox = await mkdtemp(join(tmpdir(), "comply-git-hooks-"))
 const env = {
   ...process.env,
   CI: "false",
-  GIT_AUTHOR_NAME: "Complyz Hook Test",
+  GIT_AUTHOR_NAME: "Comply Hook Test",
   GIT_AUTHOR_EMAIL: "hooks@example.invalid",
-  GIT_COMMITTER_NAME: "Complyz Hook Test",
+  GIT_COMMITTER_NAME: "Comply Hook Test",
   GIT_COMMITTER_EMAIL: "hooks@example.invalid",
 }
 let assertions = 0
@@ -78,7 +78,7 @@ async function main() {
     join(sandbox, "scripts/setup-git-hooks.mjs")
   )
   await cp(join(sourceRoot, ".githooks"), join(sandbox, ".githooks"), { recursive: true })
-  await write("README.md", "Complyz hook sandbox\n")
+  await write("README.md", "Comply hook sandbox\n")
   await write(
     "skills-lock.json",
     JSON.stringify(
@@ -179,8 +179,8 @@ async function main() {
   await rm(join(sandbox, "credential.txt"))
 
   const base = git("rev-parse", "HEAD")
-  await write("apps/api/src/main/java/com/complyz/Example.java", "package com.complyz;\n")
-  git("add", "apps/api/src/main/java/com/complyz/Example.java")
+  await write("apps/api/src/main/java/com/comply/Example.java", "package com.comply;\n")
+  git("add", "apps/api/src/main/java/com/comply/Example.java")
   const apiHead = commit("test(api): exercise scoped push checks")
   const apiResult = command(process.execPath, ["scripts/git-hooks.mjs", "pre-push"], {
     input: `refs/heads/test ${apiHead} refs/heads/test ${base}\n`,

@@ -10,11 +10,11 @@ RUN chmod +x gradlew && ./gradlew --no-daemon :api:bootJar
 
 FROM eclipse-temurin:25-jre-alpine AS api
 WORKDIR /app
-RUN addgroup -S complyz && adduser -S complyz -G complyz \
-    && mkdir -p /var/lib/complyz/imports \
-    && chown -R complyz:complyz /var/lib/complyz
-COPY --from=api-build --chown=complyz:complyz /workspace/apps/api/build/libs/complyz-api-*.jar app.jar
-USER complyz
+RUN addgroup -S comply && adduser -S comply -G comply \
+    && mkdir -p /var/lib/comply/imports \
+    && chown -R comply:comply /var/lib/comply
+COPY --from=api-build --chown=comply:comply /workspace/apps/api/build/libs/comply-api-*.jar app.jar
+USER comply
 EXPOSE 8080
 ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=40.0 -XX:+ExitOnOutOfMemoryError"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
@@ -32,7 +32,7 @@ COPY packages/api-clients/package.json ./packages/api-clients/package.json
 COPY packages/config/eslint-config/package.json ./packages/config/eslint-config/package.json
 COPY packages/config/typescript-config/package.json ./packages/config/typescript-config/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
-RUN pnpm install --frozen-lockfile --filter @complyz/web...
+RUN pnpm install --frozen-lockfile --filter @comply/web...
 
 FROM web-base AS web-build
 COPY --from=web-deps /workspace/node_modules ./node_modules
@@ -42,12 +42,12 @@ COPY --from=web-deps /workspace/packages/config/eslint-config/node_modules ./pac
 COPY --from=web-deps /workspace/packages/ui/node_modules ./packages/ui/node_modules
 COPY . .
 ARG NEXT_PUBLIC_API_URL=/api
-ARG NEXT_PUBLIC_APP_NAME=Complyz
+ARG NEXT_PUBLIC_APP_NAME=Comply
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-RUN pnpm --filter @complyz/web build
+RUN pnpm --filter @comply/web build
 
 FROM node:26.10.0-alpine AS web
 WORKDIR /app

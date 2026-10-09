@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Lausanne is the primary Complyz typeface. */
+/* Lausanne is the primary Comply typeface. */
 @font-face {
   font-family: "Lausanne";
   src: url("./fonts/TWKLausanne/TWKLausanne-300.woff2") format("woff2");

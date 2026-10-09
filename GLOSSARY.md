@@ -1,6 +1,6 @@
-# Complyz domain language
+# Comply domain language
 
-Complyz supports financial institutions with separate human identity, operational tenant and compliance domains. Use these terms consistently in code, APIs and product language.
+Comply supports financial institutions with separate human identity, operational tenant and compliance domains. Use these terms consistently in code, APIs and product language.
 
 ## Identity and organization
 

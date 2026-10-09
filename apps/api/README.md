@@ -1,6 +1,6 @@
 # Intelligent Financial Compliance
 
-Connect systems to Complyz's current finance workflows through a versioned API. The API serves customer profiles, transaction imports, alerts, investigations, reports and activity history for regulated-finance operations.
+Connect systems to Comply's current finance workflows through a versioned API. The API serves customer profiles, transaction imports, alerts, investigations, reports and activity history for regulated-finance operations.
 
 ## Run and test
 

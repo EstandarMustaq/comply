@@ -27,7 +27,8 @@ apps/ui/out/
 apps/ui/build/
 apps/ui/*.tsbuildinfo
 apps/ui/next-env.d.ts
-apps/ui/playwright-report/
+apps/ui/storybook-static/
+storybook-static/
 apps/ui/.vercel/
 coverage/
 packages/api-clients/openapi.json
@@ -40,11 +41,10 @@ yarn-error.log*
 pnpm-debug.log*
 __pycache__/
 *.py[cod]
-/tmp/complyz_backups/
+/tmp/comply_backups/
 node_modules/
 apps/ui/test-results/
 packages/ui/test-results/
-packages/ui/playwright-report/
 npm-packages-offline-cache/
 .pnp
 .pnp.js

@@ -4,10 +4,10 @@ title: Membership authorization and separation of duties
 status: draft
 branch: task/0005-membership-authorization-and-separation-of-duties
 scope:
-  - apps/api/src/main/java/com/complyz/users/**
-  - apps/api/src/main/java/com/complyz/tenancy/**
-  - apps/api/src/main/java/com/complyz/**/access/**
-  - apps/api/src/main/java/com/complyz/**/membership/**
+  - apps/api/src/main/java/com/comply/users/**
+  - apps/api/src/main/java/com/comply/tenancy/**
+  - apps/api/src/main/java/com/comply/**/access/**
+  - apps/api/src/main/java/com/comply/**/membership/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
   - apps/api/src/test/**
   - packages/api-clients/**
@@ -15,7 +15,7 @@ scope:
   - apps/ui/lib/api-client.ts
   - packages/ui/tests/contract/**
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
+  - apps/api/src/main/java/com/comply/auth/**
   - apps/ui/app/**
   - apps/ui/components/**
   - docs/**/*.mdx
@@ -55,7 +55,7 @@ pnpm check
 pnpm test:contract
 ```
 
-The contract test's remote OpenAPI assertion must be run with `COMPLYZ_OPENAPI_URL` set for release; local route/unit tests must cover authorization independently.
+The contract test's remote OpenAPI assertion must be run with `COMPLY_OPENAPI_URL` set for release; local route/unit tests must cover authorization independently.
 
 ## Operational considerations
 

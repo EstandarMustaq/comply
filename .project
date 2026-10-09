@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>complyz</name>
-	<comment>Complyz project managed by Gradle.</comment>
+	<name>comply</name>
+	<comment>Comply project managed by Gradle.</comment>
 	<projects>
 	</projects>
 	<buildSpec>

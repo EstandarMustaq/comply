@@ -35,7 +35,7 @@ import { CommandSearch, type CommandSearchGroup } from "@/components/command-sea
 import { NotificationsMenu } from "@/components/notifications-menu"
 import { HeaderUserMenu } from "@/components/header-user-menu"
 import { OrganizationSelector } from "@/components/organization-selector"
-import { ComplyzLogo } from "@/components/complyz-logo"
+import { ComplyLogo } from "@/components/comply-logo"
 import { Separator } from "@/components/ui/separator"
 import { api } from "@/lib/api-client"
 import type { InsightsData } from "@/lib/types"
@@ -151,10 +151,10 @@ export function AppShellClient({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              aria-label="Complyz"
+              aria-label="Comply"
               className="transition-opacity hover:opacity-85"
             >
-              <ComplyzLogo size="sm" priority />
+              <ComplyLogo size="sm" priority />
             </Link>
             <Separator
               orientation="vertical"

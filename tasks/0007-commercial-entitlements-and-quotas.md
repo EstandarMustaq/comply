@@ -4,9 +4,9 @@ title: Organization entitlements and quotas
 status: draft
 branch: task/0007-commercial-entitlements-and-quotas
 scope:
-  - apps/api/src/main/java/com/complyz/**/commercial/**
-  - apps/api/src/main/java/com/complyz/**/entitlement/**
-  - apps/api/src/main/java/com/complyz/**/quota/**
+  - apps/api/src/main/java/com/comply/**/commercial/**
+  - apps/api/src/main/java/com/comply/**/entitlement/**
+  - apps/api/src/main/java/com/comply/**/quota/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
   - apps/api/src/test/**
   - packages/api-clients/**

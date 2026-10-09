@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./", import.meta.url)),
-      "@complyz/api-clients": fileURLToPath(
+      "@comply/api-clients": fileURLToPath(
         new URL("../../packages/api-clients/src/index.ts", import.meta.url)
       ),
     },

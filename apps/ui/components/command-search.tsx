@@ -163,7 +163,7 @@ export function CommandSearch({
         <DialogContent className="top-[20%] max-w-xl translate-y-0 gap-0 overflow-hidden p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">Search</DialogTitle>
           <DialogDescription className="sr-only">
-            Search Complyz and jump to a workspace
+            Search Comply and jump to a workspace
           </DialogDescription>
 
           <div className="p-3 pb-2">

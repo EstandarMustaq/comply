@@ -28,7 +28,7 @@ if (process.env.CI === "true" || process.env.CI === "1") {
 
 try {
   if (git(["rev-parse", "--show-toplevel"]) !== root.replace(/\/$/, "")) {
-    throw new Error("Run this command from the Complyz Git worktree.")
+    throw new Error("Run this command from the Comply Git worktree.")
   }
 
   for (const file of hookFiles) {

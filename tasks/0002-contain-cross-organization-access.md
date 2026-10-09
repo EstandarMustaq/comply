@@ -4,19 +4,19 @@ title: Contain cross-Organization access
 status: done
 branch: task/0002-contain-cross-organization-access
 scope:
-  - apps/api/src/main/java/com/complyz/audit/**
-  - apps/api/src/main/java/com/complyz/config/ApiVersioningConfiguration.java
-  - apps/api/src/main/java/com/complyz/clients/**
-  - apps/api/src/main/java/com/complyz/flags/**
-  - apps/api/src/main/java/com/complyz/ingest/**
-  - apps/api/src/main/java/com/complyz/insights/**
-  - apps/api/src/main/java/com/complyz/monitoring/**
-  - apps/api/src/main/java/com/complyz/reporting/**
-  - apps/api/src/main/java/com/complyz/sanctions/**
-  - apps/api/src/main/java/com/complyz/settings/controller/SettingsController.java
-  - apps/api/src/main/java/com/complyz/settings/entity/**
-  - apps/api/src/main/java/com/complyz/users/**
-  - apps/api/src/test/java/com/complyz/**
+  - apps/api/src/main/java/com/comply/audit/**
+  - apps/api/src/main/java/com/comply/config/ApiVersioningConfiguration.java
+  - apps/api/src/main/java/com/comply/clients/**
+  - apps/api/src/main/java/com/comply/flags/**
+  - apps/api/src/main/java/com/comply/ingest/**
+  - apps/api/src/main/java/com/comply/insights/**
+  - apps/api/src/main/java/com/comply/monitoring/**
+  - apps/api/src/main/java/com/comply/reporting/**
+  - apps/api/src/main/java/com/comply/sanctions/**
+  - apps/api/src/main/java/com/comply/settings/controller/SettingsController.java
+  - apps/api/src/main/java/com/comply/settings/entity/**
+  - apps/api/src/main/java/com/comply/users/**
+  - apps/api/src/test/java/com/comply/**
   - packages/api-clients/**
   - packages/ui/tests/contract/**
   - apps/api/build.gradle.kts
@@ -28,9 +28,9 @@ scope:
   - tasks/0011-organization-members-policy-and-settings-ui.md
   - tasks/README.md
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
+  - apps/api/src/main/java/com/comply/auth/**
 
-  - apps/api/src/main/java/com/complyz/tenancy/**
+  - apps/api/src/main/java/com/comply/tenancy/**
   - apps/api/src/main/resources/db/migration/**
 depends_on: []
 ---
@@ -81,5 +81,5 @@ Threshold/system configuration remains global reference state, but writes fail c
 - 2026-10-03: Re-ran `pnpm api:test` after the serialization fix; it passes. The first OpenAPI generation attempt was blocked by unresolved Springdoc component references, so generated client artifacts were not changed at that point.
 - 2026-10-04: Versioned the public API routes under `/api/v1`, renamed the response metadata type to `ApiResponseMetadata`, and replaced entity serialization for system configuration with `SystemConfigResponse` so `updatedBy` is not part of the JSON or OpenAPI contract. Regenerated OpenAPI from the running candidate: all 40 operations across 35 paths are versioned and every local `$ref` resolves.
 - 2026-10-04: Closed review findings: routed audit/import reads through services; excluded batches/flags/reports with cross-Organization user associations while retaining batches without an uploader; disabled direct user creation with a uniform response to remove global email enumeration; denied Organization-role writes to global settings; and added a method-security test proving both `ADMIN` and `OCOS` are denied. PostgreSQL A/B tests cover foreign uploader/reviewer records. `pnpm api:test` passes; status is `done`, subject to the separate full-product release audit in task 0015.
-- 2026-10-04: Restricted API route prefixing to `com.complyz` controllers so Springdoc remains at `/v3/api-docs`; documented the direct-user-creation `501` response and regenerated the OpenAPI client from Springdoc (40 operations across 35 versioned resource paths).
-- 2026-10-04: Final verification after the API/config changes: `pnpm api:test`, `pnpm --filter @complyz/api-clients run typecheck`, product-language validation, focused Prettier checks and `git diff --check` pass. `pnpm test:contract` completes with its sole OpenAPI-backed test skipped because `COMPLYZ_OPENAPI_URL` is unset. `pnpm check`'s UI lint/typecheck passed, but its repository-wide Prettier phase reports pre-existing formatting issues under `.worktrees/task-0002-client-ingest`; those unrelated worktree files were left untouched.
+- 2026-10-04: Restricted API route prefixing to `com.comply` controllers so Springdoc remains at `/v3/api-docs`; documented the direct-user-creation `501` response and regenerated the OpenAPI client from Springdoc (40 operations across 35 versioned resource paths).
+- 2026-10-04: Final verification after the API/config changes: `pnpm api:test`, `pnpm --filter @comply/api-clients run typecheck`, product-language validation, focused Prettier checks and `git diff --check` pass. `pnpm test:contract` completes with its sole OpenAPI-backed test skipped because `COMPLY_OPENAPI_URL` is unset. `pnpm check`'s UI lint/typecheck passed, but its repository-wide Prettier phase reports pre-existing formatting issues under `.worktrees/task-0002-client-ingest`; those unrelated worktree files were left untouched.

@@ -20,9 +20,9 @@ const requiredVariables = [
   "MFA_ENCRYPTION_KEY",
   "CORS_ALLOWED_ORIGINS",
   "NEXT_PUBLIC_API_URL",
-  "COMPLYZ_BOOTSTRAP_ENABLED",
+  "COMPLY_BOOTSTRAP_ENABLED",
   "SPRING_PROFILES_ACTIVE",
-  "COMPLYZ_ENVIRONMENT",
+  "COMPLY_ENVIRONMENT",
   "POSTGRES_VOLUME_NAME",
   "REDIS_VOLUME_NAME",
 ]
@@ -70,20 +70,20 @@ export function validateDeploymentEnvironment(env) {
   if (env.SPRING_PROFILES_ACTIVE !== "production") {
     throw new Error("SPRING_PROFILES_ACTIVE must be 'production'.")
   }
-  if (env.COMPLYZ_ENVIRONMENT !== "production") {
-    throw new Error("COMPLYZ_ENVIRONMENT must be 'production'.")
+  if (env.COMPLY_ENVIRONMENT !== "production") {
+    throw new Error("COMPLY_ENVIRONMENT must be 'production'.")
   }
-  if (env.POSTGRES_VOLUME_NAME !== "complyz_postgres_prod_data") {
-    throw new Error("POSTGRES_VOLUME_NAME must preserve complyz_postgres_prod_data.")
+  if (env.POSTGRES_VOLUME_NAME !== "comply_postgres_prod_data") {
+    throw new Error("POSTGRES_VOLUME_NAME must preserve comply_postgres_prod_data.")
   }
-  if (env.REDIS_VOLUME_NAME !== "complyz_redis_prod_data") {
-    throw new Error("REDIS_VOLUME_NAME must preserve complyz_redis_prod_data.")
+  if (env.REDIS_VOLUME_NAME !== "comply_redis_prod_data") {
+    throw new Error("REDIS_VOLUME_NAME must preserve comply_redis_prod_data.")
   }
   if (env.DOMAIN === "localhost" || env.DOMAIN.includes("://")) {
     throw new Error("DOMAIN must be a production hostname without a URL scheme.")
   }
-  if (env.DOMAIN !== "trycomplyz.com" || env.API_DOMAIN !== "api.trycomplyz.com") {
-    throw new Error("Production domains must be trycomplyz.com and api.trycomplyz.com.")
+  if (env.DOMAIN !== "trycomply.io" || env.API_DOMAIN !== "api.trycomply.io") {
+    throw new Error("Production domains must be trycomply.io and api.trycomply.io.")
   }
   if (env.JWT_SECRET.length < 32 || env.JWT_SECRET.includes("404E635266556A586E3272")) {
     throw new Error("JWT_SECRET is missing, too short, or uses the development default.")
@@ -97,17 +97,15 @@ export function validateDeploymentEnvironment(env) {
     )
   }
   for (const [name, developmentValue] of [
-    ["POSTGRES_PASSWORD", "complyz_dev_password"],
+    ["POSTGRES_PASSWORD", "comply_dev_password"],
     ["REDIS_PASSWORD", "redis_dev_password"],
   ]) {
     if (env[name].length < 12 || env[name] === developmentValue) {
       throw new Error(`${name} is too short or uses its development default.`)
     }
   }
-  if (env.COMPLYZ_BOOTSTRAP_ENABLED !== "false") {
-    throw new Error(
-      "COMPLYZ_BOOTSTRAP_ENABLED must be false for a production deployment."
-    )
+  if (env.COMPLY_BOOTSTRAP_ENABLED !== "false") {
+    throw new Error("COMPLY_BOOTSTRAP_ENABLED must be false for a production deployment.")
   }
   const origins = (env.CORS_ALLOWED_ORIGINS ?? "")
     .split(",")
@@ -141,11 +139,11 @@ export function validateDeploymentEnvironment(env) {
       )
     }
   }
-  if (!origins.some((origin) => origin === "https://trycomplyz.com")) {
-    throw new Error("CORS_ALLOWED_ORIGINS must allow https://trycomplyz.com.")
+  if (!origins.some((origin) => origin === "https://trycomply.io")) {
+    throw new Error("CORS_ALLOWED_ORIGINS must allow https://trycomply.io.")
   }
-  if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomplyz.com/api/v1") {
-    throw new Error("NEXT_PUBLIC_API_URL must use https://api.trycomplyz.com/api/v1.")
+  if (env.NEXT_PUBLIC_API_URL !== "https://api.trycomply.io/api/v1") {
+    throw new Error("NEXT_PUBLIC_API_URL must use https://api.trycomply.io/api/v1.")
   }
 }
 
@@ -233,11 +231,11 @@ async function main() {
   if (options.noCache) buildArgs.push("--no-cache")
   await run(composeArgs(...buildArgs))
   for (const container of [
-    "complyz-postgres",
-    "complyz-redis",
-    "complyz-api",
-    "complyz-ui",
-    "complyz-caddy",
+    "comply-postgres",
+    "comply-redis",
+    "comply-api",
+    "comply-ui",
+    "comply-caddy",
   ]) {
     await waitForHealthy(container)
   }

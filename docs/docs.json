@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Complyz",
+  "name": "Comply",
   "description": "Guides for customer, transaction, alert and reporting workflows in regulated finance.",
   "colors": {
     "primary": "#0B746B"
@@ -26,7 +26,7 @@
             "pages": ["index", "guides/getting-started", "guides/organization-and-access"]
           },
           {
-            "group": "Use Complyz",
+            "group": "Use Comply",
             "pages": [
               "guides/clients",
               "guides/importing-data",

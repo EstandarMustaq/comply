@@ -6,13 +6,13 @@ server:
 
 spring:
   application:
-    name: complyz-api
+    name: comply-api
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:complyz_db}}
-    username: ${DB_USER:${POSTGRES_USER:complyz_app}}
-    password: ${DB_PASSWORD:${POSTGRES_PASSWORD:complyz_dev_password}}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:comply_db}}
+    username: ${DB_USER:${POSTGRES_USER:comply_app}}
+    password: ${DB_PASSWORD:${POSTGRES_PASSWORD:comply_dev_password}}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -44,19 +44,19 @@ spring:
 
 springdoc:
   api-docs:
-    enabled: ${COMPLYZ_API_DOCS_ENABLED:false}
+    enabled: ${COMPLY_API_DOCS_ENABLED:false}
 
-complyz:
+comply:
   bootstrap:
-    enabled: ${COMPLYZ_BOOTSTRAP_ENABLED:false}
+    enabled: ${COMPLY_BOOTSTRAP_ENABLED:false}
     admin:
-      full-name: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:}
-      email: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:}
-      password: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:}
+      full-name: ${COMPLY_BOOTSTRAP_ADMIN_FULL_NAME:}
+      email: ${COMPLY_BOOTSTRAP_ADMIN_EMAIL:}
+      password: ${COMPLY_BOOTSTRAP_ADMIN_PASSWORD:}
     ocos:
-      full-name: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:}
-      email: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:}
-      password: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:}
+      full-name: ${COMPLY_BOOTSTRAP_OCOS_FULL_NAME:}
+      email: ${COMPLY_BOOTSTRAP_OCOS_EMAIL:}
+      password: ${COMPLY_BOOTSTRAP_OCOS_PASSWORD:}
   security:
     jwt:
       secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
@@ -77,12 +77,12 @@ complyz:
     retention:
       standard-years: 10
   imports:
-    storage-path: ${COMPLYZ_IMPORT_STORAGE_PATH:${java.io.tmpdir}/complyz-imports}
-    pending-ttl-hours: ${COMPLYZ_IMPORT_PENDING_TTL_HOURS:24}
+    storage-path: ${COMPLY_IMPORT_STORAGE_PATH:${java.io.tmpdir}/comply-imports}
+    pending-ttl-hours: ${COMPLY_IMPORT_PENDING_TTL_HOURS:24}
 
 logging:
   level:
-    com.complyz: DEBUG
+    com.comply: DEBUG
     org.springframework.security: INFO
     org.flywaydb: INFO
 

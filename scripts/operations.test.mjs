@@ -8,7 +8,7 @@ import { retentionDate, validateBackupEnvironment } from "./backup-s3.mjs"
 import { parseArguments, validateDeploymentEnvironment } from "./deploy-production.mjs"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const temporaryDirectory = await mkdtemp(join(tmpdir(), "complyz-operations-test-"))
+const temporaryDirectory = await mkdtemp(join(tmpdir(), "comply-operations-test-"))
 const binaryDirectory = join(temporaryDirectory, "bin")
 const statePath = join(temporaryDirectory, "aws-state.json")
 
@@ -31,21 +31,21 @@ function run(script, args = [], env = {}) {
 }
 
 const productionEnvironment = {
-  DOMAIN: "trycomplyz.com",
-  API_DOMAIN: "api.trycomplyz.com",
-  COMPLYZ_ENVIRONMENT: "production",
+  DOMAIN: "trycomply.io",
+  API_DOMAIN: "api.trycomply.io",
+  COMPLY_ENVIRONMENT: "production",
   SPRING_PROFILES_ACTIVE: "production",
-  POSTGRES_DB: "complyz_db",
-  POSTGRES_USER: "complyz_app",
+  POSTGRES_DB: "comply_db",
+  POSTGRES_USER: "comply_app",
   POSTGRES_PASSWORD: "strong-postgres-password-value",
   REDIS_PASSWORD: "strong-redis-password-value",
   JWT_SECRET: "a".repeat(64),
   MFA_ENCRYPTION_KEY: "b".repeat(64),
-  POSTGRES_VOLUME_NAME: "complyz_postgres_prod_data",
-  REDIS_VOLUME_NAME: "complyz_redis_prod_data",
-  CORS_ALLOWED_ORIGINS: "https://trycomplyz.com",
-  NEXT_PUBLIC_API_URL: "https://api.trycomplyz.com/api/v1",
-  COMPLYZ_BOOTSTRAP_ENABLED: "false",
+  POSTGRES_VOLUME_NAME: "comply_postgres_prod_data",
+  REDIS_VOLUME_NAME: "comply_redis_prod_data",
+  CORS_ALLOWED_ORIGINS: "https://trycomply.io",
+  NEXT_PUBLIC_API_URL: "https://api.trycomply.io/api/v1",
+  COMPLY_BOOTSTRAP_ENABLED: "false",
 }
 
 /** Exercise deployment and backup safety with isolated command fixtures. */
@@ -93,20 +93,20 @@ async function main() {
     /S3_BACKUP_BUCKET, AWS_REGION, BACKUP_ENCRYPTION_PASSPHRASE/
   )
   const backupConfig = validateBackupEnvironment({
-    S3_BACKUP_BUCKET: "complyz-backups",
+    S3_BACKUP_BUCKET: "comply-backups",
     AWS_REGION: "af-south-1",
     BACKUP_ENCRYPTION_PASSPHRASE: "secret-value",
   })
   assert.equal(backupConfig.retentionYears, 10)
-  assert.equal(backupConfig.container, "complyz-postgres-dev")
+  assert.equal(backupConfig.container, "comply-postgres-dev")
   assert.equal(
     validateBackupEnvironment({
-      S3_BACKUP_BUCKET: "complyz-backups",
+      S3_BACKUP_BUCKET: "comply-backups",
       AWS_REGION: "af-south-1",
       BACKUP_ENCRYPTION_PASSPHRASE: "secret-value",
-      COMPLYZ_ENVIRONMENT: "production",
+      COMPLY_ENVIRONMENT: "production",
     }).container,
-    "complyz-postgres"
+    "comply-postgres"
   )
   assert.match(retentionDate(1), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
 
@@ -125,9 +125,9 @@ async function main() {
     () =>
       validateDeploymentEnvironment({
         ...productionEnvironment,
-        POSTGRES_VOLUME_NAME: "complyz_postgres_data",
+        POSTGRES_VOLUME_NAME: "comply_postgres_data",
       }),
-    /preserve complyz_postgres_prod_data/
+    /preserve comply_postgres_prod_data/
   )
   assert.throws(
     () =>
@@ -141,22 +141,22 @@ async function main() {
     () =>
       validateDeploymentEnvironment({
         ...productionEnvironment,
-        COMPLYZ_BOOTSTRAP_ENABLED: "TRUE",
+        COMPLY_BOOTSTRAP_ENABLED: "TRUE",
       }),
-    /COMPLYZ_BOOTSTRAP_ENABLED must be false/
+    /COMPLY_BOOTSTRAP_ENABLED must be false/
   )
   assert.throws(
     () =>
       validateDeploymentEnvironment({
         ...productionEnvironment,
-        COMPLYZ_BOOTSTRAP_ENABLED: "",
+        COMPLY_BOOTSTRAP_ENABLED: "",
       }),
-    /Missing required production settings: COMPLYZ_BOOTSTRAP_ENABLED/
+    /Missing required production settings: COMPLY_BOOTSTRAP_ENABLED/
   )
   assert.doesNotThrow(() => validateDeploymentEnvironment(productionEnvironment))
   for (const origins of [
-    " https://trycomplyz.com , https://portal.example.com:8443 ",
-    "https://portal.example.com,https://trycomplyz.com",
+    " https://trycomply.io , https://portal.example.com:8443 ",
+    "https://portal.example.com,https://trycomply.io",
   ]) {
     assert.doesNotThrow(() =>
       validateDeploymentEnvironment({
@@ -166,15 +166,15 @@ async function main() {
     )
   }
   for (const origin of [
-    "https://TRYCOMPLYZ.com:443",
-    "https://TRYCOMPLYZ.com",
-    "HTTPS://trycomplyz.com",
-    "https://trycomplyz.com:443",
-    "https://trycomplyz.com/",
-    "https://%74rycomplyz.com",
-    "https://trycomplyz.com:0443",
+    "https://TRYCOMPLY.io:443",
+    "https://TRYCOMPLY.io",
+    "HTTPS://trycomply.io",
+    "https://trycomply.io:443",
+    "https://trycomply.io/",
+    "https://%74rycomply.io",
+    "https://trycomply.io:0443",
   ]) {
-    for (const origins of [origin, `https://trycomplyz.com,${origin}`]) {
+    for (const origins of [origin, `https://trycomply.io,${origin}`]) {
       assert.throws(
         () =>
           validateDeploymentEnvironment({
@@ -211,15 +211,15 @@ async function main() {
       () =>
         validateDeploymentEnvironment({
           ...productionEnvironment,
-          CORS_ALLOWED_ORIGINS: `https://trycomplyz.com,${origin}`,
+          CORS_ALLOWED_ORIGINS: `https://trycomply.io,${origin}`,
         }),
       /explicit production origins/,
       `Must reject an invalid origin even alongside the required origin: ${JSON.stringify(origin)}`
     )
   }
   for (const origins of [
-    ",https://trycomplyz.com",
-    "https://trycomplyz.com,,https://example.com",
+    ",https://trycomply.io",
+    "https://trycomply.io,,https://example.com",
   ]) {
     assert.throws(
       () =>
@@ -231,9 +231,9 @@ async function main() {
     )
   }
   for (const origin of [
-    "https://trycomplyz.com.attacker.example",
-    "https://attacker-trycomplyz.com",
-    "https://trycomplyz.com:8443",
+    "https://trycomply.io.attacker.example",
+    "https://attacker-trycomply.io",
+    "https://trycomply.io:8443",
     "https://attacker.example",
   ]) {
     assert.throws(
@@ -242,7 +242,7 @@ async function main() {
           ...productionEnvironment,
           CORS_ALLOWED_ORIGINS: origin,
         }),
-      /must allow https:\/\/trycomplyz\.com/
+      /must allow https:\/\/trycomply\.io/
     )
   }
 
@@ -268,7 +268,7 @@ async function main() {
   assert.equal(composeInvocation.profiles, "app")
 
   const backupEnv = {
-    S3_BACKUP_BUCKET: "complyz-backups-test",
+    S3_BACKUP_BUCKET: "comply-backups-test",
     S3_BACKUP_PREFIX: "verification",
     AWS_REGION: "af-south-1",
     BACKUP_ENCRYPTION_PASSPHRASE: "test-passphrase-not-a-production-secret",

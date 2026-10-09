@@ -4,16 +4,16 @@ title: Camel jobs and WSO2 Integrator boundary
 status: draft
 branch: task/0013-camel-jobs-and-wso2-integrator
 scope:
-  - apps/api/src/main/java/com/complyz/**/integration/**
-  - apps/api/src/main/java/com/complyz/**/outbox/**
-  - apps/api/src/main/java/com/complyz/ingest/**
+  - apps/api/src/main/java/com/comply/**/integration/**
+  - apps/api/src/main/java/com/comply/**/outbox/**
+  - apps/api/src/main/java/com/comply/ingest/**
   - apps/api/src/main/resources/**
   - apps/api/src/test/**
   - packages/contracts/**
   - docker-compose.yml
   - docs/integrations/**
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
+  - apps/api/src/main/java/com/comply/auth/**
   - apps/ui/app/**
   - docs/**/*.mdx
 depends_on:

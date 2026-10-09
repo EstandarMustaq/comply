@@ -10,7 +10,8 @@ apps/ui/.next
 apps/ui/out
 apps/ui/build
 apps/ui/test-results
-apps/ui/playwright-report
+apps/ui/storybook-static
+storybook-static
 apps/api/build
 apps/api/.gradle
 .gradle

@@ -33,7 +33,7 @@ type OpenApiDocument = {
   >
   servers?: Array<{ url: string }>
 }
-const openApiUrl = process.env.COMPLYZ_OPENAPI_URL
+const openApiUrl = process.env.COMPLY_OPENAPI_URL
 
 describe.skipIf(!openApiUrl)("GRC engine API contract", () => {
   let document: OpenApiDocument
@@ -45,7 +45,7 @@ describe.skipIf(!openApiUrl)("GRC engine API contract", () => {
 
   it("declares every method and route used by the design-system client", () => {
     expect(
-      document.servers?.some((server) => server.url === "https://api.trycomplyz.com")
+      document.servers?.some((server) => server.url === "https://api.trycomply.io")
     ).toBe(true)
     expect(document.components?.schemas?.ApiErrorEnvelope).toBeDefined()
     expect(document.components?.schemas?.ApiResponseMetadata).toBeDefined()

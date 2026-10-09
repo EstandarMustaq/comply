@@ -4,10 +4,10 @@ title: OIDC, context tokens and session revocation
 status: draft
 branch: task/0006-oidc-context-tokens-and-session-revocation
 scope:
-  - apps/api/src/main/java/com/complyz/auth/**
-  - apps/api/src/main/java/com/complyz/tenancy/**
+  - apps/api/src/main/java/com/comply/auth/**
+  - apps/api/src/main/java/com/comply/tenancy/**
   - apps/api/src/main/resources/**
-  - apps/api/src/test/java/com/complyz/auth/**
+  - apps/api/src/test/java/com/comply/auth/**
   - apps/ui/app/api/auth/**
   - apps/ui/lib/auth/**
   - apps/ui/lib/api-client.ts
@@ -37,7 +37,7 @@ Federate human authentication through the approved IdP and Next.js BFF. Keep IdP
 ## Acceptance criteria
 
 - [ ] BFF uses Authorization Code + PKCE S256, exact registered redirect URI matching, `state`, `nonce` and authorization-response issuer validation; implicit and password grants are disabled. Browser receives only a Secure/HttpOnly/SameSite session cookie with CSRF protection.
-- [ ] IdP access/refresh tokens remain in the BFF; refresh rotation detects reuse and revokes the token family. External identity is linked to Account by unique `(issuer, subject)`. WSO2 B2B Organizations are not used for Complyz memberships; Accounts reside in the IdP root organization and Complyz remains the membership source of truth. Logout and back-channel logout are tested; IdP deactivation ends the session within the approved ≤60-second target.
+- [ ] IdP access/refresh tokens remain in the BFF; refresh rotation detects reuse and revokes the token family. External identity is linked to Account by unique `(issuer, subject)`. WSO2 B2B Organizations are not used for Comply memberships; Accounts reside in the IdP root organization and Comply remains the membership source of truth. Logout and back-channel logout are tested; IdP deactivation ends the session within the approved ≤60-second target.
 - [ ] API validates IdP tokens against exact `iss`/`aud`, fixed RS256 or ES256, `typ`, time claims and trusted JWKS; rejects `none`, token-supplied `jku`/`x5u`/`jwk`, refreshes unknown `kid` at most once per minute, and supports overlapping key rotation. API publishes its own JWKS for authorized resource servers, which enforce the mandatory header contract.
 - [ ] `POST /api/v1/context/token` validates the requested Organization against the profile identity's active membership and issues one five-minute Organization-scoped operational `at+jwt`. No CommercialClient token, scope or authorization claim is issued. CommercialClient identity is never trusted for access. Public REST operations retain `/api/v1`; additive changes stay compatible and breaking changes use a new major version under the API-version policy.
 - [ ] Tokens carry the approved stable `sub`, `iss`, `aud`, `exp`, `iat`, `jti`, membership authorization `ver`, and `acr`/`amr`/`auth_time`; token type and audience cannot be confused between profile and operational tokens.

@@ -14,7 +14,7 @@ scope:
 reserved:
   - apps/ui/app/**/account/**
   - apps/ui/app/**/commercial/**
-  - apps/api/src/main/java/com/complyz/**
+  - apps/api/src/main/java/com/comply/**
 depends_on:
   - 0004
   - 0005

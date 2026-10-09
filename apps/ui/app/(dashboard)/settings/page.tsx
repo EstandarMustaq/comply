@@ -41,7 +41,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const _userRole = useMemo(() => {
     try {
-      const stored = localStorage.getItem("complyz_user")
+      const stored = localStorage.getItem("comply_user")
       if (stored) {
         const u = JSON.parse(stored) as { role?: string }
         return u.role || ""

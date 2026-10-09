@@ -1,6 +1,6 @@
 ---
 name: product-quality
-description: Automatically review Complyz product changes as one production system, including correctness, security, tenant isolation, customer workflows, UX, operations, and regressions. Use whenever implementing or changing API, UI, data, integrations, jobs, reporting, authentication, deployment, backup, recovery, or other behavior that can affect customers or production.
+description: Automatically review Comply product changes as one production system, including correctness, security, tenant isolation, customer workflows, UX, operations, and regressions. Use whenever implementing or changing API, UI, data, integrations, jobs, reporting, authentication, deployment, backup, recovery, or other behavior that can affect customers or production.
 ---
 
 # Product quality review

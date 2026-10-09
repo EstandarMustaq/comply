@@ -41,6 +41,7 @@ export const config = [
       ".next/**",
       "out/**",
       "build/**",
+      "storybook-static/**",
       "next-env.d.ts",
     ],
   },

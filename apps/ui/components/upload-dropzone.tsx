@@ -171,7 +171,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                 : "Choose or drop a spreadsheet here"}
             </h3>
             <p className="max-w-md text-xs text-muted-foreground">
-              Upload operational statements as CSV or XLSX. Complyz detects delimiters,
+              Upload operational statements as CSV or XLSX. Comply detects delimiters,
               encoding and header rows.
             </p>
           </div>
@@ -213,13 +213,13 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
             </DialogTitle>
             <DialogDescription className="text-xs">
               File: <strong>{currentBatch?.fileName}</strong>. Match each statement header
-              to a Complyz field.
+              to a Comply field.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-3">
             <div className="grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase text-muted-foreground">
-              <div>Complyz field</div>
+              <div>Comply field</div>
               <div>Detected column</div>
             </div>
 
