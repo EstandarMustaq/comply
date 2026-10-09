@@ -21,17 +21,12 @@ class AccountMembershipMigrationTest {
   private static final PostgreSQLContainer<?> POSTGRES =
       new PostgreSQLContainer<>("postgres:16-alpine");
 
-  /** Recreates the isolated database schemas before each migration scenario. */
   @BeforeEach
   void resetDatabase() throws SQLException {
     execute(
         "DROP SCHEMA IF EXISTS platform_backoffice CASCADE; DROP SCHEMA public CASCADE; CREATE SCHEMA public");
   }
 
-  /**
-   * Verifies a fresh migration creates no fabricated identities or contracts and reruns without
-   * changes.
-   */
   @Test
   void emptySchemaHasNoInventedAccountsOrCommercialContractsAndRerunIsANoOp() throws SQLException {
     assertThat(flyway(null).migrate().migrationsExecuted).isEqualTo(28);
@@ -44,10 +39,6 @@ class AccountMembershipMigrationTest {
     flyway(null).validate();
   }
 
-  /**
-   * Verifies legacy UUIDs, roles, credentials and tenant data survive expansion without inferred
-   * OWNER grants.
-   */
   @Test
   void populatedLegacyDatabasePreservesEveryIdentityRoleCredentialAndTenant() throws SQLException {
     flyway("24").migrate();
@@ -98,7 +89,6 @@ class AccountMembershipMigrationTest {
     assertThat(count("organization_memberships")).isEqualTo(4);
   }
 
-  /** Verifies invalid legacy roles roll back expansion and allow a corrected migration retry. */
   @Test
   void invalidLegacyRoleRollsBackExpansionAndCanBeCorrectedBeforeRetry() throws SQLException {
     flyway("24").migrate();
@@ -122,10 +112,6 @@ class AccountMembershipMigrationTest {
         .isEqualTo(4);
   }
 
-  /**
-   * Verifies database constraints reject invalid identities, memberships and commercial links
-   * without cascading deletion.
-   */
   @Test
   void referencesUniquenessAndRequiredFieldsAreEnforcedWithoutCascadingLegacyDeletion()
       throws SQLException {
@@ -167,9 +153,6 @@ class AccountMembershipMigrationTest {
         .isEqualTo(4);
   }
 
-  /**
-   * Seeds synthetic users across two tenants, including all legacy roles and case-variant emails.
-   */
   private void seedLegacyUsers() throws SQLException {
     execute(
         """
@@ -204,9 +187,6 @@ class AccountMembershipMigrationTest {
     }
   }
 
-  /**
-   * Builds Flyway for the isolated test database, using the latest migration when target is null.
-   */
   private Flyway flyway(String target) {
     var configuration =
         Flyway.configure()
@@ -215,13 +195,11 @@ class AccountMembershipMigrationTest {
     return configuration.load();
   }
 
-  /** Opens a connection to the isolated test container; the caller must close it. */
   private Connection connection() throws SQLException {
     return DriverManager.getConnection(
         POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
   }
 
-  /** Executes fixture SQL against the isolated database and closes the connection. */
   private void execute(String sql) throws SQLException {
     try (var connection = connection();
         var statement = connection.createStatement()) {
@@ -229,12 +207,10 @@ class AccountMembershipMigrationTest {
     }
   }
 
-  /** Counts rows in a trusted fixture table; the table name must be test-controlled. */
   private long count(String table) throws SQLException {
     return number("SELECT count(*) FROM " + table);
   }
 
-  /** Returns the first column of the first row from a scalar fixture query. */
   private long number(String sql) throws SQLException {
     try (var connection = connection();
         var statement = connection.createStatement();
@@ -244,7 +220,6 @@ class AccountMembershipMigrationTest {
     }
   }
 
-  /** Asserts that fixture SQL fails with the expected PostgreSQL SQLSTATE. */
   private void rejected(String sql, String sqlState) {
     assertThatThrownBy(() -> execute(sql))
         .isInstanceOfSatisfying(

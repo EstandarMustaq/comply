@@ -26,7 +26,6 @@ export function ComplyLogo({
 
   return (
     <div className={cn("inline-flex select-none items-center", className)} {...props}>
-      {/* Render the dark-wordmark asset on light surfaces. */}
       {(variant === "auto" || variant === "light-bg") && (
         <Image
           src="/comply-logo-dark-text.svg"
@@ -43,7 +42,6 @@ export function ComplyLogo({
         />
       )}
 
-      {/* Render the light-wordmark asset on dark surfaces. */}
       {(variant === "auto" || variant === "dark-bg") && (
         <Image
           src="/comply-logo-light-text.svg"

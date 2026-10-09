@@ -31,7 +31,7 @@ public class JwtService {
       @Value("${comply.security.jwt.refresh-expiration-days:7}") long refreshExpirationDays,
       TokenBlacklistService tokenBlacklistService) {
     byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-    byte[] validKeyBytes = new byte[64]; // 512 bits for HS512 or 256 for HS256
+    byte[] validKeyBytes = new byte[64];
     System.arraycopy(keyBytes, 0, validKeyBytes, 0, Math.min(keyBytes.length, 64));
     this.signingKey = Keys.hmacShaKeyFor(validKeyBytes);
     this.expirationMinutes = expirationMinutes;

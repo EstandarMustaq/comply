@@ -71,7 +71,6 @@ public class ThresholdScreeningService {
             generatedFlags.add(flag);
           }
 
-          // Create a draft cash transaction report.
           CurrencyTransactionReport ctr =
               new CurrencyTransactionReport(
                   tx.getClient(),

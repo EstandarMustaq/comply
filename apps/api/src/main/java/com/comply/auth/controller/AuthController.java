@@ -247,7 +247,6 @@ public class AuthController {
       mfaEnrollmentService.consumeEnrollmentToken(request.getEnrollmentToken());
     }
 
-    // Generate and return eight recovery codes.
     List<String> backupCodes = mfaVerificationService.generateBackupCodes(user);
 
     auditService.record(
@@ -300,7 +299,6 @@ public class AuthController {
 
   private User getCurrentUser(Authentication authentication) {
     if (authentication != null && authentication.getPrincipal() instanceof User user) {
-      // Reload the user to obtain the latest persisted state.
       return userRepository.findById(user.getId()).orElse(user);
     }
     String email = authentication != null ? authentication.getName() : null;

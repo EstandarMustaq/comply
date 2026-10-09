@@ -33,7 +33,6 @@ public class CsvParser {
         return new CsvParsedData(List.of(), List.of());
       }
 
-      // Find the first non-empty row and use it as the header.
       int headerIdx = 0;
       while (headerIdx < allLines.size() && allLines.get(headerIdx).length == 0) {
         headerIdx++;
@@ -48,7 +47,6 @@ public class CsvParser {
       List<List<String>> rows = new ArrayList<>();
       for (int i = headerIdx + 1; i < allLines.size(); i++) {
         String[] line = allLines.get(i);
-        // Skip empty rows and blank summary rows.
         boolean hasContent =
             Arrays.stream(line).anyMatch(cell -> cell != null && !cell.trim().isBlank());
         if (hasContent) {

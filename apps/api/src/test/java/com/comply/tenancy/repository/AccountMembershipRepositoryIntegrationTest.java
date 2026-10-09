@@ -34,7 +34,6 @@ class AccountMembershipRepositoryIntegrationTest {
   private static final PostgreSQLContainer<?> POSTGRES =
       new PostgreSQLContainer<>("postgres:16-alpine");
 
-  /** Binds Spring persistence to the isolated PostgreSQL test container. */
   @DynamicPropertySource
   static void configurePostgres(DynamicPropertyRegistry registry) {
     registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
@@ -48,10 +47,6 @@ class AccountMembershipRepositoryIntegrationTest {
   @Autowired private OrganizationMembershipRepository memberships;
   @Autowired private CommercialClientRepository commercialClients;
 
-  /**
-   * Verifies independent Accounts, per-tenant roles and scoped reads across distinct commercial
-   * references.
-   */
   @Test
   void accountMayHaveNoMembershipOrDifferentRolesAcrossCommercialReferences() {
     var account = accounts.save(new Account("Member", "member@example.test"));
@@ -95,10 +90,6 @@ class AccountMembershipRepositoryIntegrationTest {
             loaded -> assertThat(loaded.getStatus()).isEqualTo(CommercialClientStatus.INACTIVE));
   }
 
-  /**
-   * Verifies shared or inactive commercial metadata neither appears in legacy JSON nor bypasses
-   * tenant checks.
-   */
   @Test
   void commercialReferenceDoesNotLeakThroughLegacyJsonOrChangeTenantAuthorization()
       throws Exception {
@@ -120,9 +111,6 @@ class AccountMembershipRepositoryIntegrationTest {
     assertThat(json.get("organization").has("version")).isFalse();
   }
 
-  /**
-   * Verifies commercial-reference writes advance the Organization version and stale writes fail.
-   */
   @Test
   void organizationVersionAdvancesAndStaleUpdatesAreRejected() {
     var organization = organizations.save(new Organization("versioned", "Versioned"));
@@ -141,10 +129,6 @@ class AccountMembershipRepositoryIntegrationTest {
         .isInstanceOf(OptimisticLockException.class);
   }
 
-  /**
-   * Persists a synthetic Organization and its separate commercial reference with the requested
-   * status.
-   */
   private Organization organization(String slug, CommercialClientStatus status) {
     var reference =
         commercialClients.save(

@@ -60,7 +60,6 @@ public class StructuringDetectionService {
         transactionRepository.findByClientAndOrganizationAndDateBetweenAndTypeIn(
             client.getId(), organizationId, startDate, endDate, CASH_TRANSACTION_TYPES);
 
-    // Require at least three transactions in the configured window.
     boolean allBelowThreshold =
         rule.getValueThreshold() != null
             && windowTransactions.stream()

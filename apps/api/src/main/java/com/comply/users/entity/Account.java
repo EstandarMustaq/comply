@@ -28,7 +28,6 @@ public class Account {
   @Column(nullable = false)
   private long version;
 
-  /** Required by JPA to hydrate persisted records. */
   protected Account() {}
 
   /**
@@ -42,35 +41,26 @@ public class Account {
     this.email = email;
   }
 
-  /** {@return the persistent record UUID, or {@code null} before persistence assigns it} */
   public UUID getId() {
     return id;
   }
 
-  /** {@return the preserved legacy User UUID, or {@code null} for a newly created Account} */
   public UUID getLegacyUserId() {
     return legacyUserId;
   }
 
-  /** {@return the Account profile name} */
   public String getFullName() {
     return fullName;
   }
 
-  /**
-   * {@return the Account email; external identities must be linked by verified issuer/subject
-   * claims}
-   */
   public String getEmail() {
     return email;
   }
 
-  /** {@return the record creation time, preserved from legacy data during backfill} */
   public Instant getCreatedAt() {
     return createdAt;
   }
 
-  /** {@return the persistence version used to reject stale concurrent updates} */
   public long getVersion() {
     return version;
   }

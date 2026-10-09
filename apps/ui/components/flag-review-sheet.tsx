@@ -134,7 +134,6 @@ export function FlagReviewSheet({
           </SheetDescription>
         </SheetHeader>
 
-        {/* Deadline status for restricted-party matches */}
         {isSanctions && (
           <div className="my-4 flex items-start gap-2.5 rounded-lg border border-destructive/40 p-3 text-xs text-destructive">
             <Clock className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
@@ -148,7 +147,6 @@ export function FlagReviewSheet({
         )}
 
         <div className="space-y-5 py-4 text-xs">
-          {/* Customer details */}
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
               <User className="h-3.5 w-3.5 text-primary" /> Customer
@@ -198,7 +196,6 @@ export function FlagReviewSheet({
             </div>
           </div>
 
-          {/* Transaction details */}
           {flag.transaction && (
             <div className="space-y-2">
               <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
@@ -240,7 +237,6 @@ export function FlagReviewSheet({
             </div>
           )}
 
-          {/* Match details */}
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
               <FileSpreadsheet className="h-3.5 w-3.5 text-primary" /> Alert details
@@ -254,7 +250,6 @@ export function FlagReviewSheet({
             </div>
           </div>
 
-          {/* Review notes */}
           <div className="space-y-2 pt-2">
             <Label htmlFor="reviewNotes" className="font-semibold text-foreground">
               Review notes <span className="text-destructive">*</span>

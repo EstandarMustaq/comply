@@ -31,7 +31,7 @@ public class PepScreeningService {
     this.flagRepository = flagRepository;
   }
 
-  @Scheduled(cron = "0 0 2 * * ?") // Runs daily at 02:00
+  @Scheduled(cron = "0 0 2 * * ?")
   @Transactional
   public int checkAndGeneratePepReviewFlags() {
     LocalDate cutoffDate = LocalDate.now().minusDays(maxReviewIntervalDays);

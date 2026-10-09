@@ -51,17 +51,14 @@ public class MfaEnrollmentService {
   }
 
   public MfaEnrollResponse startEnrollment(User user) {
-    // Generate a 20-byte (160-bit) secret and encode it as Base32.
     byte[] buffer = new byte[20];
     new SecureRandom().nextBytes(buffer);
     Base32 base32 = new Base32();
     String secretKey = base32.encodeToString(buffer).replace("=", "");
 
-    // Store the pending secret in Redis for ten minutes.
     String redisKey = ENROLLMENT_PREFIX + user.getId().toString();
     redisTemplate.opsForValue().set(redisKey, secretKey, Duration.ofMinutes(10));
 
-    // Build an otpauth URL for authenticator applications.
     String encodedIssuer = URLEncoder.encode("Comply", StandardCharsets.UTF_8);
     String encodedAccount = URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
     String otpauthUrl =
@@ -69,7 +66,6 @@ public class MfaEnrollmentService {
             "otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=SHA1&digits=6&period=30",
             encodedIssuer, encodedAccount, secretKey, encodedIssuer);
 
-    // Encode the enrollment QR code as Base64.
     String qrCodeBase64 = generateQrCodeBase64(otpauthUrl);
 
     return new MfaEnrollResponse(secretKey, qrCodeBase64, otpauthUrl);

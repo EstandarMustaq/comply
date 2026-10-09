@@ -28,9 +28,6 @@ class CommercialReferenceBackfillMigrationTest {
   private static final String REFERENCE_A = "00000000-0000-0000-0000-000000000201";
   private static final String REFERENCE_B = "00000000-0000-0000-0000-000000000202";
 
-  /**
-   * Creates legacy tenants and users, then migrates through the reviewed-mapping staging schema.
-   */
   @BeforeEach
   void stageLegacyDatabase() throws SQLException {
     execute(
@@ -48,10 +45,6 @@ class CommercialReferenceBackfillMigrationTest {
     flyway("26").migrate();
   }
 
-  /**
-   * Verifies reviewed mappings link every tenant once while preserving Accounts, memberships and
-   * legacy Users.
-   */
   @Test
   void
       reviewedMappingCreatesReferencesLinksEveryOrganizationAndPreservesIdentityAndAuthorizationData()
@@ -95,10 +88,6 @@ class CommercialReferenceBackfillMigrationTest {
     assertThat(number("SELECT count(*) FROM platform_backoffice.commercial_clients")).isEqualTo(2);
   }
 
-  /**
-   * Verifies unresolved tenants are reported precisely and late reviewed input completes the same
-   * backfill.
-   */
   @Test
   void partialMappingReportsExactPendingOrganizationsAndLateInputCompletesWithoutNewImplementation()
       throws SQLException {
@@ -131,10 +120,6 @@ class CommercialReferenceBackfillMigrationTest {
     assertThat(number("SELECT sum(version) FROM organizations")).isEqualTo(3);
   }
 
-  /**
-   * Verifies inconsistent metadata rolls back all mapping writes and succeeds after input
-   * correction.
-   */
   @Test
   void conflictingMetadataRollsBackMigrationAndNormalRetryAppliesCorrectedInput()
       throws SQLException {
@@ -160,10 +145,6 @@ class CommercialReferenceBackfillMigrationTest {
         .isEqualTo(2);
   }
 
-  /**
-   * Verifies backfill rejects conflicts with existing commercial metadata and preserves the
-   * original values.
-   */
   @Test
   void existingCommercialMetadataCannotBeSilentlyOverwritten() throws SQLException {
     execute(
@@ -182,7 +163,6 @@ class CommercialReferenceBackfillMigrationTest {
         .isZero();
   }
 
-  /** Verifies backfill cannot replace an existing Organization commercial reference. */
   @Test
   void existingOrganizationReferenceCannotBeReassignedByBackfill() throws SQLException {
     execute(
@@ -215,10 +195,6 @@ class CommercialReferenceBackfillMigrationTest {
         .isZero();
   }
 
-  /**
-   * Injects a failure after commercial insertion to verify transactional rollback and successful
-   * retry.
-   */
   @Test
   void failureAfterReferenceInsertionRollsBackAllWritesAndAllowsRetry() throws SQLException {
     stage(ORG_A, REFERENCE_A, "Reference A");
@@ -238,10 +214,6 @@ class CommercialReferenceBackfillMigrationTest {
     assertThat(number("SELECT count(*) FROM platform_backoffice.commercial_clients")).isEqualTo(1);
   }
 
-  /**
-   * Verifies staging constraints reject invalid input and an unprivileged database role cannot
-   * apply mappings.
-   */
   @Test
   void invalidUnreviewedDuplicateAndUnknownOrganizationInputIsRejectedAndPublicCannotExecute()
       throws SQLException {
@@ -275,10 +247,6 @@ class CommercialReferenceBackfillMigrationTest {
     }
   }
 
-  /**
-   * Verifies concurrent applications serialize without duplicate references or repeated version
-   * increments.
-   */
   @Test
   void concurrentRetriesDoNotDuplicateReferencesOrAdvanceVersionsTwice() throws Exception {
     stage(ORG_A, REFERENCE_A, "Reference A");
@@ -301,10 +269,6 @@ class CommercialReferenceBackfillMigrationTest {
     assertThat(number("SELECT sum(version) FROM organizations")).isEqualTo(2);
   }
 
-  /**
-   * Stages a synthetic, reviewed Organization-to-commercial-reference mapping with fixed
-   * provenance.
-   */
   private void stage(String organizationId, String referenceId, String name) throws SQLException {
     try (var connection = connection();
         var statement =
@@ -321,9 +285,6 @@ class CommercialReferenceBackfillMigrationTest {
     }
   }
 
-  /**
-   * Builds Flyway for the isolated test database, using the latest migration when target is null.
-   */
   private Flyway flyway(String target) {
     var configuration =
         Flyway.configure()
@@ -332,13 +293,11 @@ class CommercialReferenceBackfillMigrationTest {
     return configuration.load();
   }
 
-  /** Opens a connection to the isolated test container; the caller must close it. */
   private Connection connection() throws SQLException {
     return DriverManager.getConnection(
         POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
   }
 
-  /** Executes fixture SQL against the isolated database and closes the connection. */
   private void execute(String sql) throws SQLException {
     try (var connection = connection();
         var statement = connection.createStatement()) {
@@ -346,7 +305,6 @@ class CommercialReferenceBackfillMigrationTest {
     }
   }
 
-  /** Returns the first column of the first row from a scalar fixture query. */
   private long number(String sql) throws SQLException {
     try (var connection = connection();
         var statement = connection.createStatement();
@@ -356,9 +314,6 @@ class CommercialReferenceBackfillMigrationTest {
     }
   }
 
-  /**
-   * Asserts a fixture table and its snapshot contain identical rows in both comparison directions.
-   */
   private void unchanged(String actual, String snapshot) throws SQLException {
     assertThat(
             number(
@@ -374,7 +329,6 @@ class CommercialReferenceBackfillMigrationTest {
         .isZero();
   }
 
-  /** Asserts that fixture SQL fails with the expected PostgreSQL SQLSTATE. */
   private void rejected(String sql, String sqlState) {
     assertThatThrownBy(() -> execute(sql))
         .isInstanceOfSatisfying(

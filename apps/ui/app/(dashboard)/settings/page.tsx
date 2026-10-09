@@ -103,7 +103,6 @@ export default function SettingsPage() {
       />
 
       <div className="space-y-6">
-        {/* Settings tabs */}
         <div className="flex items-center justify-between">
           <Tabs
             value={activeTab}
@@ -122,7 +121,6 @@ export default function SettingsPage() {
         </div>
 
         {activeTab === "RULES" ? (
-          /* Monitoring rules */
           <div className="space-y-6">
             <Card className="border-border shadow-sm">
               <CardHeader className="pb-3">
@@ -187,7 +185,6 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* Monitoring threshold summary */}
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="border-border">
                 <CardHeader className="pb-2">

@@ -32,7 +32,6 @@ public class AccountExternalIdentity {
   @Column(nullable = false)
   private long version;
 
-  /** Required by JPA to hydrate persisted records. */
   protected AccountExternalIdentity() {}
 
   /**
@@ -85,37 +84,30 @@ public class AccountExternalIdentity {
     if (unlinkedAt == null) unlinkedAt = at;
   }
 
-  /** {@return the persistent record UUID, or {@code null} before persistence assigns it} */
   public UUID getId() {
     return id;
   }
 
-  /** {@return the referenced Account UUID, independent of Organization membership} */
   public UUID getAccountId() {
     return accountId;
   }
 
-  /** {@return the exact issuer reference, preserving case and without surrounding whitespace} */
   public String getIssuer() {
     return issuer;
   }
 
-  /** {@return the exact subject reference, meaningful only with its issuer} */
   public String getSubject() {
     return subject;
   }
 
-  /** {@return the link start time used by active identity and dependent-record queries} */
   public Instant getLinkedAt() {
     return linkedAt;
   }
 
-  /** {@return the first unlink time, or {@code null} while the link has not been ended} */
   public Instant getUnlinkedAt() {
     return unlinkedAt;
   }
 
-  /** {@return the persistence version used to reject stale concurrent updates} */
   public long getVersion() {
     return version;
   }

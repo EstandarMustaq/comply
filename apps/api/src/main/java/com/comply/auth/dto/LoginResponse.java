@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public class LoginResponse {
 
-  private String status; // "SUCCESS", "MFA_REQUIRED", ou "MFA_ENROLLMENT_REQUIRED"
-  private String challengeToken; // Presente quando status == "MFA_REQUIRED"
-  private String enrollmentToken; // Presente quando status == "MFA_ENROLLMENT_REQUIRED"
+  private String status;
+  private String challengeToken;
+  private String enrollmentToken;
   private String accessToken;
   private String refreshToken;
   private UUID userId;

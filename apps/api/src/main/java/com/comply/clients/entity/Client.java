@@ -22,7 +22,7 @@ public class Client {
   private String fullName;
 
   @Column(name = "id_document_type", nullable = false)
-  private String idDocumentType; // BI, NUIT, PASSPORT
+  private String idDocumentType;
 
   @Column(name = "id_document_number", nullable = false)
   private String idDocumentNumber;

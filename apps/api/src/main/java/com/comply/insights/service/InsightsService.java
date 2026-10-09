@@ -83,7 +83,5 @@ public class InsightsService {
   }
 
   @CacheEvict(value = "insights_cache", allEntries = true)
-  public void evictInsightsCache() {
-    // Evict cached insights after imported data or alert status changes.
-  }
+  public void evictInsightsCache() {}
 }

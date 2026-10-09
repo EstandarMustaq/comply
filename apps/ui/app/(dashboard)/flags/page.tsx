@@ -54,7 +54,6 @@ export default function FlagsPage() {
 
       const data = await api.getFlags(statusParam, typeParam)
 
-      // Sort: SANCTIONS_MATCH first, then by SLA deadline ascending
       const sorted = [...data].sort((a, b) => {
         if (a.flagType === "SANCTIONS_MATCH" && b.flagType !== "SANCTIONS_MATCH")
           return -1
@@ -157,7 +156,6 @@ export default function FlagsPage() {
           </Tabs>
         </div>
 
-        {/* Alert list */}
         <Card className="border-border shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -253,7 +251,6 @@ export default function FlagsPage() {
         </Card>
       </div>
 
-      {/* Alert review panel */}
       <FlagReviewSheet
         flag={selectedFlag}
         isOpen={isReviewOpen}

@@ -85,10 +85,8 @@ export default function ImportPage() {
       <SiteHeader title="Import transactions" />
 
       <div className="space-y-6">
-        {/* File upload area */}
         <UploadDropzone onSuccess={loadBatches} />
 
-        {/* Recent imports */}
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>

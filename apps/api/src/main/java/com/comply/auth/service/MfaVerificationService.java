@@ -84,12 +84,10 @@ public class MfaVerificationService {
 
     String trimmedCode = code.trim();
 
-    // Check for an eight-character recovery code.
     if (trimmedCode.length() == 8 && user.getMfaBackupCodesHash() != null) {
       return verifyAndConsumeBackupCode(user, trimmedCode);
     }
 
-    // Otherwise validate the standard six-digit TOTP code.
     if (trimmedCode.length() != DIGITS || user.getMfaSecretEncrypted() == null) {
       return false;
     }

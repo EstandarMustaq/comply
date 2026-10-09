@@ -23,7 +23,6 @@ public class XlsxParser {
       DataFormatter formatter = new DataFormatter();
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-      // Locate the header row after any leading institution title rows.
       int headerRowIdx = -1;
       for (int r = 0; r <= Math.min(sheet.getLastRowNum(), 10); r++) {
         Row row = sheet.getRow(r);
@@ -70,7 +69,6 @@ public class XlsxParser {
           rowData.add(cellVal);
         }
 
-        // Skip blank rows and summary rows without populated columns.
         if (hasContent) {
           rows.add(rowData);
         }

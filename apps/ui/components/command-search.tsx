@@ -67,7 +67,6 @@ export function CommandSearch({
   const [query, setQuery] = React.useState("")
   const [activeIndex, setActiveIndex] = React.useState(0)
 
-  // Open the command palette with Cmd/Ctrl + K.
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {

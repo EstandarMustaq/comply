@@ -233,7 +233,6 @@ public class ImportService {
 
     batch.setColumnMapping(objectMapper.writeValueAsString(columnMapping));
 
-    // Map the selected column indexes.
     int docIdx = getIndex(headers, columnMapping.get("clientDocument"));
     int nameIdx = getIndex(headers, columnMapping.get("clientName"));
     int dateIdx = getIndex(headers, columnMapping.get("transactionDate"));
@@ -263,12 +262,10 @@ public class ImportService {
               "A document number or amount is missing from this row.");
         }
 
-        // Validate the complete row before creating or mutating any client data.
         LocalDate txDate = parseDate(dateStr);
         BigDecimal amount = parseAmount(amountStr);
         TransactionType txType = parseTransactionType(typeStr);
 
-        // Resolve or create the customer.
         Client client =
             clientRepository
                 .findByOrganizationAndIdDocumentNumber(
@@ -289,7 +286,6 @@ public class ImportService {
               "This transaction is blocked because the customer matched a sanctions list.");
         }
 
-        // Create the transaction with the configured retention period.
         Transaction tx = new Transaction(client, amount, "MZN", txDate, txType);
         tx.setImportBatch(batch);
         if (accountStr != null) {
@@ -297,7 +293,6 @@ public class ImportService {
         }
         Transaction savedTx = transactionRepository.save(tx);
 
-        // Run the analysis engines synchronously.
         sanctionsScreeningService.screenClientAgainstSanctions(client, savedTx);
         thresholdScreeningService.evaluateTransaction(savedTx);
         structuringDetectionService.detectStructuring(savedTx);
@@ -399,7 +394,6 @@ public class ImportService {
         }
         return parsed;
       } catch (java.time.format.DateTimeParseException ignored) {
-        // Try the next supported format.
       }
     }
     throw new IllegalArgumentException("Transaction date is invalid: " + dateStr);

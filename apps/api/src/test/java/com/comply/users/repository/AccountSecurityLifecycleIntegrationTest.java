@@ -8,7 +8,10 @@ import com.comply.tenancy.entity.OrganizationMembership;
 import com.comply.tenancy.entity.OrganizationRole;
 import com.comply.tenancy.repository.OrganizationMembershipRepository;
 import com.comply.tenancy.repository.OrganizationRepository;
-import com.comply.users.entity.*;
+import com.comply.users.entity.Account;
+import com.comply.users.entity.AccountExternalIdentity;
+import com.comply.users.entity.AccountFactorReference;
+import com.comply.users.entity.AccountSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
@@ -36,7 +39,6 @@ class AccountSecurityLifecycleIntegrationTest {
   private static final Instant START = Instant.parse("2026-10-01T10:00:00Z");
   private static final Instant NOW = START.plusSeconds(60);
 
-  /** Binds Spring persistence to the isolated PostgreSQL test container. */
   @DynamicPropertySource
   static void configurePostgres(DynamicPropertyRegistry registry) {
     registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
@@ -57,9 +59,6 @@ class AccountSecurityLifecycleIntegrationTest {
   private Account otherAccount;
   private AccountExternalIdentity identity;
 
-  /**
-   * Creates two independent Accounts and one provider identity without Organization memberships.
-   */
   @BeforeEach
   void createIdentityWithoutMembership() {
     jdbc = new JdbcTemplate(dataSource);
@@ -72,7 +71,6 @@ class AccountSecurityLifecycleIntegrationTest {
     entityManager.flush();
   }
 
-  /** Verifies exact issuer/subject matching and permanent uniqueness after unlinking. */
   @Test
   void exactIssuerSubjectLinkIsUniqueAndNeverReassignedAfterUnlink() {
     assertThat(
@@ -99,10 +97,6 @@ class AccountSecurityLifecycleIntegrationTest {
     assertThat(accounts.findById(account.getId())).isPresent();
   }
 
-  /**
-   * Verifies session revocation is idempotent and preserves the independent identity, factor and
-   * membership lifecycles.
-   */
   @Test
   void revokingOneSessionPreservesIdentityFactorsOtherSessionsAndMembership() {
     var organization = organizations.save(new Organization("lifecycle", "Lifecycle"));
@@ -134,10 +128,6 @@ class AccountSecurityLifecycleIntegrationTest {
         .hasValueSatisfying(m -> assertThat(m.getVersion()).isZero());
   }
 
-  /**
-   * Verifies active queries exclude revoked factors, expired sessions and future sessions
-   * independently.
-   */
   @Test
   void factorRevocationAndSessionExpiryHaveIndependentBoundaries() {
     var revoked =
@@ -165,10 +155,6 @@ class AccountSecurityLifecycleIntegrationTest {
     assertThat(accounts.findById(account.getId())).isPresent();
   }
 
-  /**
-   * Verifies unlinking excludes active factors and sessions while preserving their independent
-   * history.
-   */
   @Test
   void unlinkImmediatelyExcludesDependentRecordsWithoutDeletingTheirIndependentHistory() {
     var factor =
@@ -186,10 +172,6 @@ class AccountSecurityLifecycleIntegrationTest {
     assertThat(accounts.findById(account.getId())).isPresent();
   }
 
-  /**
-   * Verifies Account-scoped reads fail closed and database constraints prevent cross-Account links
-   * or destructive deletion.
-   */
   @Test
   void foreignAccountAndMissingContextCannotReadOrAttachIdentityRecords() {
     var factor =
@@ -210,10 +192,6 @@ class AccountSecurityLifecycleIntegrationTest {
     rejected("DELETE FROM accounts WHERE id = '" + account.getId() + "'");
   }
 
-  /**
-   * Verifies lifecycle constraints, fingerprint-only session storage and exclusion of secrets from
-   * schema and JSON.
-   */
   @Test
   void schemaRejectsInvalidLifecycleTimesDuplicateFactorsAndRawSessionIdentifiers()
       throws Exception {
@@ -265,7 +243,6 @@ class AccountSecurityLifecycleIntegrationTest {
             "recovery_code");
   }
 
-  /** Verifies optimistic locking prevents a stale session update from undoing revocation. */
   @Test
   void staleWritesCannotUndoRevocation() {
     var session = session("session", NOW.plusSeconds(300));
@@ -280,16 +257,11 @@ class AccountSecurityLifecycleIntegrationTest {
         .isInstanceOf(OptimisticLockException.class);
   }
 
-  /** Persists synthetic session metadata for the primary fixture Account and external identity. */
   private AccountSession session(String providerId, Instant expiry) {
     return sessions.save(
         new AccountSession(account.getId(), identity.getId(), providerId, START, expiry));
   }
 
-  /**
-   * Asserts a database integrity rejection and rolls back to a savepoint so the test transaction
-   * remains usable.
-   */
   private void rejected(String sql) {
     jdbc.execute("SAVEPOINT invalid_input");
     try {

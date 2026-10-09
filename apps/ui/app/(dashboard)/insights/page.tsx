@@ -131,7 +131,6 @@ export default function InsightsPage() {
       />
 
       <div className="space-y-6">
-        {/* Items requiring a decision */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {attention.map((item) => {
             const isActive = item.value > 0
@@ -189,7 +188,6 @@ export default function InsightsPage() {
           </div>
         )}
 
-        {/* Portfolio coverage */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Customer coverage</CardTitle>
@@ -218,10 +216,8 @@ export default function InsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Volume over time */}
         <ChartAreaInteractive />
 
-        {/* Cumulative activity */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">All-time activity</CardTitle>

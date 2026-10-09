@@ -41,7 +41,6 @@ public class AccountSession {
   @Column(nullable = false)
   private long version;
 
-  /** Required by JPA to hydrate persisted records. */
   protected AccountSession() {}
 
   /**
@@ -100,37 +99,30 @@ public class AccountSession {
     if (revokedAt == null) revokedAt = at;
   }
 
-  /** {@return the persistent record UUID, or {@code null} before persistence assigns it} */
   public UUID getId() {
     return id;
   }
 
-  /** {@return the referenced Account UUID, independent of Organization membership} */
   public UUID getAccountId() {
     return accountId;
   }
 
-  /** {@return the external identity UUID constrained to belong to this record's Account} */
   public UUID getExternalIdentityId() {
     return externalIdentityId;
   }
 
-  /** {@return the inclusive session start time used by active queries} */
   public Instant getCreatedAt() {
     return createdAt;
   }
 
-  /** {@return the exclusive expiry boundary used by active session queries} */
   public Instant getExpiresAt() {
     return expiresAt;
   }
 
-  /** {@return the first revocation time, or {@code null} while no revocation has been recorded} */
   public Instant getRevokedAt() {
     return revokedAt;
   }
 
-  /** {@return the persistence version used to reject stale concurrent updates} */
   public long getVersion() {
     return version;
   }
