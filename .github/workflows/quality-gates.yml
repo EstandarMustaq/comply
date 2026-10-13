@@ -55,7 +55,7 @@ jobs:
         run: pnpm exec turbo run build
       - name: Upload browser test artifacts
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: complyz-playwright-artifacts
           path: |
