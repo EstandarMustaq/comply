@@ -57,7 +57,6 @@ export function AppShell({
     []
   )
 
-  // Toggle the sidebar with Cmd/Ctrl + \.
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "\\" && (e.metaKey || e.ctrlKey)) {
@@ -178,7 +177,6 @@ export function AppShellBody({
       className="flex min-h-0 flex-1 overflow-hidden bg-transparent"
       {...props}
     >
-      {/* Render the rail and sidebar together in the mobile drawer. */}
       <div className="md:hidden">
         {mobileDrawerOpen && (
           <div

@@ -1,27 +1,27 @@
 <div align="center">
 
-<h1 align="center">Complyz</h1>
+<h1 align="center">Comply</h1>
 
 <p align="center"><strong>Intelligent Financial Compliance</strong></p>
 
 <p align="center">
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/quality-gates.yml/badge.svg?branch=main" alt="Quality gates"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/dependabot-alert-issues.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/dependabot-alert-issues.yml/badge.svg?branch=main" alt="Dependabot security issues"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/coderabbit-finding-issues.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/coderabbit-finding-issues.yml/badge.svg?branch=main" alt="CodeRabbit finding issues"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/mintlify.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/mintlify.yml/badge.svg?branch=main" alt="Mintlify documentation checks"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/publish-containers.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/publish-containers.yml/badge.svg?branch=main" alt="Container publishing"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/actions/workflows/release-ui.yml"><img src="https://github.com/EstandarMustaq/complyz/actions/workflows/release-ui.yml/badge.svg?branch=main" alt="Web release"></a>
-  <a href="https://github.com/EstandarMustaq/complyz/commits/main/"><img src="https://img.shields.io/github/last-commit/EstandarMustaq/complyz?branch=main&label=last%20updated" alt="Last updated"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/quality-gates.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/quality-gates.yml/badge.svg?branch=main" alt="Quality gates"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/dependabot-alert-issues.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/dependabot-alert-issues.yml/badge.svg?branch=main" alt="Dependabot security issues"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/coderabbit-finding-issues.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/coderabbit-finding-issues.yml/badge.svg?branch=main" alt="CodeRabbit finding issues"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/mintlify.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/mintlify.yml/badge.svg?branch=main" alt="Mintlify documentation checks"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/publish-containers.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/publish-containers.yml/badge.svg?branch=main" alt="Container publishing"></a>
+  <a href="https://github.com/EstandarMustaq/comply/actions/workflows/release-ui.yml"><img src="https://github.com/EstandarMustaq/comply/actions/workflows/release-ui.yml/badge.svg?branch=main" alt="Web release"></a>
+  <a href="https://github.com/EstandarMustaq/comply/commits/main/"><img src="https://img.shields.io/github/last-commit/EstandarMustaq/comply?branch=main&label=last%20updated" alt="Last updated"></a>
   <img src="https://img.shields.io/badge/Node.js-26.5.0-339933?logo=node.js&logoColor=white" alt="Node.js 26.5.0">
   <img src="https://img.shields.io/badge/pnpm-12.8.1-F69220?logo=pnpm&logoColor=white" alt="pnpm 12.8.1">
-  <a href="https://trycomplyz.com"><img src="https://img.shields.io/badge/Explore%20Complyz-trycomplyz.com-536760" alt="Explore Complyz"></a>
+  <a href="https://trycomply.io"><img src="https://img.shields.io/badge/Explore%20Comply-trycomply.io-536760" alt="Explore Comply"></a>
 </p>
 
 </div>
 
-Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
+Built for regulated finance teams who know what they’re doing. Today, Comply brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
 
-## What Complyz does today
+## What Comply does today
 
 - Keep customer profiles, ownership details and risk assessments together.
 - Review transaction and sanctions alerts with the context to decide what comes next.
@@ -35,15 +35,15 @@ The longer-term design aims to support external-tool integrations, advanced prec
 
 ## Security alignment
 
-Aligning security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria is a roadmap objective, not an implemented program. Complyz does not claim ISO certification or a SOC 2 Type II report.
+Aligning security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria is a roadmap objective, not an implemented program. Comply does not claim ISO certification or a SOC 2 Type II report.
 
 ## Licensing and trademarks
 
-Source code is licensed under [AGPL-3.0-only](LICENSE-AGPL-3.0). Documentation is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0). The Complyz™ name, logo and trademarks are reserved. These licenses do not grant trademark rights.
+Source code is licensed under [AGPL-3.0-only](LICENSE-AGPL-3.0). The Comply™ name, logo and trademarks are reserved. These licenses do not grant trademark rights.
 
-## Explore Complyz
+## Explore Comply
 
-Visit [trycomplyz.com](https://trycomplyz.com) to learn more about the product.
+Visit [trycomply.io](https://trycomply.io) to learn more about the product.
 
 ## Run the workspace locally
 

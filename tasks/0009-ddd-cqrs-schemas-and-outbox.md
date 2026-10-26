@@ -5,11 +5,11 @@ status: draft
 branch: task/0009-ddd-cqrs-schemas-and-outbox
 scope:
   - packages/contracts/**
-  - apps/api/src/main/java/com/complyz/architecture/**
-  - apps/api/src/main/java/com/complyz/shared/**
-  - apps/api/src/main/java/com/complyz/**/outbox/**
-  - apps/api/src/test/java/com/complyz/architecture/**
-  - apps/api/src/test/java/com/complyz/shared/**
+  - apps/api/src/main/java/com/comply/architecture/**
+  - apps/api/src/main/java/com/comply/shared/**
+  - apps/api/src/main/java/com/comply/**/outbox/**
+  - apps/api/src/test/java/com/comply/architecture/**
+  - apps/api/src/test/java/com/comply/shared/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
   - apps/api/build.gradle.kts
   - apps/ui/package.json
@@ -18,9 +18,9 @@ scope:
   - docs/adr/**
   - GLOSSARY.md
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
-  - apps/api/src/main/java/com/complyz/clients/**
-  - apps/api/src/main/java/com/complyz/reporting/**
+  - apps/api/src/main/java/com/comply/auth/**
+  - apps/api/src/main/java/com/comply/clients/**
+  - apps/api/src/main/java/com/comply/reporting/**
   - apps/ui/app/**
   - apps/ui/components/**
 depends_on:

@@ -163,13 +163,13 @@ export function validateBackupEnvironment(env) {
     passphrase: env.BACKUP_ENCRYPTION_PASSPHRASE,
     retentionYears,
     prefix,
-    database: env.POSTGRES_DB ?? "complyz_db",
-    user: env.POSTGRES_USER ?? "complyz_app",
+    database: env.POSTGRES_DB ?? "comply_db",
+    user: env.POSTGRES_USER ?? "comply_app",
     container:
       env.POSTGRES_CONTAINER ??
-      (env.COMPLYZ_ENVIRONMENT === "production"
-        ? "complyz-postgres"
-        : "complyz-postgres-dev"),
+      (env.COMPLY_ENVIRONMENT === "production"
+        ? "comply-postgres"
+        : "comply-postgres-dev"),
   }
 }
 
@@ -195,10 +195,10 @@ async function main() {
     .toISOString()
     .replace(/[-:]/g, "")
     .replace(/\.\d{3}Z$/, "Z")
-  const temporaryDirectory = await mkdtemp(join(tmpdir(), "complyz-backup-"))
+  const temporaryDirectory = await mkdtemp(join(tmpdir(), "comply-backup-"))
   const encryptedPath = join(
     temporaryDirectory,
-    `complyz_${database}_${timestamp}.sql.gz.gpg`
+    `comply_${database}_${timestamp}.sql.gz.gpg`
   )
   try {
     await createEncryptedDump({

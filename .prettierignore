@@ -10,7 +10,8 @@ apps/ui/.next
 apps/ui/out
 apps/ui/build
 apps/ui/test-results
-apps/ui/playwright-report
+apps/ui/storybook-static
+storybook-static
 apps/api/build
 apps/api/.gradle
 .gradle
@@ -20,8 +21,6 @@ package-lock.json
 *.woff2
 *.png
 *.ico
-
-# Preserve upstream formatting for vendored agent skill bundles.
 .agents/skills/impeccable
 .agents/skills/typescript-advanced-types
 .agents/skills/ui-ux-pro-max
@@ -52,7 +51,5 @@ package-lock.json
 .claude/skills/improve-codebase-architecture
 .claude/skills/tdd
 .claude/skills/to-questionnaire
-
-# Nested worktrees are separate checkouts; do not format their contents.
 .worktrees/
 .delta/

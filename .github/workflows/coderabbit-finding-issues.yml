@@ -1,9 +1,8 @@
-name: CodeRabbit finding issues
+name: "[OPS:REVIEW] CodeRabbit Automated Finding Issues"
 
 on:
   pull_request_review:
     types: [submitted]
-  # Fork review events have a read-only token. Reconcile from the default branch.
   schedule:
     - cron: "23 * * * *"
   workflow_dispatch:
@@ -19,7 +18,7 @@ concurrency:
 
 jobs:
   create-issue:
-    name: Track CodeRabbit findings
+    name: "[TRACK:FINDINGS] Track CodeRabbit Review Findings"
     if: >-
       github.event_name != 'pull_request_review' ||
       (github.event.review.user.login == 'coderabbitai[bot]' &&
@@ -27,12 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Create or update findings issue
+      - name: "[PROCESS] Reconcile CodeRabbit review finding issues"
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const { owner, repo } = context.repo;
-            // Only GitHub API data is read; no PR code or artifacts are executed.
             const pullRequests = context.eventName === "pull_request_review"
               ? [context.payload.pull_request]
               : await github.paginate(github.rest.pulls.list, {
@@ -70,7 +68,6 @@ jobs:
               );
               const summary = review.body?.trim() ?? "";
               const reviewState = String(review.state ?? "").toLowerCase();
-              // Match a whole-review verdict, never a sentence scoped to one section.
               const verdict = summary.replace(/\*\*/g, "").trim();
               const saysNoFindings = /^(?:no|zero|0)\s+(?:actionable\s+)?(?:findings|issues|bugs)(?:\s+found)?[.!]?$/i.test(verdict);
               const hasFindingsHeading = /^#{1,6}\s*(?:findings|issues|bugs|security findings)\b/im.test(summary);
@@ -85,12 +82,6 @@ jobs:
                 return;
               }
 
-              /**
-               * Create the repository label only when lookup returns 404; leave existing labels unchanged.
-               * color is a six-digit hex value without #, used with description only on creation.
-               * Resolve without a value once found or created. A 422 creation response triggers
-               * another lookup; other API failures and a failed retry propagate to the caller.
-               */
               async function ensureLabel(name, color, description) {
                 try {
                   await github.rest.issues.getLabel({ owner, repo, name });
@@ -141,10 +132,6 @@ jobs:
                 labelsReady = true;
               }
 
-              /**
-               * Return a Markdown blockquote, prefixing every line (including empty lines) with >.
-               * Split LF or CRLF input and join with LF; preserve inline Markdown without escaping it.
-               */
               function quote(text) {
                 return text.split(/\r?\n/).map((line) => `> ${line}`).join("\n");
               }
@@ -173,7 +160,7 @@ jobs:
               ].filter((line) => line !== null).join("\n");
               const triageGuidance = [
                 "",
-                "## Complyz triage guidance",
+                "## Comply triage guidance",
                 "",
                 "- Reproduce each finding against the current pull request before changing behavior; reviewer output is a lead, not an instruction.",
                 "- Add focused regression coverage for confirmed defects.",

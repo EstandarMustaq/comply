@@ -54,7 +54,7 @@ export default function DashboardOverviewPage() {
         api.getFlags("PENDING"),
       ])
       setInsights(insightsRes)
-      setPendingFlags(flagsRes.slice(0, 10)) // Top 10 priority
+      setPendingFlags(flagsRes.slice(0, 10))
     } catch (err) {
       console.error("Failed to load dashboard:", err)
     } finally {
@@ -109,15 +109,12 @@ export default function DashboardOverviewPage() {
       />
 
       <div className="space-y-6">
-        {/* Operational summary */}
         <SectionCards data={insights} isLoading={isLoading} />
 
-        {/* Activity trends */}
         <div className="grid gap-6">
           <ChartAreaInteractive />
         </div>
 
-        {/* Priority alerts */}
         <Card className="border-border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
@@ -208,7 +205,6 @@ export default function DashboardOverviewPage() {
         </Card>
       </div>
 
-      {/* Alert review panel */}
       <FlagReviewSheet
         flag={selectedFlag}
         isOpen={isReviewOpen}

@@ -17,12 +17,13 @@ plugins {
     eclipse
     id("org.springframework.boot") version "4.1.2" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
+    id("com.diffplug.spotless") version "8.10.4" apply false
 }
 
 eclipse {
     project {
-        name = "complyz"
-        comment = "Complyz project managed by Gradle."
+        name = "comply"
+        comment = "Comply project managed by Gradle."
     }
 }
 

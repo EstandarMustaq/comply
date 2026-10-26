@@ -4,15 +4,15 @@ title: Explicit policy scopes and security floors
 status: draft
 branch: task/0004-explicit-policy-scopes-and-security-floors
 scope:
-  - apps/api/src/main/java/com/complyz/**/policy/**
-  - apps/api/src/main/java/com/complyz/tenancy/**
+  - apps/api/src/main/java/com/comply/**/policy/**
+  - apps/api/src/main/java/com/comply/tenancy/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
   - apps/api/src/test/**
   - apps/ui/lib/types.ts
   - packages/api-clients/**
   - packages/ui/tests/contract/**
 reserved:
-  - apps/api/src/main/java/com/complyz/auth/**
+  - apps/api/src/main/java/com/comply/auth/**
   - apps/ui/app/**
   - apps/ui/components/**
   - docs/**/*.mdx

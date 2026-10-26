@@ -5,7 +5,7 @@ import openapiTS, { astToString } from "openapi-typescript"
 import prettier from "prettier"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const url = process.env.COMPLYZ_OPENAPI_URL ?? "http://127.0.0.1:8080/v3/api-docs"
+const url = process.env.COMPLY_OPENAPI_URL ?? "http://127.0.0.1:8080/v3/api-docs"
 const response = await fetch(url)
 
 if (!response.ok) {
@@ -60,7 +60,6 @@ await Promise.all([
     `${JSON.stringify(document, null, 2)}\n`
   ),
   writeFile(generatedPath, formattedGenerated),
-  // Keep public reference builds independent of the production API's availability.
   writeFile(
     resolve(root, "docs/openapi.json"),
     await prettier.format(JSON.stringify(document), {

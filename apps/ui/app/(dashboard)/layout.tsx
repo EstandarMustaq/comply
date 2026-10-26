@@ -8,7 +8,7 @@ import { env } from "@/lib/env"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token =
-      typeof window !== "undefined" ? localStorage.getItem("complyz_token") : null
+      typeof window !== "undefined" ? localStorage.getItem("comply_token") : null
     if (!token && env.NEXT_PUBLIC_AUTH_URL && typeof window !== "undefined") {
       try {
         const authUrl = new URL(env.NEXT_PUBLIC_AUTH_URL, window.location.origin)

@@ -70,7 +70,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
         </SheetHeader>
 
         <div className="space-y-6 py-4 text-xs">
-          {/* Identity and documents */}
           <div className="space-y-2">
             <h4 className="font-semibold uppercase tracking-wider text-muted-foreground">
               Identity and documents
@@ -95,7 +94,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             </div>
           </div>
 
-          {/* Politically exposed person status */}
           {client.isPep ? (
             <div className="space-y-1 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-amber-900">
               <div className="flex items-center gap-1.5 font-bold">
@@ -122,7 +120,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             </div>
           )}
 
-          {/* Simplified regime limits */}
           {isSimplified && (
             <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-3">
               <div className="flex items-center justify-between">
@@ -138,7 +135,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 </Badge>
               </div>
 
-              {/* Monthly limit */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
@@ -160,7 +156,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
                 </div>
               </div>
 
-              {/* Annual limit */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span>
@@ -188,7 +183,6 @@ export function ClientDetailSheet({ client, isOpen, onClose }: ClientDetailSheet
             </div>
           )}
 
-          {/* Beneficial owners */}
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-muted-foreground">
               <Layers className="h-3.5 w-3.5 text-primary" />

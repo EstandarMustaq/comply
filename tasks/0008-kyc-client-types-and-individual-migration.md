@@ -4,17 +4,17 @@ title: KYC client types and INDIVIDUAL migration
 status: draft
 branch: task/0008-kyc-client-types-and-individual-migration
 scope:
-  - apps/api/src/main/java/com/complyz/clients/**
+  - apps/api/src/main/java/com/comply/clients/**
   - apps/api/src/main/resources/db/migration/V*__*.sql
-  - apps/api/src/test/java/com/complyz/clients/**
+  - apps/api/src/test/java/com/comply/clients/**
   - apps/ui/app/**/clients/**
   - apps/ui/components/clients/**
   - apps/ui/lib/**
   - packages/api-clients/**
   - packages/ui/tests/**
 reserved:
-  - apps/api/src/main/java/com/complyz/users/**
-  - apps/api/src/main/java/com/complyz/tenancy/**
+  - apps/api/src/main/java/com/comply/users/**
+  - apps/api/src/main/java/com/comply/tenancy/**
   - docs/**/*.mdx
 depends_on:
   - 0001

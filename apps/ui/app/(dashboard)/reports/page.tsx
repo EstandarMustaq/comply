@@ -64,7 +64,6 @@ function ReportsContent() {
   const [ctrs, setCtrs] = useState<CurrencyTransactionReport[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  // Report submission dialog state.
   const [selectedStr, setSelectedStr] = useState<SuspiciousActivityReport | null>(null)
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
   const [suspicionGrounds, setSuspicionGrounds] = useState("")
@@ -172,7 +171,6 @@ function ReportsContent() {
       />
 
       <div className="space-y-6">
-        {/* Report retention details */}
         <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-3.5 text-xs text-foreground">
           <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <div>
@@ -184,7 +182,6 @@ function ReportsContent() {
           </div>
         </div>
 
-        {/* Report category tabs */}
         <div className="flex items-center justify-between">
           <Tabs
             value={activeTab}
@@ -203,7 +200,6 @@ function ReportsContent() {
         </div>
 
         {activeTab === "STR" ? (
-          /* Investigation reports */
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -306,7 +302,6 @@ function ReportsContent() {
             </CardContent>
           </Card>
         ) : (
-          /* Cash transaction reports */
           <Card className="border-border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -370,7 +365,6 @@ function ReportsContent() {
         )}
       </div>
 
-      {/* Report submission and details dialog */}
       <Dialog open={isSubmitModalOpen} onOpenChange={setIsSubmitModalOpen}>
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>

@@ -3,11 +3,12 @@ plugins {
     `maven-publish`
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("com.diffplug.spotless")
 }
 
-group = "com.complyz"
-version = "1.0.0-SNAPSHOT"
-description = "Complyz Financial Compliance Intelligent engine"
+group = "com.comply"
+version = (findProperty("version") as? String)?.takeIf { it != "unspecified" } ?: "1.0.0-SNAPSHOT"
+description = "Comply Financial Compliance Intelligent engine"
 
 java {
     toolchain {
@@ -22,7 +23,6 @@ extra["opencsvVersion"] = "5.12.0"
 extra["tomcatVersion"] = "11.0.25"
 extra["springdocVersion"] = "3.1.1"
 
-// Keep both Jackson families and Apache Commons Lang aligned with security fixes.
 extra["jackson-2-bom.version"] = "2.21.7"
 extra["jackson-bom.version"] = "3.1.7"
 extra["commons-lang3.version"] = "3.20.0"
@@ -83,26 +83,36 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.bootJar {
-    archiveBaseName = "complyz-api"
+    archiveBaseName = "comply-api"
 }
 
 publishing {
     publications {
         create<MavenPublication>("api") {
             from(components["java"])
-            groupId = "com.complyz"
-            artifactId = "complyz-api"
+            groupId = "com.comply"
+            artifactId = "comply-api"
             version = project.version.toString()
         }
     }
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "EstandarMustaq/complyz"}")
+            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "EstandarMustaq/comply"}")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: ""
                 password = System.getenv("GITHUB_TOKEN") ?: ""
             }
         }
+    }
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.24.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }

@@ -4,7 +4,7 @@
 
 **Intelligent Financial Compliance.**
 
-Built for regulated finance teams who know what they’re doing. Today, Complyz brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
+Built for regulated finance teams who know what they’re doing. Today, Comply brings customer and transaction data into one operational workspace so teams can assess risk, review alerts, investigate activity and prepare reports.
 
 Compliance should make finance safer, sharper and easier to operate—not slow it down.
 
@@ -14,7 +14,7 @@ Security alignment with ISO/IEC 27001:2022 and SOC 2 Type II criteria is a roadm
 
 ## Voice
 
-Complyz speaks like software built for people who know what they are doing.
+Comply speaks like software built for people who know what they are doing.
 
 - Write in English: youthful, professional, clear, direct, confident and bold.
 - Keep sentences short. Lead with the action or the state.

@@ -1,11 +1,11 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Complyz API",
-    "description": "API for Complyz's financial compliance workspace.",
+    "title": "Comply API",
+    "description": "API for Comply's financial compliance workspace.",
     "version": "1.0"
   },
-  "servers": [{ "url": "https://api.trycomplyz.com", "description": "Production" }],
+  "servers": [{ "url": "https://api.trycomply.io", "description": "Production" }],
   "security": [{ "bearerAuth": [] }],
   "paths": {
     "/api/v1/settings/threshold-rules/{id}": {

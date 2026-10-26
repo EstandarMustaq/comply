@@ -1,15 +1,15 @@
-name: complyz
+name: comply
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: complyz-postgres-dev
+    container_name: comply-postgres-dev
     profiles: [app]
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-complyz_db}
-      POSTGRES_USER: ${POSTGRES_USER:-complyz_app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-comply_db}
+      POSTGRES_USER: ${POSTGRES_USER:-comply_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comply_dev_password}
     ports:
       - "${DB_BIND_ADDRESS:-127.0.0.1}:${DB_PORT:-5432}:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [complyz]
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -28,7 +28,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: complyz-redis-dev
+    container_name: comply-redis-dev
     profiles: [app]
     restart: unless-stopped
     command:
@@ -48,7 +48,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [complyz]
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -63,7 +63,7 @@ services:
       - ./scripts/production-compose-preflight.mjs:/production-compose-preflight.mjs:ro
       - ./scripts/deploy-production.mjs:/deploy-production.mjs:ro
     environment:
-      COMPLYZ_ENVIRONMENT: ${COMPLYZ_ENVIRONMENT:-}
+      COMPLY_ENVIRONMENT: ${COMPLY_ENVIRONMENT:-}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
       DOMAIN: ${DOMAIN:-}
       API_DOMAIN: ${API_DOMAIN:-}
@@ -75,19 +75,19 @@ services:
       MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
-      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-}
+      COMPLY_BOOTSTRAP_ENABLED: ${COMPLY_BOOTSTRAP_ENABLED:-}
       POSTGRES_VOLUME_NAME: ${POSTGRES_VOLUME_NAME:-}
       REDIS_VOLUME_NAME: ${REDIS_VOLUME_NAME:-}
 
   postgres-production:
     image: postgres:16-alpine
-    container_name: complyz-postgres
+    container_name: comply-postgres
     profiles: [production]
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-complyz_db}
-      POSTGRES_USER: ${POSTGRES_USER:-complyz_app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-comply_db}
+      POSTGRES_USER: ${POSTGRES_USER:-comply_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-comply_dev_password}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     depends_on:
@@ -98,7 +98,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [complyz]
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -107,7 +107,7 @@ services:
 
   redis-production:
     image: redis:7-alpine
-    container_name: complyz-redis
+    container_name: comply-redis
     profiles: [production]
     restart: unless-stopped
     command:
@@ -128,7 +128,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: [complyz]
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -136,13 +136,13 @@ services:
         max-file: "3"
 
   api:
-    container_name: complyz-api-dev
+    container_name: comply-api-dev
     profiles: [app]
     build:
       context: .
       dockerfile: Dockerfile
       target: api
-    image: ghcr.io/estandarmustaq/complyz-api:${COMPLYZ_IMAGE_TAG:-local}
+    image: ghcr.io/estandarmustaq/comply-api:${COMPLY_IMAGE_TAG:-local}
     restart: unless-stopped
     ports:
       - "${API_BIND_ADDRESS:-127.0.0.1}:${SERVER_PORT:-8080}:8080"
@@ -150,9 +150,9 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB:-complyz_db}
-      DB_USER: ${POSTGRES_USER:-complyz_app}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+      DB_NAME: ${POSTGRES_DB:-comply_db}
+      DB_USER: ${POSTGRES_USER:-comply_app}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-comply_dev_password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_dev_password}
@@ -160,17 +160,17 @@ services:
       MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}
       MFA_AES_KEY: ${MFA_AES_KEY:-0123456789abcdef0123456789abcdef}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
-      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-false}
-      COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:-}
-      COMPLYZ_BOOTSTRAP_ADMIN_EMAIL: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:-}
-      COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:-}
-      COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:-}
-      COMPLYZ_BOOTSTRAP_OCOS_EMAIL: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:-}
-      COMPLYZ_BOOTSTRAP_OCOS_PASSWORD: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:-}
-      COMPLYZ_IMPORT_STORAGE_PATH: /var/lib/complyz/imports
+      COMPLY_BOOTSTRAP_ENABLED: ${COMPLY_BOOTSTRAP_ENABLED:-false}
+      COMPLY_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLY_BOOTSTRAP_ADMIN_FULL_NAME:-}
+      COMPLY_BOOTSTRAP_ADMIN_EMAIL: ${COMPLY_BOOTSTRAP_ADMIN_EMAIL:-}
+      COMPLY_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLY_BOOTSTRAP_ADMIN_PASSWORD:-}
+      COMPLY_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLY_BOOTSTRAP_OCOS_FULL_NAME:-}
+      COMPLY_BOOTSTRAP_OCOS_EMAIL: ${COMPLY_BOOTSTRAP_OCOS_EMAIL:-}
+      COMPLY_BOOTSTRAP_OCOS_PASSWORD: ${COMPLY_BOOTSTRAP_OCOS_PASSWORD:-}
+      COMPLY_IMPORT_STORAGE_PATH: /var/lib/comply/imports
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:-health,info,metrics,prometheus}
     volumes:
-      - imports:/var/lib/complyz/imports
+      - imports:/var/lib/comply/imports
     depends_on:
       postgres:
         condition: service_healthy
@@ -189,10 +189,10 @@ services:
     cpus: ${API_CPU_LIMIT:-1.00}
     mem_limit: ${API_MEMORY_LIMIT:-1024m}
     labels:
-      com.complyz.environment: ${COMPLYZ_ENVIRONMENT:-development}
-      com.complyz.service: api
-      com.complyz.cost-center: product
-    networks: [complyz]
+      com.comply.environment: ${COMPLY_ENVIRONMENT:-development}
+      com.comply.service: api
+      com.comply.cost-center: product
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -200,21 +200,21 @@ services:
         max-file: "3"
 
   api-production:
-    container_name: complyz-api
+    container_name: comply-api
     profiles: [production]
     build:
       context: .
       dockerfile: Dockerfile
       target: api
-    image: ghcr.io/estandarmustaq/complyz-api:${COMPLYZ_IMAGE_TAG:-local}
+    image: ghcr.io/estandarmustaq/comply-api:${COMPLY_IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: production
       DB_HOST: postgres-production
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB:-complyz_db}
-      DB_USER: ${POSTGRES_USER:-complyz_app}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-complyz_dev_password}
+      DB_NAME: ${POSTGRES_DB:-comply_db}
+      DB_USER: ${POSTGRES_USER:-comply_app}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-comply_dev_password}
       REDIS_HOST: redis-production
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_dev_password}
@@ -222,17 +222,17 @@ services:
       MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}
       MFA_AES_KEY: ${MFA_AES_KEY:-0123456789abcdef0123456789abcdef}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
-      COMPLYZ_BOOTSTRAP_ENABLED: ${COMPLYZ_BOOTSTRAP_ENABLED:-}
-      COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLYZ_BOOTSTRAP_ADMIN_FULL_NAME:-}
-      COMPLYZ_BOOTSTRAP_ADMIN_EMAIL: ${COMPLYZ_BOOTSTRAP_ADMIN_EMAIL:-}
-      COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLYZ_BOOTSTRAP_ADMIN_PASSWORD:-}
-      COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLYZ_BOOTSTRAP_OCOS_FULL_NAME:-}
-      COMPLYZ_BOOTSTRAP_OCOS_EMAIL: ${COMPLYZ_BOOTSTRAP_OCOS_EMAIL:-}
-      COMPLYZ_BOOTSTRAP_OCOS_PASSWORD: ${COMPLYZ_BOOTSTRAP_OCOS_PASSWORD:-}
-      COMPLYZ_IMPORT_STORAGE_PATH: /var/lib/complyz/imports
+      COMPLY_BOOTSTRAP_ENABLED: ${COMPLY_BOOTSTRAP_ENABLED:-}
+      COMPLY_BOOTSTRAP_ADMIN_FULL_NAME: ${COMPLY_BOOTSTRAP_ADMIN_FULL_NAME:-}
+      COMPLY_BOOTSTRAP_ADMIN_EMAIL: ${COMPLY_BOOTSTRAP_ADMIN_EMAIL:-}
+      COMPLY_BOOTSTRAP_ADMIN_PASSWORD: ${COMPLY_BOOTSTRAP_ADMIN_PASSWORD:-}
+      COMPLY_BOOTSTRAP_OCOS_FULL_NAME: ${COMPLY_BOOTSTRAP_OCOS_FULL_NAME:-}
+      COMPLY_BOOTSTRAP_OCOS_EMAIL: ${COMPLY_BOOTSTRAP_OCOS_EMAIL:-}
+      COMPLY_BOOTSTRAP_OCOS_PASSWORD: ${COMPLY_BOOTSTRAP_OCOS_PASSWORD:-}
+      COMPLY_IMPORT_STORAGE_PATH: /var/lib/comply/imports
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:-health,info,metrics,prometheus}
     volumes:
-      - imports:/var/lib/complyz/imports
+      - imports:/var/lib/comply/imports
     depends_on:
       production-preflight:
         condition: service_completed_successfully
@@ -253,10 +253,10 @@ services:
     cpus: ${API_CPU_LIMIT:-1.00}
     mem_limit: ${API_MEMORY_LIMIT:-1024m}
     labels:
-      com.complyz.environment: production
-      com.complyz.service: api
-      com.complyz.cost-center: product
-    networks: [complyz]
+      com.comply.environment: production
+      com.comply.service: api
+      com.comply.cost-center: product
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -264,7 +264,7 @@ services:
         max-file: "3"
 
   ui:
-    container_name: complyz-ui-dev
+    container_name: comply-ui-dev
     profiles: [app]
     build:
       context: .
@@ -272,8 +272,8 @@ services:
       target: web
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Complyz}
-    image: ghcr.io/estandarmustaq/complyz-ui:${COMPLYZ_IMAGE_TAG:-local}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Comply}
+    image: ghcr.io/estandarmustaq/comply-ui:${COMPLY_IMAGE_TAG:-local}
     restart: unless-stopped
     ports:
       - "${UI_BIND_ADDRESS:-127.0.0.1}:${UI_PORT:-3000}:3000"
@@ -297,10 +297,10 @@ services:
     cpus: ${UI_CPU_LIMIT:-0.50}
     mem_limit: ${UI_MEMORY_LIMIT:-512m}
     labels:
-      com.complyz.environment: ${COMPLYZ_ENVIRONMENT:-development}
-      com.complyz.service: ui
-      com.complyz.cost-center: product
-    networks: [complyz]
+      com.comply.environment: ${COMPLY_ENVIRONMENT:-development}
+      com.comply.service: ui
+      com.comply.cost-center: product
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -308,7 +308,7 @@ services:
         max-file: "3"
 
   ui-production:
-    container_name: complyz-ui
+    container_name: comply-ui
     profiles: [production]
     build:
       context: .
@@ -316,8 +316,8 @@ services:
       target: web
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Complyz}
-    image: ghcr.io/estandarmustaq/complyz-ui:${COMPLYZ_IMAGE_TAG:-local}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Comply}
+    image: ghcr.io/estandarmustaq/comply-ui:${COMPLY_IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -339,10 +339,10 @@ services:
     cpus: ${UI_CPU_LIMIT:-0.50}
     mem_limit: ${UI_MEMORY_LIMIT:-512m}
     labels:
-      com.complyz.environment: production
-      com.complyz.service: ui
-      com.complyz.cost-center: product
-    networks: [complyz]
+      com.comply.environment: production
+      com.comply.service: ui
+      com.comply.cost-center: product
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -350,7 +350,7 @@ services:
         max-file: "3"
 
   caddy:
-    container_name: complyz-caddy
+    container_name: comply-caddy
     profiles: [production]
     image: caddy:2-alpine
     restart: unless-stopped
@@ -359,7 +359,7 @@ services:
       - "443:443"
     environment:
       DOMAIN: ${DOMAIN:-localhost}
-      API_DOMAIN: ${API_DOMAIN:-api.trycomplyz.com}
+      API_DOMAIN: ${API_DOMAIN:-api.trycomply.io}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -377,10 +377,10 @@ services:
     cpus: ${CADDY_CPU_LIMIT:-0.25}
     mem_limit: ${CADDY_MEMORY_LIMIT:-128m}
     labels:
-      com.complyz.environment: production
-      com.complyz.service: edge
-      com.complyz.cost-center: platform
-    networks: [complyz]
+      com.comply.environment: production
+      com.comply.service: edge
+      com.comply.cost-center: platform
+    networks: [comply]
     logging:
       driver: json-file
       options:
@@ -389,21 +389,21 @@ services:
 
 volumes:
   postgres_dev_data:
-    name: complyz_postgres_data
+    name: comply_postgres_data
   redis_dev_data:
-    name: complyz_redis_data
+    name: comply_redis_data
   postgres_prod_data:
-    name: ${POSTGRES_VOLUME_NAME:-complyz_postgres_prod_data}
+    name: ${POSTGRES_VOLUME_NAME:-comply_postgres_prod_data}
   redis_prod_data:
-    name: ${REDIS_VOLUME_NAME:-complyz_redis_prod_data}
+    name: ${REDIS_VOLUME_NAME:-comply_redis_prod_data}
   imports:
-    name: ${COMPLYZ_IMPORT_VOLUME_NAME:-complyz_complyz_imports}
+    name: ${COMPLY_IMPORT_VOLUME_NAME:-comply_imports}
   caddy_data:
-    name: ${CADDY_DATA_VOLUME_NAME:-complyz_caddy_data}
+    name: ${CADDY_DATA_VOLUME_NAME:-comply_caddy_data}
   caddy_config:
-    name: ${CADDY_CONFIG_VOLUME_NAME:-complyz_caddy_config}
+    name: ${CADDY_CONFIG_VOLUME_NAME:-comply_caddy_config}
 
 networks:
-  complyz:
-    name: complyz-net
+  comply:
+    name: comply-net
     driver: bridge

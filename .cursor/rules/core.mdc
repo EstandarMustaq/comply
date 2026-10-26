@@ -1,9 +1,9 @@
 ---
-description: Canonical Complyz repository architecture, tenant isolation, commands, and product-language boundaries
+description: Canonical Comply repository architecture, tenant isolation, commands, and product-language boundaries
 alwaysApply: true
 ---
 
-# Complyz repository
+# Comply repository
 
 - Read root `AGENTS.md`; it is the canonical guide. For UI changes, also follow `.github/instructions/ui.instructions.md`.
 - Use Node `26.5.0`, pnpm `12.8.1`, Java `21`, root pnpm scripts, and root `scripts/*.mjs`.

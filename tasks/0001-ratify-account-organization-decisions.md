@@ -54,7 +54,7 @@ depends_on: []
 - Each Organization has exactly one active `OCOS` coordinator. A sole OCOS may also be the coordinator. OCOS designations and temporary substitutes retain appointment/qualification references and effective dates; an external member or internal auditor cannot be OCOS/substitute.
 - Staff submit an internal suspicion report to an OCOS. The OCOS decides whether a STR is submitted and records the decision and reason; the coordinator sees and is notified of Organization STRs and may submit or escalate. CTR submission follows OCOS authority.
 - STR content is restricted to OCOS and explicitly named need-to-know recipients who accept the confidentiality duty. Owners, admins and auditors receive only non-identifying aggregate status by default. Access to report content is audited. A two-person maker-checker requirement is not imposed; it must not block a one-person compliance operation.
-- GIFiM credentials remain outside Complyz. Until an approved official integration exists, Complyz prepares the submission material for OCOS action. List updates notify the OCOS; decisions not to apply a restrictive measure are recorded with reasons.
+- GIFiM credentials remain outside Comply. Until an approved official integration exists, Comply prepares the submission material for OCOS action. List updates notify the OCOS; decisions not to apply a restrictive measure are recorded with reasons.
 
 ### D3 — Organization entitlements and quotas
 
@@ -65,7 +65,7 @@ depends_on: []
 ### D4 — Identity provider and sessions
 
 - Use WSO2 Identity Server 7.3. Use Asgardeo when customer data-residency requirements permit; otherwise self-host WSO2 Identity Server. Preserve the SaaS-to-self-hosted exit path. The product owner is the initial operational owner until reassigned.
-- IdP B2B Organizations are not the Complyz membership source of truth. Accounts live in the IdP root organization; Complyz owns Accounts' Organization memberships.
+- IdP B2B Organizations are not the Comply membership source of truth. Accounts live in the IdP root organization; Comply owns Accounts' Organization memberships.
 - The IdP issues the profile token; the API issues a five-minute Organization-scoped operational context token after checking membership, Organization state and effective policy. These are the only human token classes; there is no CommercialClient token or `commercial_client_id` authorization claim.
 - Initial sessions use 30-minute idle and eight-hour absolute limits, adjustable only within D1 floors. Authorization version is checked on every protected request, forced logout uses a `jti` deny-list, and IdP deactivation ends sessions through back-channel logout within 60 seconds. Local password/MFA flows migrate to the IdP.
 

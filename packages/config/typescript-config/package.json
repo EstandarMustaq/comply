@@ -1,8 +1,8 @@
 {
-  "name": "@complyz/config-typescript",
+  "name": "@comply/config-typescript",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared TypeScript configuration for Complyz",
+  "description": "Shared TypeScript configuration for Comply",
   "license": "AGPL-3.0-only",
   "publishConfig": {
     "access": "restricted"

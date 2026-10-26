@@ -23,7 +23,7 @@ function resolveApiBaseUrl(value: string): string {
 const API_BASE_URL = resolveApiBaseUrl(env.NEXT_PUBLIC_API_URL)
 
 // The contract test validates these routes against the running API schema.
-export { apiContract } from "@complyz/api-clients"
+export { apiContract } from "@comply/api-clients"
 
 export interface CurrentUser {
   id: string
@@ -36,24 +36,24 @@ export interface CurrentUser {
 class ApiClient {
   private getToken(): string | null {
     if (typeof window === "undefined") return null
-    return localStorage.getItem("complyz_token")
+    return localStorage.getItem("comply_token")
   }
 
   public setToken(token: string) {
     if (typeof window !== "undefined") {
-      localStorage.setItem("complyz_token", token)
+      localStorage.setItem("comply_token", token)
     }
   }
 
   public clearToken() {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("complyz_token")
+      localStorage.removeItem("comply_token")
     }
   }
 
   public hasToken(): boolean {
     if (typeof window === "undefined") return false
-    return !!localStorage.getItem("complyz_token")
+    return !!localStorage.getItem("comply_token")
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -80,7 +80,7 @@ class ApiClient {
 
     if (response.status === 401) {
       if (typeof window !== "undefined") {
-        const refreshToken = localStorage.getItem("complyz_refresh_token")
+        const refreshToken = localStorage.getItem("comply_refresh_token")
         if (refreshToken && !endpoint.includes("/auth/refresh")) {
           try {
             const refreshed = await this.request<AuthResponse>("/auth/refresh", {
@@ -90,16 +90,15 @@ class ApiClient {
             if (refreshed.accessToken) {
               this.setToken(refreshed.accessToken)
               if (refreshed.refreshToken)
-                localStorage.setItem("complyz_refresh_token", refreshed.refreshToken)
+                localStorage.setItem("comply_refresh_token", refreshed.refreshToken)
               return this.request<T>(endpoint, options)
             }
           } catch {
-            // Clear credentials below when rotation fails.
+            // Refresh failed; fall through to session clear.
           }
         }
         this.clearToken()
-        localStorage.removeItem("complyz_refresh_token")
-        // Redirect to the external authentication service after session expiry.
+        localStorage.removeItem("comply_refresh_token")
         if (env.NEXT_PUBLIC_AUTH_URL) {
           window.location.href = env.NEXT_PUBLIC_AUTH_URL
         }
@@ -115,7 +114,7 @@ class ApiClient {
         else if (errorData.message) errorMsg = errorData.message
         else if (typeof errorData === "string") errorMsg = errorData
       } catch {
-        // fallback to status text
+        // Body parse failed; keep the status-line message.
       }
       throw new Error(errorMsg)
     }
@@ -131,7 +130,6 @@ class ApiClient {
     return response.text() as unknown as T
   }
 
-  // --- Auth ---
   async login(email: string, password: string): Promise<AuthResponse> {
     const res = await this.request<AuthResponse>("/auth/login", {
       method: "POST",
@@ -142,7 +140,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("complyz_refresh_token", res.refreshToken)
+      localStorage.setItem("comply_refresh_token", res.refreshToken)
     return res
   }
 
@@ -161,7 +159,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("complyz_refresh_token", res.refreshToken)
+      localStorage.setItem("comply_refresh_token", res.refreshToken)
     return res
   }
 
@@ -182,7 +180,7 @@ class ApiClient {
       this.setToken(token)
     }
     if (res.refreshToken && typeof window !== "undefined")
-      localStorage.setItem("complyz_refresh_token", res.refreshToken)
+      localStorage.setItem("comply_refresh_token", res.refreshToken)
     return res
   }
 
@@ -194,19 +192,17 @@ class ApiClient {
     try {
       await this.request("/auth/logout", { method: "POST" })
     } catch {
-      // Best-effort: always clear the local token
+      // Server-side invalidation is best-effort; local session is cleared in finally.
     } finally {
       this.clearToken()
-      if (typeof window !== "undefined") localStorage.removeItem("complyz_refresh_token")
+      if (typeof window !== "undefined") localStorage.removeItem("comply_refresh_token")
     }
   }
 
-  // --- Current User (from JWT via GRC engine) ---
   async getMe(): Promise<CurrentUser> {
     return this.request<CurrentUser>("/auth/me")
   }
 
-  // --- Insights & Dashboard ---
   async getInsights(): Promise<InsightsData> {
     return this.request<InsightsData>("/insights/summary").then((data) => ({
       ...data,
@@ -217,7 +213,6 @@ class ApiClient {
     }))
   }
 
-  // --- Clients & KYC ---
   async getClients(page = 0, size = 50, search?: string): Promise<Client[]> {
     const params = new URLSearchParams({ page: String(page), size: String(size) })
     if (search) params.set("search", search)
@@ -249,7 +244,6 @@ class ApiClient {
     }).then(mapClient)
   }
 
-  // --- Flags & Risk Queue ---
   async getFlags(status?: string, flagType?: string): Promise<Flag[]> {
     const params = new URLSearchParams()
     if (status) params.append("status", status)
@@ -277,7 +271,6 @@ class ApiClient {
     return this.getStrById(result.strId)
   }
 
-  // --- Ingestion / Batches ---
   async uploadBatch(file: File): Promise<ImportBatch> {
     const formData = new FormData()
     formData.append("file", file)
@@ -324,7 +317,6 @@ class ApiClient {
     )
   }
 
-  // --- Reports (STR & CTR) ---
   async getStrs(): Promise<SuspiciousActivityReport[]> {
     return this.request<GrcEngineStr[]>("/reports/str").then((reports) =>
       reports.map(mapStr)
@@ -359,7 +351,6 @@ class ApiClient {
     )
   }
 
-  // --- Threshold Rules & Admin Settings ---
   async getThresholdRules(): Promise<ThresholdRule[]> {
     return this.request<ThresholdRule[]>("/settings/threshold-rules")
   }

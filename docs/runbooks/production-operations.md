@@ -1,7 +1,7 @@
 # Production operations
 
 This runbook covers release readiness, service health, backup, and recovery for
-Complyz deployments.
+Comply deployments.
 
 ## Local operation
 
@@ -17,7 +17,7 @@ in `.env`; use the deployment environment for production credentials.
 - Run `pnpm api:test` for API tests.
 - Run `pnpm check` and `pnpm test:unit` for web and shared-package checks.
 - Run `pnpm test:contract` when the API is available.
-- Run `pnpm test:e2e` with the Playwright browser installed.
+- Run `pnpm test:e2e` to validate the UI component library.
 - Run `pnpm compose:config` to validate application and production service
   settings.
 
@@ -29,7 +29,7 @@ do not treat the local Compose command as an ECS release.
 
 ## Production configuration
 
-Set `SPRING_PROFILES_ACTIVE=production` and `COMPLYZ_ENVIRONMENT=production` in
+Set `SPRING_PROFILES_ACTIVE=production` and `COMPLY_ENVIRONMENT=production` in
 the deployment environment. Activate the production profile with `pnpm deploy`
 or `docker compose --profile production up -d --build`. Production Compose uses
 separate API, UI, PostgreSQL, and Redis services from the local application profile.
@@ -39,16 +39,16 @@ services can start.
 
 Before deploying, verify the configured PostgreSQL, Redis, imported-file, and
 proxy volume names against the target environment. Compose resolves them from
-`POSTGRES_VOLUME_NAME`, `REDIS_VOLUME_NAME`, `COMPLYZ_IMPORT_VOLUME_NAME`,
+`POSTGRES_VOLUME_NAME`, `REDIS_VOLUME_NAME`, `COMPLY_IMPORT_VOLUME_NAME`,
 `CADDY_DATA_VOLUME_NAME`, and `CADDY_CONFIG_VOLUME_NAME`. Never use `down -v`
 or otherwise remove production volumes as part of a release.
 
 The deployment preflight requires the existing PostgreSQL and Redis volumes:
 
-| Service    | Required production volume   | Configuration variable |
-| ---------- | ---------------------------- | ---------------------- |
-| PostgreSQL | `complyz_postgres_prod_data` | `POSTGRES_VOLUME_NAME` |
-| Redis      | `complyz_redis_prod_data`    | `REDIS_VOLUME_NAME`    |
+| Service    | Required production volume  | Configuration variable |
+| ---------- | --------------------------- | ---------------------- |
+| PostgreSQL | `comply_postgres_prod_data` | `POSTGRES_VOLUME_NAME` |
+| Redis      | `comply_redis_prod_data`    | `REDIS_VOLUME_NAME`    |
 
 Set these values explicitly before deployment. Compose development defaults
 use different names and must not be allowed to create empty production

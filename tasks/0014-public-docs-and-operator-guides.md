@@ -12,7 +12,7 @@ scope:
 reserved:
   - apps/ui/app/**
   - apps/ui/components/**
-  - apps/api/src/main/java/com/complyz/**
+  - apps/api/src/main/java/com/comply/**
   - packages/ui/tests/**
 depends_on:
   - 0001
@@ -34,7 +34,7 @@ depends_on:
 
 ## Context
 
-The current Mintlify API guide documents the public `/api/v1` routes. The Organization/access guide is minimal. Customer-facing product and public documentation use Complyz's clear, direct English voice; internal engineering docs use concise technical English. Customer documentation covers Account, Organizations, permissions, policy, SSO/MFA, compliance and API; restricted operator documentation may describe CommercialClient as a back-office commercial reference, never as an Organization hierarchy or customer access context. Documentation must not present proposed or untested functionality as available.
+The current Mintlify API guide documents the public `/api/v1` routes. The Organization/access guide is minimal. Customer-facing product and public documentation use Comply's clear, direct English voice; internal engineering docs use concise technical English. Customer documentation covers Account, Organizations, permissions, policy, SSO/MFA, compliance and API; restricted operator documentation may describe CommercialClient as a back-office commercial reference, never as an Organization hierarchy or customer access context. Documentation must not present proposed or untested functionality as available.
 
 ## Objective
 

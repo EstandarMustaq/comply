@@ -1,4 +1,4 @@
-name: Dependabot security issues
+name: "[OPS:SECURITY] Dependabot Security Advisory Reconciliation"
 
 on:
   schedule:
@@ -15,11 +15,11 @@ concurrency:
 
 jobs:
   create-issues:
-    name: Track open Dependabot alerts
+    name: "[AUDIT:ALERTS] Track and Reconcile Security Advisories"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Create or reconcile alert issues
+      - name: "[AUDIT] Reconcile Dependabot alert issues"
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           DEPENDABOT_ALERTS_TOKEN: ${{ secrets.DEPENDABOT_ALERTS_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
                 headers: {
                   Accept: "application/vnd.github+json",
                   Authorization: `Bearer ${alertsToken}`,
-                  "User-Agent": "complyz-dependabot-alert-issues",
+                  "User-Agent": "comply-dependabot-alert-issues",
                   "X-GitHub-Api-Version": "2022-11-28",
                 },
               });
@@ -87,12 +87,6 @@ jobs:
               }
             }
 
-            /**
-             * Create the repository label only when lookup returns 404; leave existing labels unchanged.
-             * color is a six-digit hex value without #, used with description only on creation.
-             * Resolve without a value once found or created. Non-404 lookup errors and all
-             * creation errors propagate to the caller.
-             */
             async function ensureLabel(name, color, description) {
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
@@ -108,11 +102,6 @@ jobs:
               await ensureLabel("dependencies", "0366d6", "Dependency updates and vulnerabilities");
             }
 
-            /**
-             * Return trimmed text with carriage returns, newlines, pipes, and backticks replaced by spaces.
-             * Use fallback for nullish input or an empty normalized result; the latter fallback
-             * is returned unchanged. Other Markdown syntax is preserved.
-             */
             function plainText(value, fallback = "Not provided") {
               return String(value ?? fallback).replace(/[\r\n|`]/g, " ").trim() || fallback;
             }

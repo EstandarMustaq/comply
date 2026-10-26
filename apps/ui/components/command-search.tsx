@@ -67,7 +67,6 @@ export function CommandSearch({
   const [query, setQuery] = React.useState("")
   const [activeIndex, setActiveIndex] = React.useState(0)
 
-  // Open the command palette with Cmd/Ctrl + K.
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
@@ -163,7 +162,7 @@ export function CommandSearch({
         <DialogContent className="top-[20%] max-w-xl translate-y-0 gap-0 overflow-hidden p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">Search</DialogTitle>
           <DialogDescription className="sr-only">
-            Search Complyz and jump to a workspace
+            Search Comply and jump to a workspace
           </DialogDescription>
 
           <div className="p-3 pb-2">

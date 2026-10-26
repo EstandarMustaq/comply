@@ -1,12 +1,12 @@
 ---
 title: "Make your first API request"
-description: "Connect an authorized client to Complyz when your API deployment is available."
+description: "Connect an authorized client to Comply when your API deployment is available."
 ---
 
-Use the Complyz API to connect authorized applications to your Organization's workspace. The API reference lists every operation, its request fields, and its responses.
+Use the Comply API to connect authorized applications to your Organization's workspace. The API reference lists every operation, its request fields, and its responses.
 
 <Note>
-  `api.trycomplyz.com` is currently offline. The API reference describes the current API
+  `api.trycomply.io` is currently offline. The API reference describes the current API
   contract; live requests require an available deployment. Ask your administrator for your
   deployment's base URL.
 </Note>
@@ -45,10 +45,10 @@ Send the access token in the `Authorization` header. For example, this request r
 ```bash
 curl --request GET \
   --url "https://<your-deployment>/api/v1/insights/summary" \
-  --header "Authorization: Bearer ${COMPLYZ_ACCESS_TOKEN}"
+  --header "Authorization: Bearer ${COMPLY_ACCESS_TOKEN}"
 ```
 
-Replace `COMPLYZ_ACCESS_TOKEN` with the access token returned after authentication. Keep access and refresh tokens in a secure secret store. Never put them in URLs, logs, source control, or support messages.
+Replace `COMPLY_ACCESS_TOKEN` with the access token returned after authentication. Keep access and refresh tokens in a secure secret store. Never put them in URLs, logs, source control, or support messages.
 
 ### Refresh an access token
 

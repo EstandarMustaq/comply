@@ -29,25 +29,25 @@ describe("api client", () => {
         )
       )
     vi.stubGlobal("fetch", fetchMock)
-    await api.login("officer@complyz.test", "secret")
+    await api.login("officer@comply.test", "secret")
     expect(fetchMock).toHaveBeenCalledWith(
       "http://api:8080/api/v1/auth/login",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
-          email: "officer@complyz.test",
+          email: "officer@comply.test",
           password: "secret",
           passwordHash: "secret",
         }),
       })
     )
-    expect(localStorage.getItem("complyz_token")).toBe("access-token")
-    expect(localStorage.getItem("complyz_refresh_token")).toBe("refresh-token")
+    expect(localStorage.getItem("comply_token")).toBe("access-token")
+    expect(localStorage.getItem("comply_refresh_token")).toBe("refresh-token")
   })
 
   it("refreshes a rejected request once and retries with the new token", async () => {
-    localStorage.setItem("complyz_token", "expired-token")
-    localStorage.setItem("complyz_refresh_token", "refresh-token")
+    localStorage.setItem("comply_token", "expired-token")
+    localStorage.setItem("comply_refresh_token", "refresh-token")
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse(errorEnvelope("expired", 401), 401))

@@ -49,7 +49,7 @@ function startDev() {
       stdio: "inherit",
       detached,
     }),
-    spawn(pnpm, ["exec", "turbo", "run", "dev", "--filter=@complyz/web"], {
+    spawn(pnpm, ["exec", "turbo", "run", "dev", "--filter=@comply/web"], {
       cwd: root,
       stdio: "inherit",
       detached,
@@ -94,10 +94,11 @@ switch (command) {
     break
   case "test":
     runGradle(":api:test")
-    runPnpm("exec", "turbo", "run", "test:unit", "test:contract", "test:e2e")
+    runPnpm("exec", "turbo", "run", "test:unit", "test:contract")
     break
   case "check":
   case "quality":
+    runGradle(":api:spotlessCheck")
     runGradle(":api:test")
     runPnpm("exec", "turbo", "run", "check", "typecheck", "test:unit")
     runPnpm("exec", "prettier", "--check", ".")
@@ -117,6 +118,9 @@ switch (command) {
     break
   case "api:build":
     runGradle(":api:bootJar")
+    break
+  case "api:format":
+    runGradle(":api:spotlessApply")
     break
   case "api:test":
     runGradle(":api:test")

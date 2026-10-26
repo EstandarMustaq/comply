@@ -12,7 +12,7 @@ scope:
 reserved:
   - apps/ui/app/**/account/**
   - apps/ui/app/**/organizations/**
-  - apps/api/src/main/java/com/complyz/**/reporting/**
+  - apps/api/src/main/java/com/comply/**/reporting/**
   - docs/**/*.mdx
 depends_on:
   - 0006

@@ -1,6 +1,6 @@
 # Intelligent Financial Compliance
 
-Build the interface for regulated finance teams who know what they’re doing. The Complyz web app brings customer profiles, transaction activity, alerts, investigations and reports into one operational workspace, with the current state and next action up front.
+Build the interface for regulated finance teams who know what they’re doing. The Comply web app brings customer profiles, transaction activity, alerts, investigations and reports into one operational workspace, with the current state and next action up front.
 
 ## Run locally
 
@@ -8,7 +8,7 @@ From the repository root, install the shared dependencies and start the app:
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm --filter @complyz/web dev
+pnpm --filter @comply/web dev
 ```
 
 The app runs at `http://localhost:3000` and connects to the API at
@@ -23,8 +23,8 @@ Run the checks and tests from the root workspace:
 pnpm check
 pnpm test:unit
 pnpm test:contract
-pnpm test:e2e
-pnpm --filter @complyz/web build
+pnpm storybook:build
+pnpm --filter @comply/web build
 ```
 
 The root workspace owns dependency versions and shared settings. Reusable UI

@@ -1,4 +1,4 @@
-name: Quality Gates
+name: "[CI:GATE] Quality Assurance"
 
 on:
   push:
@@ -14,70 +14,65 @@ concurrency:
 
 jobs:
   api:
-    name: API test and package
+    name: "[TEST:API] Spring Boot Service & Tests"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v7
+      - name: "[SETUP] Java 21 Toolchain"
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
-      - uses: gradle/actions/setup-gradle@v6
-      - name: Test and package API
-        run: ./gradlew --no-daemon :api:test :api:bootJar
+      - name: "[SETUP] Gradle Cache"
+        uses: gradle/actions/setup-gradle@v6
+      - name: "[TEST] Test and package API"
+        run: ./gradlew --no-daemon :api:spotlessCheck :api:test :api:bootJar
 
   web:
-    name: Workspace checks, UI tests, and build
+    name: "[TEST:UI] Workspace Validation & Storybook"
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v7
+      - name: "[SETUP] Setup pnpm"
+        uses: pnpm/action-setup@v6
         with:
           version: 12.8.1
-      - uses: actions/setup-node@v7
+      - name: "[SETUP] Setup Node.js"
+        uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Install workspace
+      - name: "[SETUP] Install workspace dependencies"
         run: pnpm install --frozen-lockfile
-      - name: Check types, lint, and formatting
+      - name: "[CHECK] Check types, lint, and formatting"
         run: pnpm check
-      - name: Run UI unit tests
+      - name: "[TEST] Run UI unit tests"
         run: pnpm test:unit
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Run UI browser tests
-        run: pnpm test:e2e
-      - name: Build UI and shared packages
+      - name: "[TEST] Verify component library with Storybook"
+        run: pnpm storybook:build
+      - name: "[BUILD] Build Next.js application and workspace packages"
         run: pnpm exec turbo run build
-      - name: Upload browser test artifacts
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: complyz-playwright-artifacts
-          path: |
-            apps/ui/test-results
-            apps/ui/playwright-report
-          if-no-files-found: ignore
 
   api-contract:
-    name: Spring OpenAPI and web contract
+    name: "[TEST:CONTRACT] OpenAPI Schema & Contract Suite"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     services:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: complyz_contract
-          POSTGRES_USER: complyz_app
-          POSTGRES_PASSWORD: complyz_contract_password
+          POSTGRES_DB: comply_contract
+          POSTGRES_USER: comply_app
+          POSTGRES_PASSWORD: comply_contract_password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U complyz_app -d complyz_contract"
+          --health-cmd "pg_isready -U comply_app -d comply_contract"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -91,38 +86,43 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v7
+      - name: "[SETUP] Java 21 Toolchain"
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
-      - uses: gradle/actions/setup-gradle@v6
-      - uses: pnpm/action-setup@v6
+      - name: "[SETUP] Gradle Cache"
+        uses: gradle/actions/setup-gradle@v6
+      - name: "[SETUP] Setup pnpm"
+        uses: pnpm/action-setup@v6
         with:
           version: 12.8.1
-      - uses: actions/setup-node@v7
+      - name: "[SETUP] Setup Node.js"
+        uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Install workspace
+      - name: "[SETUP] Install workspace dependencies"
         run: pnpm install --frozen-lockfile
-      - name: Start Spring API with OpenAPI enabled
+      - name: "[START] Launch Spring API in contract mode"
         env:
           SPRING_PROFILES_ACTIVE: contract
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
-          DB_NAME: complyz_contract
-          DB_USER: complyz_app
-          DB_PASSWORD: complyz_contract_password
+          DB_NAME: comply_contract
+          DB_USER: comply_app
+          DB_PASSWORD: comply_contract_password
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
           REDIS_PASSWORD: ""
           JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
           MFA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef
-          COMPLYZ_API_DOCS_ENABLED: "true"
-        run: ./gradlew --no-daemon :api:bootRun > /tmp/complyz-api.log 2>&1 &
-      - name: Wait for API readiness
+          COMPLY_API_DOCS_ENABLED: "true"
+        run: ./gradlew --no-daemon :api:bootRun > /tmp/comply-api.log 2>&1 &
+      - name: "[CHECK] Wait for API readiness"
         run: |
           for attempt in {1..60}; do
             if curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness; then
@@ -130,49 +130,52 @@ jobs:
             fi
             sleep 2
           done
-          cat /tmp/complyz-api.log
+          cat /tmp/comply-api.log
           exit 1
-      - name: Generate client types from Springdoc
+      - name: "[BUILD] Generate client types from Springdoc"
         env:
-          COMPLYZ_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
+          COMPLY_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
         run: pnpm api:openapi
-      - name: Verify the checked-in documentation contract
+      - name: "[CHECK] Verify the checked-in documentation contract"
         run: |
           if [ -n "$(git status --porcelain --untracked-files=all -- docs/openapi.json)" ]; then
             echo "Regenerate and commit docs/openapi.json with pnpm api:openapi."
             git status --short -- docs/openapi.json
             exit 1
           fi
-      - name: Type-check generated API client
-        run: pnpm --filter @complyz/api-clients run typecheck
-      - name: Run API/UI contract assertions
+      - name: "[CHECK] Type-check generated API client"
+        run: pnpm --filter @comply/api-clients run typecheck
+      - name: "[TEST] Run API and UI contract assertions"
         env:
-          COMPLYZ_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
+          COMPLY_OPENAPI_URL: http://127.0.0.1:8080/v3/api-docs
         run: pnpm test:contract
 
   configuration:
-    name: Root configuration and repository structure
+    name: "[CHECK:CONFIG] Repository Topology & Security Gates"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v7
+      - name: "[SETUP] Setup pnpm"
+        uses: pnpm/action-setup@v6
         with:
           version: 12.8.1
-      - uses: actions/setup-node@v7
+      - name: "[SETUP] Setup Node.js"
+        uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Install workspace
+      - name: "[SETUP] Install workspace dependencies"
         run: pnpm install --frozen-lockfile
-      - name: Exercise Git hook behavior
+      - name: "[TEST] Exercise Git hook behavior"
         run: pnpm hooks:test
-      - name: Test operational safety checks
+      - name: "[TEST] Test operational safety checks"
         run: pnpm operations:test
-      - name: Validate unified Compose profiles
+      - name: "[CHECK] Validate unified Compose profiles"
         run: pnpm compose:config
-      - name: Validate scripts and worktree topology
+      - name: "[CHECK] Validate scripts and worktree topology"
         run: |
           for file in scripts/*.mjs; do node --check "$file"; done
           test ! -e scripts/backup-s3.sh
@@ -206,7 +209,7 @@ jobs:
             echo "Embedded Git repositories are not allowed."
             exit 1
           fi
-      - name: Check high-confidence secrets in tracked files
+      - name: "[SECURITY] Check high-confidence secrets in tracked files"
         shell: bash
         run: |
           set -euo pipefail

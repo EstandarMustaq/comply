@@ -55,7 +55,6 @@ export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-  // New customer dialog state.
   const [isNewClientOpen, setIsNewClientOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newClientName, setNewClientName] = useState("")
@@ -107,7 +106,6 @@ export default function ClientsPage() {
         pepCategory: newClientIsPep ? newClientPepCategory : undefined,
       })
 
-      // Reset the customer form.
       setNewClientName("")
       setNewClientDoc("")
       setNewClientNuib("")
@@ -158,7 +156,6 @@ export default function ClientsPage() {
       />
 
       <div className="space-y-6">
-        {/* Customer search and filters */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -196,7 +193,6 @@ export default function ClientsPage() {
           </div>
         </div>
 
-        {/* Customer records */}
         <Card className="border-border shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -300,7 +296,6 @@ export default function ClientsPage() {
         </Card>
       </div>
 
-      {/* Customer details panel */}
       <ClientDetailSheet
         client={selectedClient}
         isOpen={isDetailOpen}
@@ -310,7 +305,6 @@ export default function ClientsPage() {
         }}
       />
 
-      {/* New customer profile dialog */}
       <Dialog open={isNewClientOpen} onOpenChange={setIsNewClientOpen}>
         <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
           <DialogHeader>
@@ -410,7 +404,6 @@ export default function ClientsPage() {
               </div>
             </div>
 
-            {/* Politically exposed person indicator */}
             <div className="space-y-2 rounded-lg border bg-muted/40 p-3">
               <label className="flex cursor-pointer items-center gap-2">
                 <input

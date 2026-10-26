@@ -8,7 +8,7 @@ const generatedPaths = [
   "apps/ui/out",
   "apps/ui/build",
   "packages/ui/test-results",
-  "packages/ui/playwright-report",
+  "apps/ui/storybook-static",
   ".turbo",
   "build",
 ]

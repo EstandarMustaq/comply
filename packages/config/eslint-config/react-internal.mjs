@@ -4,11 +4,6 @@ import globals from "globals"
 
 import { config as baseConfig } from "./base.mjs"
 
-/**
- * ESLint rules for React packages that do not use Next.js.
- *
- * @type {import("eslint").Linter.Config[]}
- */
 export const config = [
   ...baseConfig,
   pluginReact.configs.flat.recommended,
@@ -30,7 +25,6 @@ export const config = [
     },
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
-      // The automatic JSX runtime does not require React in scope.
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
     },

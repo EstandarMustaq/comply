@@ -3,8 +3,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  applicationName: "Complyz",
-  title: "Complyz | Intelligent Financial Compliance",
+  applicationName: "Comply",
+  title: "Comply | Intelligent Financial Compliance",
   description:
     "Review customer risk, monitor transactions and keep every decision clear and traceable.",
 }

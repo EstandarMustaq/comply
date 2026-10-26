@@ -1,6 +1,6 @@
 # Engineering workflow
 
-This guide documents the repository's supported checks for contributors. Product UI and public documentation use Complyz's clear, direct, confident English voice. Engineering materials use concise technical English.
+This guide documents the repository's supported checks for contributors. Product UI and public documentation use Comply's clear, direct, confident English voice. Engineering materials use concise technical English.
 
 ## Toolchain and workspace
 
@@ -21,9 +21,9 @@ pnpm dev
 For focused runs:
 
 ```bash
-./gradlew :api:test --tests 'com.complyz.reporting.service.ReportExportServiceTest'
-pnpm --filter @complyz/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts
-pnpm --filter @complyz/ui exec playwright test --config ../../apps/ui/playwright.config.ts --project desktop tests/e2e/shell.spec.ts
+./gradlew :api:test --tests 'com.comply.reporting.service.ReportExportServiceTest'
+pnpm --filter @comply/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts
+pnpm --filter @comply/ui exec playwright test --config ../../apps/ui/playwright.config.ts --project desktop tests/e2e/shell.spec.ts
 ```
 
 ## Git hooks
@@ -89,8 +89,8 @@ The publishing workflows request `packages: write`. The target GHCR package must
 also grant this repository access:
 
 1. Open the affected package's settings. For the UI image, use
-   [complyz-ui package settings](https://github.com/users/EstandarMustaq/packages/container/complyz-ui/settings).
-2. Under **Manage Actions access**, grant `EstandarMustaq/complyz` **Write** access.
+   [comply-ui package settings](https://github.com/users/EstandarMustaq/packages/container/comply-ui/settings).
+2. Under **Manage Actions access**, grant `EstandarMustaq/comply` **Write** access.
    A package administrator must make this change.
 3. Rerun the failed publishing job after access is granted. It publishes the
    revision selected by the workflow.

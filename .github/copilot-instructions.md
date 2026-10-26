@@ -4,11 +4,11 @@ Read the repository-wide [`AGENTS.md`](../AGENTS.md) for canonical engineering r
 
 ## Repository model
 
-Complyz is a pnpm monorepo. pnpm workspaces and Turborepo coordinate the Next.js web application in `apps/ui` and shared packages under `packages/`. The Spring Boot API is a Gradle subproject, included as `:api` from `apps/api`; the root `scripts/workspace.mjs` orchestrates Gradle, Turbo, and Docker Compose commands. Local PostgreSQL and Redis services and application containers are defined in the root `docker-compose.yml`.
+Comply is a pnpm monorepo. pnpm workspaces and Turborepo coordinate the Next.js web application in `apps/ui` and shared packages under `packages/`. The Spring Boot API is a Gradle subproject, included as `:api` from `apps/api`; the root `scripts/workspace.mjs` orchestrates Gradle, Turbo, and Docker Compose commands. Local PostgreSQL and Redis services and application containers are defined in the root `docker-compose.yml`.
 
 The web app calls the API through `apps/ui/lib/api-client.ts`; UI domain types are in `apps/ui/lib/types.ts`. API client types and route contracts are kept in `packages/api-clients`, generated from Springdoc by `pnpm api:openapi`. Unit and contract tests for the web client live in `packages/ui/tests`, with their runners configured from `apps/ui`.
 
-The API uses module boundaries under `com.complyz`: controllers handle HTTP, services hold business operations, repositories query persistence, and entities map the database. PostgreSQL schema changes are managed by Flyway in `apps/api/src/main/resources/db/migration`.
+The API uses module boundaries under `com.comply`: controllers handle HTTP, services hold business operations, repositories query persistence, and entities map the database. PostgreSQL schema changes are managed by Flyway in `apps/api/src/main/resources/db/migration`.
 
 ## Build, test, and lint
 
@@ -23,7 +23,7 @@ pnpm build                     # API bootJar and Turbo workspace build
 pnpm test                      # API tests and all configured UI test suites
 pnpm test:unit
 pnpm test:contract             # Requires an API with OpenAPI available
-pnpm test:e2e                  # Playwright; install Chromium if needed
+pnpm test:e2e                  # Storybook component validation
 pnpm lint
 pnpm compose:config
 pnpm hooks:install
@@ -36,17 +36,15 @@ Run one test without running its entire suite:
 
 ```bash
 # One API test class; use a fully qualified JUnit class name.
-./gradlew :api:test --tests 'com.complyz.reporting.service.ReportExportServiceTest'
+./gradlew :api:test --tests 'com.comply.reporting.service.ReportExportServiceTest'
 
 # One Vitest unit test; paths are relative to packages/ui.
-pnpm --filter @complyz/ui exec vitest run \
+pnpm --filter @comply/ui exec vitest run \
   --config ../../apps/ui/vitest.config.mts \
   --project unit tests/unit/api-client.test.ts
 
-# One Playwright file and browser project.
-pnpm --filter @complyz/ui exec playwright test \
-  --config ../../apps/ui/playwright.config.ts \
-  --project desktop tests/e2e/shell.spec.ts
+# UI component library validation with Storybook.
+pnpm storybook:build
 ```
 
 ## Cross-layer conventions

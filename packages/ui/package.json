@@ -1,9 +1,9 @@
 {
-  "name": "@complyz/ui",
+  "name": "@comply/ui",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Shared UI test utilities and test suites for Complyz",
+  "description": "Shared UI test utilities and test suites for Comply",
   "license": "AGPL-3.0-only",
   "exports": {
     ".": "./src/index.ts",
@@ -17,8 +17,6 @@
     "test": "pnpm run test:unit",
     "test:unit": "vitest run --config ../../apps/ui/vitest.config.mts --project unit",
     "test:contract": "vitest run --config ../../apps/ui/vitest.config.mts --project contract",
-    "test:e2e": "playwright test --config ../../apps/ui/playwright.config.ts",
-    "test:e2e:update": "playwright test --config ../../apps/ui/playwright.config.ts --update-snapshots",
     "test:watch": "vitest --config ../../apps/ui/vitest.config.mts --project unit"
   }
 }

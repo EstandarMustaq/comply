@@ -1,1 +1,1 @@
-export { cn } from "@complyz/ui"
+export { cn } from "@comply/ui"

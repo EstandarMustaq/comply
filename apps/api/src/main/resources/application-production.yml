@@ -1,6 +1,3 @@
-# Complyz production profile (strict mode)
-# All sensitive secrets MUST be provided via environment variables.
-
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -14,8 +11,8 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:complyz_db}}
-    username: ${DB_USER:${POSTGRES_USER:complyz_app}}
+    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:${POSTGRES_DB:comply_db}}
+    username: ${DB_USER:${POSTGRES_USER:comply_app}}
     password: ${DB_PASSWORD:${POSTGRES_PASSWORD}}
     hikari:
       maximum-pool-size: 10
@@ -31,7 +28,7 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD}
 
-complyz:
+comply:
   security:
     jwt:
       secret: ${JWT_SECRET}
@@ -40,12 +37,12 @@ complyz:
     mfa:
       encryption-key: ${MFA_ENCRYPTION_KEY:${MFA_AES_KEY}}
     cors:
-      allowed-origins: ${CORS_ALLOWED_ORIGINS:https://trycomplyz.com}
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:https://trycomply.io}
 
 logging:
   level:
     root: WARN
-    com.complyz: INFO
+    com.comply: INFO
     org.springframework.security: WARN
 
 management:

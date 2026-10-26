@@ -104,7 +104,6 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       const batch = await api.uploadBatch(file)
       setCurrentBatch(batch)
 
-      // Pre-fill heuristic mapping
       if (batch.columnMapping) {
         setColumnMapping(batch.columnMapping)
       }
@@ -171,7 +170,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                 : "Choose or drop a spreadsheet here"}
             </h3>
             <p className="max-w-md text-xs text-muted-foreground">
-              Upload operational statements as CSV or XLSX. Complyz detects delimiters,
+              Upload operational statements as CSV or XLSX. Comply detects delimiters,
               encoding and header rows.
             </p>
           </div>
@@ -187,7 +186,6 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
         </CardContent>
       </Card>
 
-      {/* Error alert */}
       {error && (
         <div className="flex items-center gap-2 rounded-md border border-destructive/40 p-3 text-xs text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
@@ -195,7 +193,6 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
         </div>
       )}
 
-      {/* Success alert */}
       {successResult && (
         <div className="flex items-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
@@ -203,7 +200,6 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
         </div>
       )}
 
-      {/* Confirm the selected column mapping before import. */}
       <Dialog open={isMappingModalOpen} onOpenChange={setIsMappingModalOpen}>
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
@@ -213,13 +209,13 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
             </DialogTitle>
             <DialogDescription className="text-xs">
               File: <strong>{currentBatch?.fileName}</strong>. Match each statement header
-              to a Complyz field.
+              to a Comply field.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-3">
             <div className="grid grid-cols-2 gap-3 border-b pb-2 text-xs font-semibold uppercase text-muted-foreground">
-              <div>Complyz field</div>
+              <div>Comply field</div>
               <div>Detected column</div>
             </div>
 

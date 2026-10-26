@@ -6,13 +6,13 @@
 
 ## Outcome
 
-Move Complyz from a single-Organization `User` model to an enterprise, multi-tenant model with separate personal identity (`Account`) and operational tenant (`Organization`), which represents the client institution in the product. `CommercialClient` is a segregated commercial namespace reference used only for commercial control in the platform back office; it is not an Organization parent or grouping/management entity. Every compliance operation remains explicitly Organization-scoped. Commercial administration does not grant access to compliance records. Support must be evidenced by API authorization tests, migration rehearsal, browser flows and accurate customer/operator documentation before release.
+Move Comply from a single-Organization `User` model to an enterprise, multi-tenant model with separate personal identity (`Account`) and operational tenant (`Organization`), which represents the client institution in the product. `CommercialClient` is a segregated commercial namespace reference used only for commercial control in the platform back office; it is not an Organization parent or grouping/management entity. Every compliance operation remains explicitly Organization-scoped. Commercial administration does not grant access to compliance records. Support must be evidenced by API authorization tests, migration rehearsal, browser flows and accurate customer/operator documentation before release.
 
 ## Security alignment planning objective
 
-- **Objective:** develop a scoped plan for aligning Complyz security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria.
+- **Objective:** develop a scoped plan for aligning Comply security practices with ISO/IEC 27001:2022 and SOC 2 Type II criteria.
 - **Status:** planning only. No control assessment, gap analysis, implementation sequence, owner, timeline or certification evidence has been approved.
-- **Claim boundary:** this roadmap entry is not evidence that Complyz currently aligns with either framework. Complyz does not claim ISO certification or a SOC 2 Type II report.
+- **Claim boundary:** this roadmap entry is not evidence that Comply currently aligns with either framework. Comply does not claim ISO certification or a SOC 2 Type II report.
 - **Next decision:** approve the scope and work required to create an alignment plan before adding delivery milestones. No implementation roadmap exists yet.
 
 ## Reviewed baseline
@@ -33,7 +33,7 @@ This review is a planning baseline, not a security certification. Task 0002 is a
 
 ### Confirmed requirements
 
-- Complyz is enterprise-only in the target model; `Organization` is the client institution represented in the product and the tenant. `organization.commercial_client_id` is a commercial reference only, not a parent-child or Organization-grouping relationship.
+- Comply is enterprise-only in the target model; `Organization` is the client institution represented in the product and the tenant. `organization.commercial_client_id` is a commercial reference only, not a parent-child or Organization-grouping relationship.
 - `Account` is the technical name for the human identity; its target name in code and schema is closed. Existing `User` data must be preserved when migrated.
 - Organization memberships, rather than the Account itself, carry Organization role and status. Account profile/security, Organization compliance operations and CommercialClient administration are separate permission domains.
 - `CommercialClient` is a segregated back-office namespace record containing an identifier, name, contract reference and status, referenced by `organization.commercial_client_id`. It does not group, manage or parent Organizations, and no authorization decision reads it. KYC `Client` and OAuth client are distinct concepts. Avoid the unqualified word “client” in code, APIs and docs.
@@ -162,7 +162,7 @@ pnpm operations:test
 pnpm compose:config
 ```
 
-`pnpm test:contract` may skip its OpenAPI-backed assertion when `COMPLYZ_OPENAPI_URL` is unset; the release gate must run it against the candidate API and retain the result. Run the relevant Playwright E2E projects for context switching, role denial and customer flows when the browser/runtime is available. A green build is not evidence of tenant isolation.
+`pnpm test:contract` may skip its OpenAPI-backed assertion when `COMPLY_OPENAPI_URL` is unset; the release gate must run it against the candidate API and retain the result. Run the relevant Playwright E2E projects for context switching, role denial and customer flows when the browser/runtime is available. A green build is not evidence of tenant isolation.
 
 ## Definition of done
 

@@ -4,4 +4,6 @@ packages:
   - "packages/config/*"
 
 allowBuilds:
+  core-js-pure: false
+  esbuild: true
   unrs-resolver: true
