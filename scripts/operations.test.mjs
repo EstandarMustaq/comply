@@ -48,7 +48,6 @@ const productionEnvironment = {
   COMPLY_BOOTSTRAP_ENABLED: "false",
 }
 
-/** Exercise deployment and backup safety with isolated command fixtures. */
 async function main() {
   await mkdir(binaryDirectory)
   await executable(

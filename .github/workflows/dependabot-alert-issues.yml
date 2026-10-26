@@ -87,12 +87,6 @@ jobs:
               }
             }
 
-            /**
-             * Create the repository label only when lookup returns 404; leave existing labels unchanged.
-             * color is a six-digit hex value without #, used with description only on creation.
-             * Resolve without a value once found or created. Non-404 lookup errors and all
-             * creation errors propagate to the caller.
-             */
             async function ensureLabel(name, color, description) {
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
@@ -108,11 +102,6 @@ jobs:
               await ensureLabel("dependencies", "0366d6", "Dependency updates and vulnerabilities");
             }
 
-            /**
-             * Return trimmed text with carriage returns, newlines, pipes, and backticks replaced by spaces.
-             * Use fallback for nullish input or an empty normalized result; the latter fallback
-             * is returned unchanged. Other Markdown syntax is preserved.
-             */
             function plainText(value, fallback = "Not provided") {
               return String(value ?? fallback).replace(/[\r\n|`]/g, " ").trim() || fallback;
             }

@@ -2,19 +2,12 @@ import js from "@eslint/js"
 import eslintConfigPrettier from "eslint-config-prettier"
 import tseslint from "typescript-eslint"
 
-/**
- * Shared ESLint rules for every workspace package.
- * Keep Prettier last to disable conflicting formatting rules.
- *
- * @type {import("eslint").Linter.Config[]}
- */
 export const config = [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
     rules: {
-      // Treat unused variables as errors unless their names start with "_".
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -23,7 +16,6 @@ export const config = [
           caughtErrorsIgnorePattern: "^_",
         },
       ],
-      // Report explicit any usage without blocking compilation.
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/consistent-type-imports": [
         "warn",

@@ -61,7 +61,6 @@ export function parseArguments(args) {
   return options
 }
 
-/** Reject unsafe production settings and CORS origins that differ from browser serialization. */
 export function validateDeploymentEnvironment(env) {
   const missing = requiredVariables.filter((name) => !env[name]?.trim())
   if (missing.length) {

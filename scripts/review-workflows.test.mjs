@@ -5,7 +5,6 @@ import { join } from "node:path"
 import { execFileSync, spawnSync } from "node:child_process"
 import { test } from "node:test"
 
-// Execute the actual github-script block with synthetic API responses and no network.
 async function workflow(name) {
   const source = await readFile(
     new URL(`../.github/workflows/${name}.yml`, import.meta.url),

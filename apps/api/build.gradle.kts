@@ -23,7 +23,6 @@ extra["opencsvVersion"] = "5.12.0"
 extra["tomcatVersion"] = "11.0.25"
 extra["springdocVersion"] = "3.1.1"
 
-// Keep both Jackson families and Apache Commons Lang aligned with security fixes.
 extra["jackson-2-bom.version"] = "2.21.7"
 extra["jackson-bom.version"] = "3.1.7"
 extra["commons-lang3.version"] = "3.20.0"
