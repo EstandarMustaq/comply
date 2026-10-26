@@ -109,6 +109,12 @@ async function main() {
   )
   assert.match(retentionDate(1), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
 
+  validateDeploymentEnvironment({
+    ...productionEnvironment,
+    POSTGRES_VOLUME_NAME: "complyz_postgres_prod_data",
+    REDIS_VOLUME_NAME: "complyz_redis_prod_data",
+  })
+
   assert.throws(() => parseArguments(["--skip-security-check"]), /Unsupported/)
   assert.throws(() => parseArguments(["--down"]), /requires --confirm-production-down/)
   assert.deepEqual(parseArguments(["--down", "--confirm-production-down"]).down, true)

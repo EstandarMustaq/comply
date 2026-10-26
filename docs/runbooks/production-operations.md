@@ -17,7 +17,7 @@ in `.env`; use the deployment environment for production credentials.
 - Run `pnpm api:test` for API tests.
 - Run `pnpm check` and `pnpm test:unit` for web and shared-package checks.
 - Run `pnpm test:contract` when the API is available.
-- Run `pnpm test:e2e` with the Playwright browser installed.
+- Run `pnpm test:e2e` to validate the UI component library.
 - Run `pnpm compose:config` to validate application and production service
   settings.
 

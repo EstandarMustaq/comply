@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.comply"
-version = "1.0.0-SNAPSHOT"
+version = (findProperty("version") as? String)?.takeIf { it != "unspecified" } ?: "1.0.0-SNAPSHOT"
 description = "Comply Financial Compliance Intelligent engine"
 
 java {

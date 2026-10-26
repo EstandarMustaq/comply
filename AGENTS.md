@@ -30,7 +30,7 @@ pnpm hooks:test
 pnpm operations:test
 ```
 
-Run one API test class with `./gradlew :api:test --tests 'com.comply.reporting.service.ReportExportServiceTest'`. Run one UI unit test with `pnpm --filter @comply/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts`. Run one browser test with `pnpm --filter @comply/ui exec playwright test --config ../../apps/ui/playwright.config.ts --project desktop tests/e2e/shell.spec.ts`.
+Run one API test class with `./gradlew :api:test --tests 'com.comply.reporting.service.ReportExportServiceTest'`. Run one UI unit test with `pnpm --filter @comply/ui exec vitest run --config ../../apps/ui/vitest.config.mts --project unit tests/unit/api-client.test.ts`. Run UI component validation with `pnpm storybook:build`.
 
 ## Architecture and boundaries
 

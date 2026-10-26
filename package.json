@@ -15,6 +15,7 @@
     "test": "node scripts/workspace.mjs test",
     "test:unit": "turbo run test:unit",
     "test:contract": "turbo run test:contract",
+    "test:e2e": "pnpm storybook:build",
     "storybook": "pnpm --filter @comply/web storybook",
     "storybook:build": "pnpm --filter @comply/web storybook:build",
     "check": "turbo run check typecheck && prettier --check . && ./gradlew :api:spotlessCheck",

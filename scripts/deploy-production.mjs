@@ -72,11 +72,21 @@ export function validateDeploymentEnvironment(env) {
   if (env.COMPLY_ENVIRONMENT !== "production") {
     throw new Error("COMPLY_ENVIRONMENT must be 'production'.")
   }
-  if (env.POSTGRES_VOLUME_NAME !== "comply_postgres_prod_data") {
-    throw new Error("POSTGRES_VOLUME_NAME must preserve comply_postgres_prod_data.")
+  if (
+    env.POSTGRES_VOLUME_NAME !== "comply_postgres_prod_data" &&
+    env.POSTGRES_VOLUME_NAME !== "complyz_postgres_prod_data"
+  ) {
+    throw new Error(
+      "POSTGRES_VOLUME_NAME must preserve comply_postgres_prod_data (or legacy complyz_postgres_prod_data)."
+    )
   }
-  if (env.REDIS_VOLUME_NAME !== "comply_redis_prod_data") {
-    throw new Error("REDIS_VOLUME_NAME must preserve comply_redis_prod_data.")
+  if (
+    env.REDIS_VOLUME_NAME !== "comply_redis_prod_data" &&
+    env.REDIS_VOLUME_NAME !== "complyz_redis_prod_data"
+  ) {
+    throw new Error(
+      "REDIS_VOLUME_NAME must preserve comply_redis_prod_data (or legacy complyz_redis_prod_data)."
+    )
   }
   if (env.DOMAIN === "localhost" || env.DOMAIN.includes("://")) {
     throw new Error("DOMAIN must be a production hostname without a URL scheme.")

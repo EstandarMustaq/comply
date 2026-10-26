@@ -23,7 +23,7 @@ pnpm build                     # API bootJar and Turbo workspace build
 pnpm test                      # API tests and all configured UI test suites
 pnpm test:unit
 pnpm test:contract             # Requires an API with OpenAPI available
-pnpm test:e2e                  # Playwright; install Chromium if needed
+pnpm test:e2e                  # Storybook component validation
 pnpm lint
 pnpm compose:config
 pnpm hooks:install
@@ -43,10 +43,8 @@ pnpm --filter @comply/ui exec vitest run \
   --config ../../apps/ui/vitest.config.mts \
   --project unit tests/unit/api-client.test.ts
 
-# One Playwright file and browser project.
-pnpm --filter @comply/ui exec playwright test \
-  --config ../../apps/ui/playwright.config.ts \
-  --project desktop tests/e2e/shell.spec.ts
+# UI component library validation with Storybook.
+pnpm storybook:build
 ```
 
 ## Cross-layer conventions

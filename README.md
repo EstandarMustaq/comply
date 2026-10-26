@@ -14,7 +14,7 @@
   <a href="https://github.com/EstandarMustaq/comply/commits/main/"><img src="https://img.shields.io/github/last-commit/EstandarMustaq/comply?branch=main&label=last%20updated" alt="Last updated"></a>
   <img src="https://img.shields.io/badge/Node.js-26.5.0-339933?logo=node.js&logoColor=white" alt="Node.js 26.5.0">
   <img src="https://img.shields.io/badge/pnpm-12.8.1-F69220?logo=pnpm&logoColor=white" alt="pnpm 12.8.1">
-  <a href="https://trycomply.com"><img src="https://img.shields.io/badge/Explore%20Comply-trycomply.com-536760" alt="Explore Comply"></a>
+  <a href="https://trycomply.io"><img src="https://img.shields.io/badge/Explore%20Comply-trycomply.io-536760" alt="Explore Comply"></a>
 </p>
 
 </div>
