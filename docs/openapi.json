@@ -5,7 +5,7 @@
     "description": "API for Comply's financial compliance workspace.",
     "version": "1.0"
   },
-  "servers": [{ "url": "https://api.trycomply.com", "description": "Production" }],
+  "servers": [{ "url": "https://api.trycomply.io", "description": "Production" }],
   "security": [{ "bearerAuth": [] }],
   "paths": {
     "/api/v1/settings/threshold-rules/{id}": {
