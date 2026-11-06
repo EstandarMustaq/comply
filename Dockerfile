@@ -19,7 +19,7 @@ EXPOSE 8080
 ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=40.0 -XX:+ExitOnOutOfMemoryError"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 
-FROM node:26.12.1-alpine AS web-base
+FROM node:26.13.0-alpine AS web-base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN npm install --global pnpm@12.8.1
@@ -49,7 +49,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 RUN pnpm --filter @comply/web build
 
-FROM node:26.12.1-alpine AS web
+FROM node:26.13.0-alpine AS web
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
