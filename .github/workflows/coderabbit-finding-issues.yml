@@ -6,7 +6,6 @@ on:
   schedule:
     - cron: "23 * * * *"
   workflow_dispatch:
-
 permissions:
   contents: read
   issues: write
@@ -23,7 +22,7 @@ jobs:
       github.event_name != 'pull_request_review' ||
       (github.event.review.user.login == 'coderabbitai[bot]' &&
        github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 10
     steps:
       - name: "[PROCESS] Reconcile CodeRabbit review finding issues"

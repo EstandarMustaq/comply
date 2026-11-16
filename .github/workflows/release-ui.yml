@@ -17,7 +17,7 @@ concurrency:
 jobs:
   release:
     name: "[RELEASE:UI] Publish Comply UI Image"
-    runs-on: ubuntu-latest
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 30
     steps:
       - name: "[SETUP] Checkout repository"
