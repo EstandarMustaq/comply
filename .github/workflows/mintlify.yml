@@ -23,7 +23,6 @@ on:
       - ".prettierignore"
       - ".github/workflows/mintlify.yml"
   workflow_dispatch:
-
 permissions:
   contents: read
 
@@ -34,7 +33,7 @@ concurrency:
 jobs:
   validate:
     name: "[TEST:DOCS] Format, Links, and Build Validation"
-    runs-on: ubuntu-latest
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 15
     defaults:
       run:
