@@ -5,9 +5,9 @@ buildscript {
     }
     dependencies {
         constraints {
-            classpath("org.apache.commons:commons-lang3:3.21.0")
-            classpath("tools.jackson.core:jackson-core:3.2.4")
-            classpath("tools.jackson.core:jackson-databind:3.2.4")
+            classpath("org.apache.commons:commons-lang3:3.22.0")
+            classpath("tools.jackson.core:jackson-core:3.3.0")
+            classpath("tools.jackson.core:jackson-databind:3.3.0")
         }
     }
 }
@@ -15,7 +15,7 @@ buildscript {
 plugins {
     base
     eclipse
-    id("org.springframework.boot") version "4.1.2" apply false
+    id("org.springframework.boot") version "4.2.0" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("com.diffplug.spotless") version "8.11.0" apply false
 }
